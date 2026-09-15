@@ -1,33 +1,33 @@
 {
   "game": "mega645",
-  "draw_id": "01560",
+  "draw_id": "01562",
   "jackpots": {
-    "Jackpot": 54850911000
+    "Jackpot": 69161109500
   },
   "tiers": [
     {
       "label": "Jackpot",
       "winners": 0,
-      "value_vnd": 54850911000
+      "value_vnd": 69161109500
     },
     {
       "label": "Giải Nhất",
-      "winners": 52,
+      "winners": 39,
       "value_vnd": 10000000
     },
     {
       "label": "Giải Nhì",
-      "winners": 2130,
+      "winners": 2245,
       "value_vnd": 300000
     },
     {
       "label": "Giải Ba",
-      "winners": 35347,
+      "winners": 36854,
       "value_vnd": 30000
     }
   ],
-  "top_jackpot_vnd": 54850911000,
+  "top_jackpot_vnd": 69161109500,
   "rolled_over": true,
-  "fetched_at": "2026-09-11T07:52:22+00:00",
+  "fetched_at": "2026-09-15T08:54:00+00:00",
   "source": "live:vietlott.vn"
 }
