@@ -1406,3 +1406,4 @@
 {"game": "powerball", "draw_id": "01406", "date": "2026-09-12", "main": [14, 16, 23, 58, 69], "bonus": 3, "source": "mirror:jbaranski/jeffs-lottery-utils"}
 {"game": "powerball", "draw_id": "01407", "date": "2026-09-14", "main": [19, 20, 57, 61, 67], "bonus": 22, "source": "mirror:jbaranski/jeffs-lottery-utils"}
 {"game": "powerball", "draw_id": "01408", "date": "2026-09-16", "main": [2, 21, 24, 25, 64], "bonus": 7, "source": "mirror:jbaranski/jeffs-lottery-utils"}
+{"game": "powerball", "draw_id": "01409", "date": "2026-09-19", "main": [18, 30, 41, 45, 68], "bonus": 10, "source": "mirror:jbaranski/jeffs-lottery-utils"}
