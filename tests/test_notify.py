@@ -7,10 +7,10 @@ from datetime import date
 import pytest
 
 from conftest import make_draw, make_prophecy
-from trungso import kienthiet_oracle, kienthiet_scoreboard, notify, scoreboard
-from trungso.games import MEGA645, POWER655
-from trungso.models import utc_now
-from trungso.sources import kienthiet
+from tientrivutru import kienthiet_oracle, kienthiet_scoreboard, notify, scoreboard
+from tientrivutru.games import MEGA645, POWER655
+from tientrivutru.models import utc_now
+from tientrivutru.sources import kienthiet
 
 
 @pytest.fixture(autouse=True)
@@ -236,8 +236,8 @@ def test_prize_alert_names_the_game_the_gap_and_the_cause():
     """Written for the 2026-08-25 outage. An alert that says only "stale" sends its
     reader digging; this one has to carry the draw ids and the number that is being
     shown in the meantime."""
-    from trungso import prize_health
-    from trungso.games import MEGA645, POWER655
+    from tientrivutru import prize_health
+    from tientrivutru.games import MEGA645, POWER655
 
     message = notify.format_prize_alert(
         (
@@ -255,8 +255,8 @@ def test_prize_alert_names_the_game_the_gap_and_the_cause():
 
 
 def test_prize_alert_says_when_nothing_was_ever_read():
-    from trungso import prize_health
-    from trungso.games import MEGA645
+    from tientrivutru import prize_health
+    from tientrivutru.games import MEGA645
 
     message = notify.format_prize_alert(((MEGA645, prize_health.freshness(None, "01560")),))
 

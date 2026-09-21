@@ -9,8 +9,8 @@ from __future__ import annotations
 
 import pytest
 
-from trungso.games import MEGA645, POWER655
-from trungso.sources import vietlott_prizes as prizes
+from tientrivutru.games import MEGA645, POWER655
+from tientrivutru.sources import vietlott_prizes as prizes
 
 # Trimmed to the two regions the parser reads, byte-for-byte from the live pages.
 POWER655_PAGE = """
@@ -201,7 +201,7 @@ def test_tier_values_for_a_single_jackpot_game():
 
 def test_tier_values_feeds_straight_into_payout_vnd():
     """The whole point of the mapping: no caller should have to translate labels."""
-    from trungso import wheel
+    from tientrivutru import wheel
 
     result = prizes.parse_prizes(MEGA645, "01551", MEGA645_PAGE)
     counts = wheel.prize_counts(MEGA645, 6)

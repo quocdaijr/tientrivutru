@@ -1,4 +1,4 @@
-# design.md — trungso
+# design.md — Tiên Tri Vũ Trụ
 
 Locked design system. Written by Hallmark on 2026-08-19. Any later page in this project
 follows this file rather than rotating to a new look.
@@ -52,6 +52,15 @@ honesty in the same move.
 Nav: **N7 brutal slab** — thick sticky bar, wordmark left, four rubber stamps right, and one
 `.slab__to` text link between the wordmark and the stamps carrying the reader to the other
 page. It is body face, not a fifth stamp: five stamps would read as five skins.
+
+The wordmark became **Tiên Tri Vũ Trụ** on 2026-09-21 (was `trungso`), and that is a
+measured change, not a cosmetic one: 214px unwrapped at the bar's 23.2px body face, up
+from 119px. One row of the slab now needs `20 + 214 + 25 + 81 + 20 = 360px`, so **360px
+is the exact floor** for wordmark and `.slab__to` sharing a row. At 375px there is 40px
+of slack; below 360px the link wraps to its own row and the bar goes 130px → 174px. That
+wrap is left in: it stays on one left axis, collides with nothing, and adds no horizontal
+scroll — 320px is the only live width that sees it. A longer name would have to earn its
+own breakpoint by being measured, not by inheriting this one.
 Footer: **Ft2 credit columns** — three columns of the same `<h2> + <dl>` shape (thanks ·
 assets · this page) over one full-width base strip. Every column head carries a hairline,
 so three rules of equal length landing on one y is what makes the grid legible; below the

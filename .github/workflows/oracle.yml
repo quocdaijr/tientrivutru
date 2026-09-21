@@ -40,29 +40,29 @@ jobs:
       # someone else's mirror, not a reason to abandon the run - and `ingest` already
       # tries vietlott.vn as a fallback before reporting a gap as unresolved.
       - name: Ingest results
-        run: uv run trungso ingest --check-gaps || true
+        run: uv run tientrivutru ingest --check-gaps || true
 
       - name: Prophesy
-        run: uv run trungso oracle
+        run: uv run tientrivutru oracle
 
       - name: Score
-        run: uv run trungso score
+        run: uv run tientrivutru score
 
       - name: Build site bundle
-        run: uv run trungso site
+        run: uv run tientrivutru site
 
       - name: Step summary
         run: |
           {
             echo '```'
-            uv run trungso today
+            uv run tientrivutru today
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Commit data
         run: |
-          git config user.name  "trungso-oracle"
-          git config user.email "oracle@trungso.invalid"
+          git config user.name  "tientrivutru-oracle"
+          git config user.email "oracle@tientrivutru.invalid"
           git add data/ site/data.json
           if git diff --staged --quiet; then
             echo "Vu tru khong noi gi moi hom nay."
@@ -79,9 +79,9 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           if [ "${{ github.event.schedule }}" = "45 11 * * *" ]; then
-            uv run trungso notify --kind result || true
+            uv run tientrivutru notify --kind result || true
           else
-            uv run trungso notify --kind prophecy || true
+            uv run tientrivutru notify --kind prophecy || true
           fi
 
       - name: Upload Pages artifact

@@ -8,7 +8,7 @@ is wrong and the migration must not land.
 
 The offline test is the gate and runs against whatever is committed. The network test
 spot-checks live minhngoc against the legacy file and is opt-in via
-TRUNGSO_NETWORK_TESTS=1, because CI must not depend on someone else's uptime.
+TIENTRIVUTRU_NETWORK_TESTS=1, because CI must not depend on someone else's uptime.
 """
 
 from __future__ import annotations
@@ -21,13 +21,13 @@ from pathlib import Path
 
 import pytest
 
-from trungso.sources import kienthiet as kt
-from trungso.sources.xsmb import PRIZE_SLOTS, XsmbDraw
+from tientrivutru.sources import kienthiet as kt
+from tientrivutru.sources.xsmb import PRIZE_SLOTS, XsmbDraw
 
 REPO_DATA = Path(__file__).resolve().parents[1] / "data"
 LEGACY = REPO_DATA / "xsmb.jsonl"
 BOARDS = REPO_DATA / "boards" / "mb.jsonl"
-NETWORK = os.environ.get("TRUNGSO_NETWORK_TESTS") == "1"
+NETWORK = os.environ.get("TIENTRIVUTRU_NETWORK_TESTS") == "1"
 
 
 def _legacy_rows() -> dict[date, XsmbDraw]:
@@ -136,7 +136,7 @@ def test_derived_view_keeps_the_xsmb_record_shape():
 
 def test_read_xsmb_prefers_boards_over_the_legacy_file(tmp_path, monkeypatch):
     """With boards present the legacy file is ignored, so one past cannot shadow another."""
-    from trungso import store
+    from tientrivutru import store
 
     legacy = XsmbDraw(date=date(2005, 10, 1), special=1, prizes=tuple([1] * PRIZE_SLOTS))
     store.write_xsmb([legacy])
@@ -151,7 +151,7 @@ def test_read_xsmb_prefers_boards_over_the_legacy_file(tmp_path, monkeypatch):
     assert derived[0].prizes != legacy.prizes
 
 
-@pytest.mark.skipif(not NETWORK, reason="set TRUNGSO_NETWORK_TESTS=1 to hit minhngoc.net.vn")
+@pytest.mark.skipif(not NETWORK, reason="set TIENTRIVUTRU_NETWORK_TESTS=1 to hit minhngoc.net.vn")
 def test_live_minhngoc_agrees_with_the_legacy_file_on_random_dates():
     """Twelve dates drawn from 21 years. Any disagreement means the sources diverge."""
     legacy = _legacy_rows()

@@ -126,4 +126,4 @@ function poseForHits(hits) {
   return 'sad';
 }
 
-window.TrungsoThay = { POSES, POSE_ALT, svg, still, flip, poseForHits };
+window.TienTriVuTruThay = { POSES, POSE_ALT, svg, still, flip, poseForHits };

@@ -6,7 +6,7 @@ from datetime import date
 
 import pytest
 
-from trungso import astrology as a
+from tientrivutru import astrology as a
 
 
 @pytest.mark.parametrize(
@@ -136,7 +136,7 @@ def test_guardian_star_cycles_every_nine_years():
 
 
 def test_tam_hop_and_tu_hanh_xung_partition_the_animals():
-    from trungso.lunar import CHI
+    from tientrivutru.lunar import CHI
 
     assert sorted(x for g in a.TAM_HOP for x in g) == sorted(CHI)
     assert sorted(x for g in a.TU_HANH_XUNG for x in g) == sorted(CHI)

@@ -6,7 +6,7 @@ from datetime import date, timedelta
 
 import pytest
 
-from trungso.lunar import julian_day_from_date, to_lunar
+from tientrivutru.lunar import julian_day_from_date, to_lunar
 
 
 def test_tet_2026_is_lunar_new_year():
@@ -108,7 +108,7 @@ def test_every_year_has_a_findable_tet(year):
 
 def test_sun_longitude_sector_is_never_negative():
     """The direct cause of that bug: a negative sector index."""
-    from trungso.lunar import _sun_longitude, julian_day_from_date
+    from tientrivutru.lunar import _sun_longitude, julian_day_from_date
 
     for year in (1930, 1968, 1990, 1999, 2000, 2026):
         sector = _sun_longitude(julian_day_from_date(date(year, 6, 15)))

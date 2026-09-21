@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pytest
 
-from trungso import tax
+from tientrivutru import tax
 
 
 def test_a_prize_at_the_threshold_is_untaxed():

@@ -434,7 +434,7 @@ def week_url(region: str, on: date) -> str:
 
 def _get(url: str, *, timeout: int, session: requests.Session | None) -> str:
     getter = session.get if session is not None else requests.get
-    response = getter(url, timeout=timeout, headers={"User-Agent": "trungso/1.0"})
+    response = getter(url, timeout=timeout, headers={"User-Agent": "tientrivutru/1.0"})
     response.raise_for_status()
     return response.text
 

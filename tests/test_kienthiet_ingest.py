@@ -7,10 +7,10 @@ from datetime import date, timedelta
 import pytest
 import requests
 
-from trungso import kienthiet_ingest as ingest
-from trungso import store
-from trungso.sources import kienthiet as kt
-from trungso.sources.kienthiet import Board
+from tientrivutru import kienthiet_ingest as ingest
+from tientrivutru import store
+from tientrivutru.sources import kienthiet as kt
+from tientrivutru.sources.kienthiet import Board
 
 MN_TIERS = (
     ("db", ("510332",)),

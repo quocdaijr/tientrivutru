@@ -20,7 +20,7 @@ from pathlib import Path
 
 import pytest
 
-from trungso import astrology, site
+from tientrivutru import astrology, site
 
 NODE = shutil.which("node")
 PERSONAL_JS = Path(__file__).resolve().parents[1] / "site" / "personal.js"
@@ -58,7 +58,7 @@ def _harness(body: str) -> str:
     global.window = {{}};
     global.localStorage = {{ getItem: () => null, setItem: () => {{}}, removeItem: () => {{}} }};
     require({str(PERSONAL_JS)!r});
-    const P = window.TrungsoPersonal;
+    const P = window.TienTriVuTruPersonal;
     {body}
     """
 
@@ -277,7 +277,7 @@ def test_js_digit_root_matches_python():
             "console.log(JSON.stringify(out));"
         )
     )
-    from trungso.oracle import digit_root
+    from tientrivutru.oracle import digit_root
 
     assert {int(k): v for k, v in got.items()} == {n: digit_root(n) for n in range(1, 101)}
 

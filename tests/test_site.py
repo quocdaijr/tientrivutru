@@ -6,9 +6,9 @@ import json
 from datetime import date
 
 from conftest import make_draw, make_prophecy, random_draw
-from trungso import site, store
-from trungso.games import MEGA645, POWER655
-from trungso.sources import kienthiet, xsmb
+from tientrivutru import site, store
+from tientrivutru.games import MEGA645, POWER655
+from tientrivutru.sources import kienthiet, xsmb
 
 
 def _seed_history(count: int = 30) -> None:
@@ -196,7 +196,7 @@ def _jackpot_label(game: str) -> str:
 
 
 def _store_prizes(game: str, draw_id: str, top: int = 34_897_731_150, winners: int = 0):
-    from trungso.sources.vietlott_prizes import DrawPrizes, PrizeTier
+    from tientrivutru.sources.vietlott_prizes import DrawPrizes, PrizeTier
 
     store.write_prizes(
         DrawPrizes(
@@ -312,7 +312,7 @@ def test_the_loss_lives_in_the_probability_not_the_payout():
 
 
 def test_probability_column_matches_the_wheel_module():
-    from trungso import wheel
+    from tientrivutru import wheel
 
     store.write_draws("mega645", [make_draw(MEGA645, 1551)])
 
@@ -386,7 +386,7 @@ def test_jackpot_odds_are_not_recomputed_from_a_rounded_probability():
     The summary must read the row's own figure, which was computed before rounding."""
     from math import comb
 
-    from trungso import wheel
+    from tientrivutru import wheel
 
     store.write_draws("power655", [make_draw(POWER655, 1386)])
     game = next(g for g in site.build_bundle()["games"] if g["key"] == "power655")

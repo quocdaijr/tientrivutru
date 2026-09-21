@@ -12,7 +12,7 @@ from __future__ import annotations
 import pytest
 import requests
 
-from trungso.sources import markets
+from tientrivutru.sources import markets
 
 # The real payload, trimmed. `giaban`/`giamua` are thousands of dong per chỉ - webgia.com
 # publishes the same board as "Đơn vị: đồng / chỉ" with 14.760.000 / 15.060.000.

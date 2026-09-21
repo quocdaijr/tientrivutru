@@ -1,9 +1,9 @@
-# 🔮 trungso
+# 🔮 Tiên Tri Vũ Trụ
 
 *Thầy phán số cho con. Rồi toán học phán thầy.*
 
-[![Oracle](https://github.com/quocdaijr/trungso/actions/workflows/oracle.yml/badge.svg)](https://github.com/quocdaijr/trungso/actions/workflows/oracle.yml)
-[![CI](https://github.com/quocdaijr/trungso/actions/workflows/ci.yml/badge.svg)](https://github.com/quocdaijr/trungso/actions/workflows/ci.yml)
+[![Oracle](https://github.com/quocdaijr/tientrivutru/actions/workflows/oracle.yml/badge.svg)](https://github.com/quocdaijr/tientrivutru/actions/workflows/oracle.yml)
+[![CI](https://github.com/quocdaijr/tientrivutru/actions/workflows/ci.yml/badge.svg)](https://github.com/quocdaijr/tientrivutru/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 [![Ruff](https://img.shields.io/badge/lint-ruff-261230.svg)](https://docs.astral.sh/ruff/)
@@ -70,26 +70,26 @@ Không thể sửa hồi tố. Nhờ vậy Bảng Phong Thần mới có ý ngh�
 ```bash
 uv sync
 
-uv run trungso ingest --check-gaps      # tải kết quả; tự vá từ vietlott.vn khi mirror lag
-uv run trungso stats                    # Tầng Thật: chi-square + phán quyết (mọi nguồn)
-uv run trungso oracle                   # Tầng Tà Đạo: 12 số Vietlott + mỗi đài một vé
-uv run trungso score                    # dựng lại Bảng Phong Thần
-uv run trungso backtest --game mega645  # tiên tri lại toàn bộ lịch sử → ROI
-uv run trungso today                    # dashboard kỳ quay tới
-uv run trungso site                     # sinh site/data.json cho trang tĩnh
-uv run trungso notify --kind prophecy   # đẩy 12 số + vé lên Telegram
-uv run trungso pulse --plan             # giờ nào hôm nay sẽ có tin random
-uv run trungso pulse --force --dry-run  # xem thử một thẻ, không gửi gì
+uv run tientrivutru ingest --check-gaps      # tải kết quả; tự vá từ vietlott.vn khi mirror lag
+uv run tientrivutru stats                    # Tầng Thật: chi-square + phán quyết (mọi nguồn)
+uv run tientrivutru oracle                   # Tầng Tà Đạo: 12 số Vietlott + mỗi đài một vé
+uv run tientrivutru score                    # dựng lại Bảng Phong Thần
+uv run tientrivutru backtest --game mega645  # tiên tri lại toàn bộ lịch sử → ROI
+uv run tientrivutru today                    # dashboard kỳ quay tới
+uv run tientrivutru site                     # sinh site/data.json cho trang tĩnh
+uv run tientrivutru notify --kind prophecy   # đẩy 12 số + vé lên Telegram
+uv run tientrivutru pulse --plan             # giờ nào hôm nay sẽ có tin random
+uv run tientrivutru pulse --force --dry-run  # xem thử một thẻ, không gửi gì
 ```
 
 Xổ số kiến thiết đi chung mọi lệnh trên. `--region {mb,mn,mt}` thu hẹp về một miền, và
 **chỉ** miền đó — không kéo theo bốn game bóng:
 
 ```bash
-uv run trungso ingest --region mn --since 2026-08-01   # kéo hẹp một khoảng
-uv run trungso ingest --backfill                       # toàn bộ lịch sử 3 miền, resume được
-uv run trungso stats --region mt                       # chi-square riêng miền Trung
-uv run trungso backtest --region mn                    # phán lại 10.654 vé → ROI
+uv run tientrivutru ingest --region mn --since 2026-08-01   # kéo hẹp một khoảng
+uv run tientrivutru ingest --backfill                       # toàn bộ lịch sử 3 miền, resume được
+uv run tientrivutru stats --region mt                       # chi-square riêng miền Trung
+uv run tientrivutru backtest --region mn                    # phán lại 10.654 vé → ROI
 ```
 
 `--backfill` đi theo **trang tuần** của minhngoc: một request trả về cả tuần của một miền
@@ -99,13 +99,13 @@ uv run trungso backtest --region mn                    # phán lại 10.654 vé 
 Xem trang tĩnh:
 
 ```bash
-uv run trungso site && python3 -m http.server -d site 8000
+uv run tientrivutru site && python3 -m http.server -d site 8000
 ```
 
 Telegram cần `TELEGRAM_BOT_TOKEN` và `TELEGRAM_CHAT_ID` (GitHub Secrets khi chạy CI).
 Thiếu biến thì `notify` báo lỗi rõ ràng, còn pipeline dữ liệu **không bao giờ** bị ảnh hưởng.
 
-### Tin random trong ngày — `trungso pulse`
+### Tin random trong ngày — `tientrivutru pulse`
 
 Ngoài hai mốc cố định (10h: 12 số, 18h45: kết quả), `pulse` gửi **2–3 tin/ngày vào giờ bất
 kỳ trong 8h–22h VN**, mỗi tin một thẻ: nóng/lạnh, chi-square, số lâu chưa ra, lịch + jackpot +
@@ -138,7 +138,7 @@ mỗi dải bốc uniform một giờ. Cách này giữ phân bố giờ **phẳ
 ≥ 3h" và **chính ràng buộc đó** làm 8h với 22h xuất hiện 1,55× nhiều hơn 20h — vì uniform trên
 *tập kế hoạch hợp lệ* không phải uniform trên *giờ*.
 
-Lá số cá nhân đọc từ `TRUNGSO_BIRTH_DATE` (kèm `TRUNGSO_GENDER`, `TRUNGSO_NAME` tuỳ chọn) và
+Lá số cá nhân đọc từ `TIENTRIVUTRU_BIRTH_DATE` (kèm `TIENTRIVUTRU_GENDER`, `TIENTRIVUTRU_NAME` tuỳ chọn) và
 chỉ ở dạng secret. Job `pulse` có `permissions: contents: read` — nó không commit gì cả, và
 thông báo lỗi chỉ gọi tên biến chứ không in giá trị, vì log Actions là công khai. Nguyên tắc
 [không thu thập PII](#cá-nhân-hoá--và-vì-sao-không-có-đăng-ký) vẫn nguyên: ngày sinh không nằm

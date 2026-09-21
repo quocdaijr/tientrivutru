@@ -16,16 +16,16 @@
  * Wrapped in an IIFE for the same reason dom.js is: classic scripts share one top-level
  * lexical scope, and this page loads five of them. `boot`, `digitRoot` and `seededRandom`
  * all collide with warning.js and personal.js otherwise - measured, not guessed. Only
- * window.TrungsoFinance escapes.
+ * window.TienTriVuTruFinance escapes.
  */
 (function () {
 'use strict';
 
-const T = window.TrungsoTheme;
-const THAY = window.TrungsoThay;
+const T = window.TienTriVuTruTheme;
+const THAY = window.TienTriVuTruThay;
 /* The site already has one seeded PRNG and it is the tested one. */
-const seededRandom = window.TrungsoPersonal.seededRandom;
-const { el, stage, tw, vnd } = window.TrungsoDom;
+const seededRandom = window.TienTriVuTruPersonal.seededRandom;
+const { el, stage, tw, vnd } = window.TienTriVuTruDom;
 
 /* ---------------- units ----------------
  *
@@ -631,8 +631,8 @@ function render(d) {
   app.appendChild(stagePhanTai(d));
   app.appendChild(stageSoGia(d));
   app.appendChild(stageSuThat(d));
-  window.TrungsoDom.observeReveals();
-  window.TrungsoDom.observeFlips();
+  window.TienTriVuTruDom.observeReveals();
+  window.TienTriVuTruDom.observeFlips();
 }
 
 async function boot() {
@@ -646,7 +646,7 @@ async function boot() {
   render({ gold, xau, indices, foreign, crypto });
 }
 
-window.TrungsoFinance = {
+window.TienTriVuTruFinance = {
   parseGold, parseXau, parseIndices, parseForeign, parseCrypto,
   impliedUsdVnd, canonical, marketRoot, digitRoot, silentCount, todayHcm, sessionLabel,
   DONG_PER_PNJ_UNIT, CHI_PER_LUONG, OZT_PER_LUONG,

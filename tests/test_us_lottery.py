@@ -6,9 +6,9 @@ from datetime import date
 
 import pytest
 
-from trungso.games import MEGAMILLIONS, POWERBALL, PROPHECY_GAMES
-from trungso.models import Draw
-from trungso.sources import us_lottery as us
+from tientrivutru.games import MEGAMILLIONS, POWERBALL, PROPHECY_GAMES
+from tientrivutru.models import Draw
+from tientrivutru.sources import us_lottery as us
 
 POWERBALL_CSV = """date,white_balls,red_ball,power_play
 10/07/2015,18|30|40|48|52,9,3X

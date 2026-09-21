@@ -46,9 +46,9 @@ MAX_PER_DAY = 3
 
 TOP_N = 5
 
-ENV_BIRTH_DATE = "TRUNGSO_BIRTH_DATE"
-ENV_GENDER = "TRUNGSO_GENDER"
-ENV_NAME = "TRUNGSO_NAME"
+ENV_BIRTH_DATE = "TIENTRIVUTRU_BIRTH_DATE"
+ENV_GENDER = "TIENTRIVUTRU_GENDER"
+ENV_NAME = "TIENTRIVUTRU_NAME"
 
 MARKET_DISCLAIMER = (
     "Giá tham khảo, đọc từ nguồn công khai đúng lúc gửi tin. Không phải tư vấn đầu tư."
@@ -64,7 +64,7 @@ PINNED_PLAN_2026_08_23 = (12, 20)
 
 
 class BirthDateError(ValueError):
-    """A malformed `TRUNGSO_BIRTH_DATE`. Carries no copy of the offending value."""
+    """A malformed `TIENTRIVUTRU_BIRTH_DATE`. Carries no copy of the offending value."""
 
 
 # ------------------------------------------------------------------------ the schedule
@@ -519,7 +519,7 @@ def card_fortune(fortune: Fortune | None, *, day: date) -> Card | None:
 
 
 def read_birth_date(*, today: date) -> date | None:
-    """`TRUNGSO_BIRTH_DATE` as a date, or None when the variable is not set.
+    """`TIENTRIVUTRU_BIRTH_DATE` as a date, or None when the variable is not set.
 
     Raises `BirthDateError` when a value is present but unusable - this is a system
     boundary and a silent None here would look identical to "not configured". The

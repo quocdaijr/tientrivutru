@@ -8,7 +8,7 @@
  *
  * Wrapped in an IIFE on purpose: classic scripts share one top-level lexical scope, so a
  * bare `const tw` here collides with render.js destructuring the same name back off
- * TrungsoDom. Only the namespace escapes.
+ * TienTriVuTruDom. Only the namespace escapes.
  */
 (function () {
 'use strict';
@@ -74,7 +74,7 @@ function observeFlips() {
   flips.forEach((f) => { f.classList.add('is-paused'); io.observe(f); });
 }
 
-window.TrungsoDom = {
+window.TienTriVuTruDom = {
   tw, vnd, billionsNum, billions, pct, pad, el, stage, observeReveals, observeFlips,
 };
 })();

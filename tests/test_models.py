@@ -7,7 +7,7 @@ from datetime import date
 import pytest
 
 from conftest import ALL_GAMES, make_draw, make_prophecy
-from trungso.games import (
+from tientrivutru.games import (
     MEGA645,
     POWER655,
     WHEEL_SIZE,
@@ -16,7 +16,7 @@ from trungso.games import (
     is_draw_day,
     next_draw_date,
 )
-from trungso.models import Draw, Prophecy, normalise_draw_id
+from tientrivutru.models import Draw, Prophecy, normalise_draw_id
 
 
 @pytest.mark.parametrize("spec", ALL_GAMES, ids=lambda s: s.key)
@@ -144,7 +144,7 @@ def test_prophecy_requires_a_seed():
             signals={},
             sermon={},
             oracle_version="1.0.0",
-            created_at=__import__("trungso.models", fromlist=["utc_now"]).utc_now(),
+            created_at=__import__("tientrivutru.models", fromlist=["utc_now"]).utc_now(),
         )
 
 

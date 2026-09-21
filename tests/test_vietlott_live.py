@@ -6,8 +6,8 @@ from datetime import date
 
 import pytest
 
-from trungso.games import MEGA645, POWER655, POWERBALL
-from trungso.sources import vietlott_live as live
+from tientrivutru.games import MEGA645, POWER655, POWERBALL
+from tientrivutru.sources import vietlott_live as live
 
 # Trimmed to the two regions the parser reads, byte-for-byte from the live pages.
 POWER655_PAGE = """

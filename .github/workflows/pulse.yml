@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   schedule:
     # Hourly across 08:00-22:00 VN (01:00-15:00 UTC). The cron is deliberately dumb:
-    # `trungso pulse` computes the day's two or three firing hours from a seed derived
+    # `tientrivutru pulse` computes the day's two or three firing hours from a seed derived
     # from the date, so every runner agrees on the plan with no state file to keep, and
     # the other twelve wake-ups exit 0 having sent nothing.
     - cron: '0 1-15 * * *'
@@ -47,9 +47,9 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           # Optional, and never committed anywhere. `pulse` reports a malformed value by
           # naming the variable and nothing else, because these logs are public.
-          TRUNGSO_BIRTH_DATE: ${{ secrets.TRUNGSO_BIRTH_DATE }}
-          TRUNGSO_GENDER: ${{ secrets.TRUNGSO_GENDER }}
-          TRUNGSO_NAME: ${{ secrets.TRUNGSO_NAME }}
+          TIENTRIVUTRU_BIRTH_DATE: ${{ secrets.TIENTRIVUTRU_BIRTH_DATE }}
+          TIENTRIVUTRU_GENDER: ${{ secrets.TIENTRIVUTRU_GENDER }}
+          TIENTRIVUTRU_NAME: ${{ secrets.TIENTRIVUTRU_NAME }}
         run: |
-          uv run trungso pulse \
+          uv run tientrivutru pulse \
             ${{ github.event_name == 'workflow_dispatch' && '--force' || '' }} || true

@@ -81,7 +81,7 @@ def _run(body: str) -> dict:
     require({str(SITE / "dom.js")!r});
     require({str(SITE / "personal.js")!r});
     require({str(SITE / "finance.js")!r});
-    const F = window.TrungsoFinance;
+    const F = window.TienTriVuTruFinance;
     const PNJ = {json.dumps(PNJ)};
     const XAU = {json.dumps(XAU)};
     const INDICES = {json.dumps(INDICES)};
@@ -360,7 +360,7 @@ def test_today_is_computed_in_vietnam_not_utc():
 # --- the page itself ---------------------------------------------------------------
 
 def test_the_finance_page_loads_the_scripts_it_needs_in_order():
-    """finance.js destructures window.TrungsoDom and reads TrungsoPersonal.seededRandom at
+    """finance.js destructures window.TienTriVuTruDom and reads TienTriVuTruPersonal.seededRandom at
     load, so both have to be on the page before it."""
     html = (SITE / "tai-chinh.html").read_text(encoding="utf-8")
     order = [s for s in ("dom.js", "thay.js", "theme.js", "personal.js", "finance.js")

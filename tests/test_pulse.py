@@ -14,15 +14,15 @@ from datetime import date, datetime, timedelta
 import pytest
 
 from conftest import make_draw, make_prophecy
-from trungso import kienthiet_oracle, kienthiet_scoreboard, notify, pulse, scoreboard, store
-from trungso.astrology import read_fortune
-from trungso.cli import VN_TZ, build_parser
-from trungso.games import MEGA645, MEGAMILLIONS, POWER655
-from trungso.models import Prophecy, utc_now
-from trungso.oracle import ORACLE_VERSION
-from trungso.sources import kienthiet, markets
-from trungso.sources.vibes import CosmicSignals
-from trungso.sources.xsmb import PRIZE_SLOTS, XsmbDraw
+from tientrivutru import kienthiet_oracle, kienthiet_scoreboard, notify, pulse, scoreboard, store
+from tientrivutru.astrology import read_fortune
+from tientrivutru.cli import VN_TZ, build_parser
+from tientrivutru.games import MEGA645, MEGAMILLIONS, POWER655
+from tientrivutru.models import Prophecy, utc_now
+from tientrivutru.oracle import ORACLE_VERSION
+from tientrivutru.sources import kienthiet, markets
+from tientrivutru.sources.vibes import CosmicSignals
+from tientrivutru.sources.xsmb import PRIZE_SLOTS, XsmbDraw
 
 A_DAY = date(2026, 8, 23)
 
@@ -146,7 +146,7 @@ def test_slots_do_not_depend_on_python_hash_seed():
                 sys.executable,
                 "-c",
                 "from datetime import date\n"
-                "from trungso.pulse import slots_for\n"
+                "from tientrivutru.pulse import slots_for\n"
                 "print(slots_for(date(2026, 8, 23)))",
             ],
             capture_output=True,

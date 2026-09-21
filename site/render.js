@@ -7,13 +7,13 @@
  */
 'use strict';
 
-const P = window.TrungsoPersonal;
-const T = window.TrungsoTheme;
-const THAY = window.TrungsoThay;
+const P = window.TienTriVuTruPersonal;
+const T = window.TienTriVuTruTheme;
+const THAY = window.TienTriVuTruThay;
 
 const {
   tw, vnd, billionsNum, billions, pct, pad, el, stage, observeReveals, observeFlips,
-} = window.TrungsoDom;
+} = window.TienTriVuTruDom;
 
 /**
  * What the fortune-teller says about a real hit count. The number drives the line, so
@@ -605,5 +605,5 @@ fetch('./data.json', { cache: 'no-store' })
   .catch((e) => {
     document.getElementById('app').innerHTML =
       `<div class="block"><p class="err">Không tải được <code>data.json</code> (${e.message}). `
-      + 'Chạy <code>uv run trungso site</code> rồi serve thư mục này.</p></div>';
+      + 'Chạy <code>uv run tientrivutru site</code> rồi serve thư mục này.</p></div>';
   });

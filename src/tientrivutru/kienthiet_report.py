@@ -26,7 +26,9 @@ def render_stats(console: Console, region: str, boards: Sequence[kt.Board]) -> b
     """Chi-square over the 00-99 tail space. Returns True when data is missing."""
     spec = kt.REGIONS[region]
     if not boards:
-        console.print(f"[red]chưa có data kiến thiết {spec.display} — chạy `trungso ingest`[/red]")
+        console.print(
+            f"[red]chưa có data kiến thiết {spec.display} — chạy `tientrivutru ingest`[/red]"
+        )
         return True
 
     result = kt.chi_square_uniform(boards)

@@ -12,8 +12,8 @@ import random
 import pytest
 
 from conftest import ALL_GAMES, make_draw, make_prophecy, random_draw, random_prophecy
-from trungso import scoreboard, wheel
-from trungso.games import MEGA645, POWER655
+from tientrivutru import scoreboard, wheel
+from tientrivutru.games import MEGA645, POWER655
 
 BACKTEST_DRAWS = 400
 BACKTEST_SEED = 20260819
