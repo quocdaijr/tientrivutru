@@ -7,9 +7,9 @@ from datetime import date, datetime, timedelta
 import pytest
 
 from conftest import make_draw
-from trungso import cli, store
-from trungso.games import MEGA645, POWER655
-from trungso.sources import kienthiet
+from tientrivutru import cli, store
+from tientrivutru.games import MEGA645, POWER655
+from tientrivutru.sources import kienthiet
 
 VN = cli.VN_TZ
 
@@ -61,7 +61,7 @@ def test_next_target_on_a_non_draw_day():
 
 
 def test_next_target_requires_history():
-    with pytest.raises(RuntimeError, match="run `trungso ingest`"):
+    with pytest.raises(RuntimeError, match="run `tientrivutru ingest`"):
         cli.next_target(MEGA645, [])
 
 
@@ -255,7 +255,7 @@ def test_region_narrows_stats_to_one_mien(capsys):
 
 def test_ingest_with_a_region_leaves_the_vietlott_games_alone(monkeypatch, capsys):
     """--region means kiến thiết only; nothing should reach for a Vietlott mirror."""
-    from trungso import kienthiet_ingest
+    from tientrivutru import kienthiet_ingest
 
     def explode(*_a, **_k):  # pragma: no cover - the point is that it never runs
         raise AssertionError("a Vietlott mirror was fetched for a --region run")
@@ -302,7 +302,7 @@ def test_mien_bac_is_never_phan(capsys):
 def test_prize_failure_does_not_break_ingest(monkeypatch, capsys):
     """The jackpot is commentary on a draw, not part of it. A vietlott.vn layout change
     must cost us the figure, not the whole ingest run."""
-    from trungso.sources import vietlott_prizes
+    from tientrivutru.sources import vietlott_prizes
 
     def explode(*_args, **_kwargs):
         raise vietlott_prizes.PrizeParseError("power655: no gt_jackpot block")
@@ -316,7 +316,7 @@ def test_prize_failure_does_not_break_ingest(monkeypatch, capsys):
 
 
 def test_prize_refresh_stores_and_reports(monkeypatch, capsys):
-    from trungso.sources.vietlott_prizes import DrawPrizes, PrizeTier
+    from tientrivutru.sources.vietlott_prizes import DrawPrizes, PrizeTier
 
     fake = DrawPrizes(
         game="power655",
@@ -339,7 +339,7 @@ def test_prize_refresh_stores_and_reports(monkeypatch, capsys):
 
 
 def _explode_prizes(monkeypatch):
-    from trungso.sources import vietlott_prizes
+    from tientrivutru.sources import vietlott_prizes
 
     def explode(*_args, **_kwargs):
         raise vietlott_prizes.PrizeParseError("power655: no gt_jackpot block")
@@ -348,7 +348,7 @@ def _explode_prizes(monkeypatch):
 
 
 def _store_stale_prize(game: str, draw_id: str):
-    from trungso.sources.vietlott_prizes import DrawPrizes, PrizeTier
+    from tientrivutru.sources.vietlott_prizes import DrawPrizes, PrizeTier
 
     store.write_prizes(
         DrawPrizes(
@@ -397,7 +397,7 @@ def test_never_fetched_prize_is_a_problem(monkeypatch, capsys):
 
 def test_ingest_exits_non_zero_when_the_jackpot_is_stuck(monkeypatch, capsys):
     """The exit code is the part CI can act on, so staleness has to reach it."""
-    from trungso.models import Draw
+    from tientrivutru.models import Draw
 
     _store_stale_prize("power655", "01388")
     _explode_prizes(monkeypatch)
@@ -425,8 +425,8 @@ def test_ingest_exits_non_zero_when_the_jackpot_is_stuck(monkeypatch, capsys):
 def test_notify_sends_one_alert_when_the_jackpot_is_stuck(monkeypatch, capsys):
     """The exit code reaches CI; this reaches a phone. Both were missing during the
     eighteen-day silence."""
-    from trungso import notify
-    from trungso.models import Draw
+    from tientrivutru import notify
+    from tientrivutru.models import Draw
 
     monkeypatch.setenv(notify.ENV_TOKEN, "tok")
     monkeypatch.setenv(notify.ENV_CHAT_ID, "42")
@@ -460,8 +460,8 @@ def test_notify_sends_one_alert_when_the_jackpot_is_stuck(monkeypatch, capsys):
 
 
 def test_notify_stays_quiet_when_the_jackpot_is_current(monkeypatch):
-    from trungso import notify
-    from trungso.models import Draw
+    from tientrivutru import notify
+    from tientrivutru.models import Draw
 
     monkeypatch.setenv(notify.ENV_TOKEN, "tok")
     monkeypatch.setenv(notify.ENV_CHAT_ID, "42")
@@ -491,10 +491,10 @@ def test_notify_stays_quiet_when_the_jackpot_is_current(monkeypatch):
 
 
 def test_today_names_a_stuck_jackpot(capsys):
-    """`trungso today` is what the Oracle workflow pipes into its step summary, so this
+    """`tientrivutru today` is what the Oracle workflow pipes into its step summary, so this
     is the line that makes an eighteen-day freeze visible in CI without having to drop
     the `|| true` that deliberately tolerates a lagging mirror."""
-    from trungso.models import Draw
+    from tientrivutru.models import Draw
 
     _store_stale_prize("power655", "01388")
     store.write_draws(
@@ -518,7 +518,7 @@ def test_today_names_a_stuck_jackpot(capsys):
 
 
 def test_today_says_nothing_when_the_jackpot_is_current(capsys):
-    from trungso.models import Draw
+    from tientrivutru.models import Draw
 
     _store_stale_prize("power655", "01396")
     store.write_draws(

@@ -1,9 +1,9 @@
-# 🔮 trungso
+# 🔮 Tiên Tri Vũ Trụ
 
 *The fortune-teller calls the numbers for you. Then mathematics calls the fortune-teller.*
 
-[![Oracle](https://github.com/quocdaijr/trungso/actions/workflows/oracle.yml/badge.svg)](https://github.com/quocdaijr/trungso/actions/workflows/oracle.yml)
-[![CI](https://github.com/quocdaijr/trungso/actions/workflows/ci.yml/badge.svg)](https://github.com/quocdaijr/trungso/actions/workflows/ci.yml)
+[![Oracle](https://github.com/quocdaijr/tientrivutru/actions/workflows/oracle.yml/badge.svg)](https://github.com/quocdaijr/tientrivutru/actions/workflows/oracle.yml)
+[![CI](https://github.com/quocdaijr/tientrivutru/actions/workflows/ci.yml/badge.svg)](https://github.com/quocdaijr/tientrivutru/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 [![Ruff](https://img.shields.io/badge/lint-ruff-261230.svg)](https://docs.astral.sh/ruff/)
@@ -93,26 +93,26 @@ deified names", used here for a scoreboard of failure) mean anything.
 ```bash
 uv sync
 
-uv run trungso ingest --check-gaps      # fetch results; patches from vietlott.vn when the mirror lags
-uv run trungso stats                    # The Honest Layer: chi-square + verdict, every source
-uv run trungso oracle                   # The Cursed Layer: twelve numbers, plus one vé per đài
-uv run trungso score                    # rebuild the Hall of Shame
-uv run trungso backtest --game mega645  # replay the oracle over all of history → ROI
-uv run trungso today                    # dashboard for the next draw
-uv run trungso site                     # emit site/data.json for the static page
-uv run trungso notify --kind prophecy   # push the twelve numbers and the vé to Telegram
-uv run trungso pulse --plan             # which hours today get a random pulse
-uv run trungso pulse --force --dry-run  # preview one card without sending it
+uv run tientrivutru ingest --check-gaps      # fetch results; patches from vietlott.vn when the mirror lags
+uv run tientrivutru stats                    # The Honest Layer: chi-square + verdict, every source
+uv run tientrivutru oracle                   # The Cursed Layer: twelve numbers, plus one vé per đài
+uv run tientrivutru score                    # rebuild the Hall of Shame
+uv run tientrivutru backtest --game mega645  # replay the oracle over all of history → ROI
+uv run tientrivutru today                    # dashboard for the next draw
+uv run tientrivutru site                     # emit site/data.json for the static page
+uv run tientrivutru notify --kind prophecy   # push the twelve numbers and the vé to Telegram
+uv run tientrivutru pulse --plan             # which hours today get a random pulse
+uv run tientrivutru pulse --force --dry-run  # preview one card without sending it
 ```
 
 Xổ số kiến thiết rides along with every command above. `--region {mb,mn,mt}` narrows to one
 region, and **only** that region — it does not drag the four ball games along with it:
 
 ```bash
-uv run trungso ingest --region mn --since 2026-08-01   # a narrow window
-uv run trungso ingest --backfill                       # all three regions, resumable
-uv run trungso stats --region mt                       # chi-square for the centre alone
-uv run trungso backtest --region mn                    # replay 10,654 vé → ROI
+uv run tientrivutru ingest --region mn --since 2026-08-01   # a narrow window
+uv run tientrivutru ingest --backfill                       # all three regions, resumable
+uv run tientrivutru stats --region mt                       # chi-square for the centre alone
+uv run tientrivutru backtest --region mn                    # replay 10,654 vé → ROI
 ```
 
 `--backfill` walks minhngoc's **weekly** pages: one request returns a whole week of a region
@@ -122,13 +122,13 @@ A week already covered is skipped without a request, so an interrupted run just 
 View the static site:
 
 ```bash
-uv run trungso site && python3 -m http.server -d site 8000
+uv run tientrivutru site && python3 -m http.server -d site 8000
 ```
 
 Telegram needs `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` (GitHub Secrets in CI). Without them
 `notify` fails loudly, while the data pipeline is **never** affected.
 
-### Random pulses through the day — `trungso pulse`
+### Random pulses through the day — `tientrivutru pulse`
 
 Beyond the two fixed slots (10:00 for the numbers, 18:45 for the result), `pulse` sends
 **two or three messages a day at arbitrary hours between 08:00 and 22:00 VN**, one card each:
@@ -165,8 +165,8 @@ days. An earlier version enforced "at least 3h apart", and **that constraint was
 08:00 and 22:00 came up 1.55× as often as 20:00: sampling uniformly over valid *schedules* is
 not sampling uniformly over *hours*.
 
-The personal layer reads `TRUNGSO_BIRTH_DATE` (with optional `TRUNGSO_GENDER` and
-`TRUNGSO_NAME`) and lives only as a secret. The `pulse` job runs with
+The personal layer reads `TIENTRIVUTRU_BIRTH_DATE` (with optional `TIENTRIVUTRU_GENDER` and
+`TIENTRIVUTRU_NAME`) and lives only as a secret. The `pulse` job runs with
 `permissions: contents: read` — it commits nothing — and a malformed value is reported by
 naming the variable and nothing else, because these logs are public. The
 [no-PII rule](#personalisation--and-why-there-is-no-sign-up) holds: the birth date is nowhere

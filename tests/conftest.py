@@ -8,11 +8,11 @@ from datetime import date, timedelta
 
 import pytest
 
-from trungso.games import MEGA645, POWER655, GameSpec
-from trungso.models import Draw, Prophecy, utc_now
-from trungso.oracle import ORACLE_VERSION
-from trungso.sources.vibes import CosmicSignals
-from trungso.store import ENV_DATA_DIR
+from tientrivutru.games import MEGA645, POWER655, GameSpec
+from tientrivutru.models import Draw, Prophecy, utc_now
+from tientrivutru.oracle import ORACLE_VERSION
+from tientrivutru.sources.vibes import CosmicSignals
+from tientrivutru.store import ENV_DATA_DIR
 
 FIRST_DRAW_DATE = date(2020, 1, 1)
 

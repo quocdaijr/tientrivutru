@@ -15,8 +15,8 @@ from datetime import date
 
 import pytest
 
-from trungso import kienthiet_prizes as kp
-from trungso.sources.kienthiet import Board
+from tientrivutru import kienthiet_prizes as kp
+from tientrivutru.sources.kienthiet import Board
 
 SPECIAL = "510332"
 BOARD = Board(
@@ -166,7 +166,7 @@ def test_the_five_digit_special_era_is_refused_not_guessed():
 
 
 def test_mien_bac_has_no_ticket_prize_table():
-    from trungso.sources.kienthiet import REGIONS
+    from tientrivutru.sources.kienthiet import REGIONS
 
     assert not REGIONS["mb"].prophesiable
     north = Board(

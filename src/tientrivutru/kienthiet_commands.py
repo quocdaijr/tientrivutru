@@ -1,4 +1,4 @@
-"""The `trungso` subcommands for xổ số kiến thiết, lifted out of cli.py.
+"""The `tientrivutru` subcommands for xổ số kiến thiết, lifted out of cli.py.
 
 Adding a third lottery family pushed cli.py past the size where it still read as a
 dispatcher, so the kiến thiết half lives here. Each function takes the console it prints

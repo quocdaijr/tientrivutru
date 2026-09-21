@@ -7,8 +7,8 @@ from math import comb, isclose
 import pytest
 
 from conftest import ALL_GAMES
-from trungso import wheel
-from trungso.games import MEGA645, POWER655, WHEEL_SIZE
+from tientrivutru import wheel
+from tientrivutru.games import MEGA645, POWER655, WHEEL_SIZE
 
 TOTAL_COMBINATIONS = 924
 WHEEL_COST_VND = 9_240_000

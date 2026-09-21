@@ -21,7 +21,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from .sources.vietlott_prizes import DrawPrizes
     from .sources.xsmb import XsmbDraw
 
-ENV_DATA_DIR = "TRUNGSO_DATA_DIR"
+ENV_DATA_DIR = "TIENTRIVUTRU_DATA_DIR"
 
 
 class ProphecyConflict(RuntimeError):
@@ -29,7 +29,7 @@ class ProphecyConflict(RuntimeError):
 
 
 def data_dir() -> Path:
-    """Where data lives. Overridable via TRUNGSO_DATA_DIR so tests never touch the repo."""
+    """Where data lives. Overridable via TIENTRIVUTRU_DATA_DIR so tests never touch the repo."""
     override = os.environ.get(ENV_DATA_DIR)
     if override:
         return Path(override)

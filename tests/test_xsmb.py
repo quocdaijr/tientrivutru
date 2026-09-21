@@ -6,8 +6,8 @@ from datetime import date
 
 import pytest
 
-from trungso import store
-from trungso.sources import xsmb
+from tientrivutru import store
+from tientrivutru.sources import xsmb
 
 HEADER = (
     "date,special,prize1,prize2_1,prize2_2,prize3_1,prize3_2,prize3_3,prize3_4,prize3_5,"

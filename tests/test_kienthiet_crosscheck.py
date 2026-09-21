@@ -22,15 +22,15 @@ from datetime import date
 import pytest
 import requests
 
-from trungso.sources import kienthiet as kt
+from tientrivutru.sources import kienthiet as kt
 
 MIRROR_URL = (
     "https://raw.githubusercontent.com/t-k-minh/XSMienNam-Analysis/main/data/xsmn.csv"
 )
-NETWORK = os.environ.get("TRUNGSO_NETWORK_TESTS") == "1"
+NETWORK = os.environ.get("TIENTRIVUTRU_NETWORK_TESTS") == "1"
 
 pytestmark = pytest.mark.skipif(
-    not NETWORK, reason="set TRUNGSO_NETWORK_TESTS=1 to hit the network"
+    not NETWORK, reason="set TIENTRIVUTRU_NETWORK_TESTS=1 to hit the network"
 )
 
 # An Giang, Thursday 2026-08-20. Chosen because its giải tư is unremarkable, which is the

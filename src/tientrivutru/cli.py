@@ -202,7 +202,7 @@ def cmd_stats(args: argparse.Namespace) -> int:
     for spec in _games_for(args):
         draws = store.read_draws(spec.key)
         if not draws:
-            console.print(f"[red]chưa có data {spec.key} — chạy `trungso ingest`[/red]")
+            console.print(f"[red]chưa có data {spec.key} — chạy `tientrivutru ingest`[/red]")
             missing_data = True
             continue
 
@@ -240,7 +240,7 @@ def _render_xsmb_stats() -> bool:
     """
     draws = store.read_xsmb()
     if not draws:
-        console.print("[red]chưa có data XSMB — chạy `trungso ingest`[/red]")
+        console.print("[red]chưa có data XSMB — chạy `tientrivutru ingest`[/red]")
         return True
 
     result = xsmb.chi_square_uniform(draws)
@@ -389,7 +389,7 @@ def cmd_backtest(args: argparse.Namespace) -> int:
     for spec in _games_for(args, prophecy_only=True):
         draws = store.read_draws(spec.key)
         if not draws:
-            console.print(f"[red]chưa có data {spec.key} — chạy `trungso ingest`[/red]")
+            console.print(f"[red]chưa có data {spec.key} — chạy `tientrivutru ingest`[/red]")
             return 1
 
         start = max(1, len(draws) - args.limit) if args.limit else 0
@@ -445,7 +445,7 @@ def cmd_today(args: argparse.Namespace) -> int:
             picks = " ".join(f"{n:02d}" for n in pending[0].numbers)
             console.print(f"  đã tiên tri: [bold cyan]{picks}[/bold cyan]")
         else:
-            console.print("  [dim]chưa tiên tri — chạy `trungso oracle`[/dim]")
+            console.print("  [dim]chưa tiên tri — chạy `tientrivutru oracle`[/dim]")
 
         # The Oracle workflow pipes this command into its step summary, which is the one
         # place a frozen jackpot becomes visible in CI without dropping the `|| true`
@@ -620,7 +620,7 @@ def cmd_pulse(args: argparse.Namespace) -> int:
     # at different times previews different cards instead of the same one all day.
     card = pulse.card_for_slot(cards, day, index if index is not None else now.hour)
     if card is None:
-        console.print("[yellow]không dựng được thẻ nào — chạy `trungso ingest` trước[/yellow]")
+        console.print("[yellow]không dựng được thẻ nào — chạy `tientrivutru ingest` trước[/yellow]")
         console.print(DISCLAIMER)
         return 0
 
@@ -646,7 +646,7 @@ def cmd_pulse(args: argparse.Namespace) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="trungso", description="Máy tiên tri xổ số tự vả mặt. Không dự đoán được gì."
+        prog="tientrivutru", description="Máy tiên tri xổ số tự vả mặt. Không dự đoán được gì."
     )
     sub = parser.add_subparsers(dest="command", required=True)
 

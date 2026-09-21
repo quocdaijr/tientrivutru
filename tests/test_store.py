@@ -5,8 +5,8 @@ from __future__ import annotations
 import pytest
 
 from conftest import make_draw, make_prophecy
-from trungso import store
-from trungso.games import MEGA645, POWER655
+from tientrivutru import store
+from tientrivutru.games import MEGA645, POWER655
 
 
 def test_reading_missing_files_returns_empty():
@@ -163,7 +163,7 @@ def test_scoreboard_write_is_skipped_when_only_time_moved():
 
 
 def _prizes(top: int = 34_897_731_150, winners: int = 0, when: str = "2026-08-20T07:00:00+00:00"):
-    from trungso.sources.vietlott_prizes import DrawPrizes, PrizeTier
+    from tientrivutru.sources.vietlott_prizes import DrawPrizes, PrizeTier
 
     return DrawPrizes(
         game="power655",

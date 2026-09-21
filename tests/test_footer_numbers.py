@@ -21,8 +21,8 @@ READMES = (ROOT / "README.md", ROOT / "README.en.md")
 
 # The same set the footer's figure was measured over: shipped code, not its tests.
 COUNTED = (
-    sorted((ROOT / "src" / "trungso").glob("*.py"))
-    + sorted((ROOT / "src" / "trungso" / "sources").glob("*.py"))
+    sorted((ROOT / "src" / "tientrivutru").glob("*.py"))
+    + sorted((ROOT / "src" / "tientrivutru" / "sources").glob("*.py"))
     + sorted((ROOT / "site").glob("*.js"))
     + sorted((ROOT / "site").glob("*.html"))
     + sorted((ROOT / "site").glob("*.css"))

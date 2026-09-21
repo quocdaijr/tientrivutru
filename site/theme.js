@@ -8,7 +8,7 @@
 'use strict';
 
 const THEMES = ['veso', 'thantai', 'viahe', 'y2k'];
-const THEME_KEY = 'trungso.theme.v1';
+const THEME_KEY = 'tientrivutru.theme.v1';
 const DEFAULT_THEME = 'veso';
 
 const THEME_LABELS = {
@@ -75,7 +75,7 @@ function preloadDisplayFaces() {
   ).catch(() => undefined);
 }
 
-window.TrungsoTheme = {
+window.TienTriVuTruTheme = {
   THEMES,
   THEME_KEY,
   THEME_LABELS,

@@ -10,9 +10,9 @@ from datetime import date
 
 import pytest
 
-from trungso.games import MEGA645, POWER655
-from trungso.models import Draw
-from trungso.sources import vietlott_mirror as mirror
+from tientrivutru.games import MEGA645, POWER655
+from tientrivutru.models import Draw
+from tientrivutru.sources import vietlott_mirror as mirror
 
 # Real upstream rows. Note the 7th number in Power 6/55: it is NOT part of the sorted six.
 POWER655_ROW = {"date": "2017-08-01", "id": "00001", "result": [5, 10, 14, 23, 24, 38, 35]}

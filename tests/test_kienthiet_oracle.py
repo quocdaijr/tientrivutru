@@ -11,12 +11,12 @@ from datetime import date
 
 import pytest
 
-from trungso import kienthiet_oracle as ko
-from trungso import oracle, store
-from trungso.games import MEGA645, POWER655
-from trungso.sources.kienthiet import Board
-from trungso.sources.vibes import CosmicSignals
-from trungso.store import ProphecyConflict
+from tientrivutru import kienthiet_oracle as ko
+from tientrivutru import oracle, store
+from tientrivutru.games import MEGA645, POWER655
+from tientrivutru.sources.kienthiet import Board
+from tientrivutru.sources.vibes import CosmicSignals
+from tientrivutru.store import ProphecyConflict
 
 DAY = date(2026, 8, 27)
 BOARD_TIERS = (

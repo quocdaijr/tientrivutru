@@ -17,7 +17,7 @@ from datetime import date
 
 import pytest
 
-from trungso.sources import kienthiet as kt
+from tientrivutru.sources import kienthiet as kt
 
 # --- minhngoc /getkqxs/an-giang/20-08-2026.js, result table only ---------------------
 AN_GIANG_2026 = (

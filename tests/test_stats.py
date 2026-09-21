@@ -7,8 +7,8 @@ import random
 import pytest
 
 from conftest import make_draw, random_draw
-from trungso import stats
-from trungso.games import MEGA645
+from tientrivutru import stats
+from tientrivutru.games import MEGA645
 
 SAMPLE_DRAWS = 500
 SEED = 20260819

@@ -7,6 +7,8 @@ __pycache__/
 # Tooling caches
 .pytest_cache/
 .ruff_cache/
+# Stale browser-automation artifacts; UI checks run in BrowserOS neo, not Playwright.
+.playwright-mcp/
 
 # Atomic-write temp files from store.py
 *.jsonl.tmp

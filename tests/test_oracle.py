@@ -8,9 +8,9 @@ from datetime import date
 import pytest
 
 from conftest import ALL_GAMES, make_draw
-from trungso import oracle
-from trungso.games import MEGA645, POWER655, WHEEL_SIZE
-from trungso.sources.vibes import CosmicSignals
+from tientrivutru import oracle
+from tientrivutru.games import MEGA645, POWER655, WHEEL_SIZE
+from tientrivutru.sources.vibes import CosmicSignals
 
 DRAW_DATE = date(2026, 8, 19)
 DRAW_ID = "01550"

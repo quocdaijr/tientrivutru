@@ -17,7 +17,7 @@
 /* The lottery page keeps the original key so nobody who already agreed is asked twice. */
 const GATES = {
   xoso: {
-    ackKey: 'trungso.ack.v1',
+    ackKey: 'tientrivutru.ack.v1',
     eyebrow: '⚠ Đọc trước khi xem số',
     title: 'Trang này không dự đoán được xổ số.<br>Không phần mềm nào làm được.',
     lede: 'Đây là một thí nghiệm đốt token AI. Mọi con số ở đây là ngẫu nhiên, và trang tự '
@@ -30,7 +30,7 @@ const GATES = {
     ],
   },
   taichinh: {
-    ackKey: 'trungso.ack.taichinh.v1',
+    ackKey: 'tientrivutru.ack.taichinh.v1',
     eyebrow: '⚠ Đọc trước khi xem giá',
     title: 'Trang này không phải tư vấn đầu tư.<br>Và nó không biết giá ngày mai.',
     lede: 'Số liệu lấy thẳng từ API công khai của bên thứ ba — không tài liệu, không cam '
@@ -81,7 +81,7 @@ function buildGate() {
       <ul class="gate__list">${copy.points.map((t) => `<li>${t}</li>`).join('')}</ul>
       <div class="gate__actions">
         <button class="btn" type="button" id="gate-ok">TÔI HIỂU</button>
-        <a class="gate__more" href="https://github.com/quocdaijr/trungso/blob/main/DISCLAIMER.md"
+        <a class="gate__more" href="https://github.com/quocdaijr/tientrivutru/blob/main/DISCLAIMER.md"
            target="_blank" rel="noopener">Đọc bản đầy đủ →</a>
       </div>
     </div>`;
@@ -147,7 +147,7 @@ function trackTopbarHeight() {
   else window.addEventListener('resize', publish);
 }
 
-window.TrungsoWarning = {
+window.TienTriVuTruWarning = {
   GATES, gateCopy, hasAcknowledged, initWarningGate, openGate, closeGate,
   trackTopbarHeight,
 };

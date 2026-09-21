@@ -20,9 +20,9 @@ from pathlib import Path
 
 import pytest
 
-from trungso import kienthiet_ingest as ingest
-from trungso.lunar import to_lunar
-from trungso.sources import kienthiet as kt
+from tientrivutru import kienthiet_ingest as ingest
+from tientrivutru.lunar import to_lunar
+from tientrivutru.sources import kienthiet as kt
 
 REPO_DATA = Path(__file__).resolve().parents[1] / "data" / "boards"
 
@@ -64,7 +64,7 @@ def test_every_region_has_a_committed_archive(region):
 @pytest.mark.parametrize("region", ("mb", "mn", "mt"))
 def test_every_gap_in_the_archive_has_a_reason(region, monkeypatch):
     """The test this file exists for: a silently lost week must not pass as a holiday."""
-    monkeypatch.setenv("TRUNGSO_DATA_DIR", str(REPO_DATA.parent))
+    monkeypatch.setenv("TIENTRIVUTRU_DATA_DIR", str(REPO_DATA.parent))
 
     gaps = ingest.missing_days(
         region, start=kt.ARCHIVE_START[region], end=EXPECTED_END
@@ -76,8 +76,8 @@ def test_every_gap_in_the_archive_has_a_reason(region, monkeypatch):
 
 @pytest.mark.parametrize("region", ("mb", "mn", "mt"))
 def test_the_archive_reaches_the_expected_span(region, monkeypatch):
-    monkeypatch.setenv("TRUNGSO_DATA_DIR", str(REPO_DATA.parent))
-    from trungso import store
+    monkeypatch.setenv("TIENTRIVUTRU_DATA_DIR", str(REPO_DATA.parent))
+    from tientrivutru import store
 
     boards = store.read_boards(region)
     assert boards
@@ -94,8 +94,8 @@ def _slack(region: str):
 
 @pytest.mark.parametrize("region", ("mb", "mn", "mt"))
 def test_no_board_in_the_archive_is_the_all_zero_filler(region, monkeypatch):
-    monkeypatch.setenv("TRUNGSO_DATA_DIR", str(REPO_DATA.parent))
-    from trungso import store
+    monkeypatch.setenv("TIENTRIVUTRU_DATA_DIR", str(REPO_DATA.parent))
+    from tientrivutru import store
 
     for board in store.read_boards(region):
         assert set(board.tails) != {0}, f"{board.province} {board.date}"
@@ -103,8 +103,8 @@ def test_no_board_in_the_archive_is_the_all_zero_filler(region, monkeypatch):
 
 @pytest.mark.parametrize("region", ("mb", "mn", "mt"))
 def test_every_board_belongs_to_its_region_and_a_known_dai(region, monkeypatch):
-    monkeypatch.setenv("TRUNGSO_DATA_DIR", str(REPO_DATA.parent))
-    from trungso import store
+    monkeypatch.setenv("TIENTRIVUTRU_DATA_DIR", str(REPO_DATA.parent))
+    from tientrivutru import store
 
     for board in store.read_boards(region):
         assert board.region == region
@@ -122,8 +122,8 @@ SIX_DIGIT_FROM = {"mn": date(2017, 1, 1), "mt": date(2017, 4, 1)}
 
 @pytest.mark.parametrize("region", ("mn", "mt"))
 def test_the_special_is_six_digits_from_the_switchover_onwards(region, monkeypatch):
-    monkeypatch.setenv("TRUNGSO_DATA_DIR", str(REPO_DATA.parent))
-    from trungso import store
+    monkeypatch.setenv("TIENTRIVUTRU_DATA_DIR", str(REPO_DATA.parent))
+    from tientrivutru import store
 
     widths = {
         len(b.special) for b in store.read_boards(region) if b.date >= SIX_DIGIT_FROM[region]
@@ -133,8 +133,8 @@ def test_the_special_is_six_digits_from_the_switchover_onwards(region, monkeypat
 
 def test_mien_trung_still_carries_its_five_digit_era(monkeypatch):
     """Kept, not discarded: chi-square wants every draw, only the ticket scorer cannot."""
-    monkeypatch.setenv("TRUNGSO_DATA_DIR", str(REPO_DATA.parent))
-    from trungso import store
+    monkeypatch.setenv("TIENTRIVUTRU_DATA_DIR", str(REPO_DATA.parent))
+    from tientrivutru import store
 
     early = [b for b in store.read_boards("mt") if b.date < SIX_DIGIT_FROM["mt"]]
     assert early

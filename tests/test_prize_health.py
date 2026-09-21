@@ -12,7 +12,7 @@ more is a dead source and must be loud.
 
 from __future__ import annotations
 
-from trungso import prize_health
+from tientrivutru import prize_health
 
 
 def _stored(draw_id: str) -> dict:

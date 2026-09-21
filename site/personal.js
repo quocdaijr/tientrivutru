@@ -11,8 +11,8 @@
  */
 'use strict';
 
-const STORAGE_KEY = 'trungso.personal.v1';
-const PICKS_KEY = 'trungso.personal.picks.v1';
+const STORAGE_KEY = 'tientrivutru.personal.v1';
+const PICKS_KEY = 'tientrivutru.personal.picks.v1';
 const WHEEL_SIZE = 12;
 const MASTER_FALLBACK = 9;
 
@@ -276,7 +276,7 @@ const GENERIC = [
  */
 function personalProphecy(profile, fortune, game, drawId, drawDate) {
   const seedText = [
-    'trungso-personal-v1', game.key, drawId, drawDate,
+    'tientrivutru-personal-v1', game.key, drawId, drawDate,
     profile.birthDate, profile.name || '-', profile.gender || '-',
   ].join('|');
   const rng = seededRandom(seedText);
@@ -344,7 +344,7 @@ function scorePicks(picks, game, draws) {
   };
 }
 
-window.TrungsoPersonal = {
+window.TienTriVuTruPersonal = {
   readFortune, personalProphecy, loadProfile, saveProfile, clearAll,
   loadPicks, savePick, scorePicks, seededRandom, stripDiacritics,
   lifePathNumber, nameNumber, westernSign, lunarYearOf, digitRoot, personalWeights,

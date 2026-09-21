@@ -6,11 +6,11 @@ from datetime import date, timedelta
 
 import pytest
 
-from trungso import kienthiet_oracle as ko
-from trungso import kienthiet_prizes as kp
-from trungso import kienthiet_scoreboard as ks
-from trungso.models import utc_now
-from trungso.sources.kienthiet import Board
+from tientrivutru import kienthiet_oracle as ko
+from tientrivutru import kienthiet_prizes as kp
+from tientrivutru import kienthiet_scoreboard as ks
+from tientrivutru.models import utc_now
+from tientrivutru.sources.kienthiet import Board
 
 SPECIAL = "510332"
 TAIL = (

@@ -40,7 +40,7 @@ def next_target(
     prophesy a draw that already happened.
     """
     if not draws:
-        raise RuntimeError(f"no {spec.key} history stored - run `trungso ingest` first")
+        raise RuntimeError(f"no {spec.key} history stored - run `tientrivutru ingest` first")
 
     now = now or now_vn()
     target = next_draw_date(spec, now.date(), inclusive=True)
