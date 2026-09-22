@@ -394,6 +394,30 @@ def test_backoff_is_monotone_and_capped():
 
 # --- the page itself -----------------------------------------------------------------
 
+def test_only_one_socket_can_be_open_at_a_time():
+    """Two callers reach connect(): the retry timer, and resume() when the tab comes back.
+    If a retry is pending when the reader returns, both fire. Two live sockets push the same
+    closed candle into bars twice, which corrupts the moving average rather than merely
+    wasting a connection - so connect() cancels the pending retry and refuses to open a
+    second socket. Asserted at source level, the way test_heatmap_layout.py does, because
+    the guard lives inside an event handler with no seam to call."""
+    js = (SITE / "trader.js").read_text(encoding="utf-8")
+    body = js[js.index("function connect()"):js.index("function scheduleReconnect()")]
+    assert "clearTimeout(retryTimer)" in body
+    assert "if (socket) return;" in body
+    ladder = js[js.index("function scheduleReconnect()"):js.index("function closeSocket()")]
+    assert "retryTimer = setTimeout(connect" in ladder, "the retry must be cancellable"
+    shut = js[js.index("function closeSocket()"):js.index("let resuming")]
+    assert "clearTimeout(retryTimer)" in shut, "a deliberate close must cancel the ladder too"
+
+
+def test_a_closed_candle_is_only_appended_if_it_is_the_next_one():
+    """Binance resends the closing frame and a reconnect can replay one. An unguarded push
+    duplicates a bar - the chart tolerates that, sma() does not."""
+    js = (SITE / "trader.js").read_text(encoding="utf-8")
+    assert "tick.closed && tick.bar.t > bars[bars.length - 1].t" in js
+
+
 def test_the_trader_page_loads_the_scripts_it_needs_in_order():
     """trader.js reads the TienTriVuTru* namespaces at load, and builds the chart against
     window.LightweightCharts, so all of them have to be on the page before it."""

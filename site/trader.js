@@ -466,6 +466,7 @@ let maLine = null;
 let bars = [];
 let socket = null;
 let attempt = 0;
+let retryTimer = null;
 let hideTimer = null;
 let liveSince = null;
 const reducedMotion = typeof matchMedia === 'function'
@@ -578,6 +579,14 @@ function connect() {
     setLiveNote('Trình duyệt này không mở được WebSocket, nên biểu đồ đứng ở cây nến cuối.');
     return;
   }
+  /* Two callers can reach this: the retry timer, and resume() when the tab comes back. If a
+     retry is already pending when the reader returns to the tab, both would fire and the
+     page would hold two live sockets - and two sockets push the SAME closed candle into
+     bars twice, which corrupts the moving average rather than merely wasting a connection.
+     One socket at a time, and whoever connects deliberately cancels the pending retry. */
+  clearTimeout(retryTimer);
+  retryTimer = null;
+  if (socket) return;
   let sock;
   try {
     sock = new WebSocket(SOURCE.stream + '/' + SYMBOL.toLowerCase() + '@kline_' + INTERVAL);
@@ -604,7 +613,10 @@ function connect() {
        are identical either way; only the frequency of the animation changes. */
     if (reducedMotion && !tick.closed) return;
     if (candles) candles.update(toBar(tick.bar));
-    if (tick.closed) {
+    /* Only ever append the NEXT candle. Binance resends the closing frame, and a reconnect
+       can replay one, so an unguarded push duplicates a bar - which the chart tolerates but
+       the moving average does not. */
+    if (tick.closed && tick.bar.t > bars[bars.length - 1].t) {
       bars.push(tick.bar);
       while (bars.length > LIMIT) bars.shift();
       if (maLine) {
@@ -627,14 +639,21 @@ function scheduleReconnect() {
   if (document.hidden) return;      // the visibility handler owns the wake-up
   const delay = backoffDelay(attempt);
   attempt++;
+  /* Five quiet retries first - about 34 seconds, measured. Until then the tape already tells
+     the truth on its own: it carries the last candle's timestamp and drops the "đang chạy"
+     label the moment ticks stop. Shouting on the first dropped frame would cry wolf at every
+     tunnel and lift. */
   if (attempt > QUIET_RETRIES) {
     setLiveNote('Thầy mất sóng trực tiếp — biểu đồ là ' + bars.length + ' cây nến gần nhất, '
       + 'không cập nhật thêm. Trang vẫn thử nối lại.');
   }
-  setTimeout(connect, delay * (0.8 + Math.random() * 0.4));
+  clearTimeout(retryTimer);
+  retryTimer = setTimeout(connect, delay * (0.8 + Math.random() * 0.4));
 }
 
 function closeSocket() {
+  clearTimeout(retryTimer);
+  retryTimer = null;
   if (!socket) return;
   const sock = socket;
   socket = null;
