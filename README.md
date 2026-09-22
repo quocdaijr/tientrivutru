@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 [![Ruff](https://img.shields.io/badge/lint-ruff-261230.svg)](https://docs.astral.sh/ruff/)
-[![tests](https://img.shields.io/badge/tests-892%20passing-brightgreen.svg)](tests/)
+[![tests](https://img.shields.io/badge/tests-922%20passing-brightgreen.svg)](tests/)
 [![draws analysed](https://img.shields.io/badge/draws%20analysed-31%2C470-informational.svg)](#kết-quả-tầng-thật-trên-dữ-liệu-thật)
 [![chi-square](https://img.shields.io/badge/chi²%20p--value-0.10%20→%20random-informational.svg)](#kết-quả-tầng-thật-trên-dữ-liệu-thật)
 [![prediction accuracy](https://img.shields.io/badge/prediction%20accuracy-0%25-critical.svg)](DISCLAIMER.md)
@@ -193,6 +193,7 @@ chi, nạp âm mỗi năm 1929–2035) nhúng vào `site/data.json`. Có test đ
 | [`khiemdoan/vietnam-lottery-xsmb-analysis`](https://github.com/khiemdoan/vietnam-lottery-xsmb-analysis) (MIT) | **Nhân chứng đối chiếu** cho XSMB — không còn là nguồn ingest | 7526 kỳ, từ 2005 |
 | [`jbaranski/jeffs-lottery-utils`](https://github.com/jbaranski/jeffs-lottery-utils) (MIT) | Powerball & Mega Millions — chỉ để thống kê | 1395 + 918 kỳ |
 | CoinGecko / Open-Meteo | Tín hiệu vũ trụ (BTC, thời tiết) | — |
+| [Binance](https://www.binance.com/) | Nến BTC/USDT cho trang trader — REST + WebSocket, gọi tại trình duyệt, không commit | 1000 cây/lần tải |
 
 `data.ny.gov` (nguồn "chính thống" hay được nhắc tới) **không dùng được**: cả domain trả
 403 từ mạng này, kể cả trang HTML thường, có hay không có header browser.
@@ -292,6 +293,52 @@ Nói rằng nó không tồn tại thì đúng.
 > Trang này **không phải tư vấn đầu tư**. Quẻ ở chặng 00 là một phép cộng chữ số, giá trị
 > dự báo bằng **không** — đúng như oracle xổ số. Xem [DISCLAIMER.md](DISCLAIMER.md) mục 2.
 
+## Trang trader — `/trader.html`
+
+Trang thứ ba, cùng hai tầng, nhưng có một thứ hai trang kia không có: **chặng im lặng chấm
+điểm chặng ồn ào, trên đúng dữ liệu của chặng ồn ào, ngay trong lúc người đọc đang nhìn.**
+
+Biểu đồ nến BTC/USDT chạy thật — REST của Binance cho 1000 cây lịch sử, WebSocket cho cây
+đang chạy. Không khoá API, không proxy. Đây là chỗ duy nhất trên cả site có realtime thật,
+và lý do rất tầm thường: crypto chạy 24/7 còn Binance mở API miễn phí, trong khi realtime
+chứng khoán Việt đi qua SignalR bán theo hợp đồng vendor.
+
+Thầy dạy con đọc nến, dạy MA20 và RSI14, gọi tên năm mẫu hình. Rồi chặng `02 · SỰ THẬT` đo
+chính năm mẫu hình đó.
+
+**Cách đo đúng, sau khi cách hiển nhiên hoá ra sai.** Ý đầu tiên là đếm mẫu hình trên nến
+thật rồi so với nến ngẫu nhiên. Nó hỏng theo hai kiểu cùng lúc: doji và nến búa là tính chất
+của **một** cây nến đứng riêng, nên xáo thứ tự cho ra **đúng** con số cũ — rỗng theo định
+nghĩa; còn hai mẫu nhiều cây thì lệch thật, nhưng cái lệch đó nói rằng thị trường có những
+đoạn biến động dồn cục, không nói rằng mẫu hình báo trước được gì.
+
+Thứ trả lời đúng câu hỏi là **lợi suất cây nến kế tiếp**: sau mỗi lần một mẫu nổ, lấy lợi
+suất mở-đến-đóng của cây ngay sau, so với nền chung, p-value bằng hoán vị 2000 lần. Trên
+6000 cây nến 1 giờ, cả năm mẫu đều nằm trong nhiễu (p từ 0,21 đến 0,65), kể cả trước hiệu
+chỉnh Bonferroni. Và lợi thế **lớn nhất đo được** nhỏ hơn phí taker vào-ra của chính sàn đó
+**một bậc**.
+
+Một chi tiết được giữ lại vì nó là bài học tự thân: ở mẫu 1000 cây, "nhấn chìm" từng ra
+p = 0,038 — trông như một phát hiện. Kéo lên 6000 cây thì nó tan. Trang in cả ngưỡng
+Bonferroni lẫn số phép thử, và nói thẳng điều đó.
+
+Hai con số trang **không** tự đo được, nên đi mượn và ghi rõ của ai:
+
+| Con số | Nguồn |
+|---|---|
+| **74–89%** tài khoản bán lẻ CFD lỗ, lỗ bình quân 1.600–29.000 EUR | ESMA35-43-1135, phân tích của các NCA thành viên EU |
+| **97%** người trụ trên 300 phiên vẫn lỗ; chỉ **0,4%** kiếm hơn một giao dịch viên ngân hàng; **không** có bằng chứng học được gì | Chague, De-Losso & Giovannetti, *"Day trading for a living?"* ([SSRN 3423101](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3423101)) |
+
+Cả hai là thị trường khác, không phải Việt Nam, và trang để nguyên như vậy.
+
+Giống trang tài chính: **không một cây nến nào được commit**. Binance không kèm điều khoản
+cho phép phát hành lại, nên trình duyệt fetch và tab quên. Nguồn chết là ô trống — đã thử
+chặn từng đường một: mất CDN thì bảng số vẫn mang đủ dữ liệu, mất REST thì thầy **không
+phán** và hai trích dẫn vẫn còn nguyên.
+
+> Trang này **không phải tư vấn đầu tư, khuyến nghị mua bán, hay khoá học.** Giá là thật;
+> mẫu hình và lời phán là trò đùa, và chặng cuối đo chính chúng để chứng minh.
+
 ## Kết quả Tầng Thật trên dữ liệu thật
 
 Kiểm định chi-square, H₀ = "mọi số đồng xác suất":
@@ -369,6 +416,10 @@ trong chính kho dữ liệu, nên đài đổi ngày thì code tự theo.
 ## Tài nguyên hình ảnh
 
 Toàn bộ **tự host trong repo** — trang không gọi một request nào ra ngoài để lấy ảnh hay emoji.
+
+Ngoài font, cả site gọi ra ngoài đúng **một** script: thư viện vẽ nến trên `/trader.html`, tải
+từ CDN, ghim theo cả phiên bản lẫn hash SRI, và ghi công ở footer trang đó vì NOTICE của
+Apache-2.0 yêu cầu thế. Nếu nó không tải được thì bảng số của trang vẫn mang đủ dữ liệu.
 Chi tiết từng file, kèm ngày tải và cả danh sách nguồn *đã cân nhắc rồi loại*, ở
 [`site/img/CREDITS.md`](site/img/CREDITS.md).
 
@@ -377,6 +428,7 @@ Chi tiết từng file, kèm ngày tải và cả danh sách nguồn *đã cân 
 | Tranh khắc gỗ Đông Hồ *Đại Cát* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dong_Ho_painting_-_Dai_cat.jpg) | Public domain |
 | 13 emoji | [jdecked/twemoji](https://github.com/jdecked/twemoji) — © Twitter/X | đồ hoạ **CC-BY 4.0**, code MIT |
 | Hình thầy bói (7 dáng) | vẽ tay trong repo này, `site/thay.js` | MIT, cùng repo |
+| TradingView Lightweight Charts™ v5.2.1 | [tradingview/lightweight-charts](https://github.com/tradingview/lightweight-charts) — © TradingView, Inc. | **Apache-2.0, bắt buộc ghi công** |
 
 Repo này là MIT, tức là ai clone cũng được cấp lại quyền phát hành. Nên nó **không thể** chứa
 thứ nó không sở hữu: meme nhân vật có bản quyền, ảnh chụp phim, hay ảnh lấy từ mạng xã hội đều

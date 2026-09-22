@@ -1,4 +1,4 @@
-/* Page styles shared by index.html and tai-chinh.html.
+/* Page styles shared by index.html, tai-chinh.html and trader.html.
    Every colour and face below is a token. No raw values live in this file. */
 
 *,*::before,*::after{box-sizing:border-box}
@@ -108,6 +108,34 @@ html.is-gated,html.is-gated body{overflow:hidden}
 }
 .slab__themes{display:flex; gap:var(--space-2xs); flex-wrap:nowrap}
 
+/* The page nav is body face, never more stamps. design.md's rule: the stamps are the skin
+   picker and only the skin picker - three more bordered boxes here would read as seven
+   skins. Three cues hold the groups apart and none of them is position: body face vs
+   display face, no border vs a --rule-mid box on four sides, no rotation vs -4deg. */
+.slab__pages{display:flex; flex-wrap:wrap; gap:var(--space-2xs) var(--space-md)}
+.slab__to{
+  font-family:var(--font-body); font-weight:800; font-size:var(--text-sm);
+  color:var(--color-ink-dim); text-decoration:none;
+  /* Same technique as .slab__mark, same reason: a real navigation target owes the full
+     --tap, and flex gets there without padding widening the group's own left edge. It also
+     lands all three underlines on one y, which is what makes them read as one group
+     rather than three loose links - the footer's rule, reused. */
+  display:inline-flex; align-items:center; min-height:var(--tap);
+  border-bottom:var(--rule-hair) solid var(--color-rule);
+  white-space:nowrap; touch-action:manipulation;
+}
+.slab__to:hover,.slab__to:focus-visible{color:var(--color-accent)}
+/* Current page. The carrying cue is the rule going 1px -> 6px, a 6x step in the bar's own
+   vocabulary; ink dim -> full is the SECOND cue, not the first. Colour alone would fail
+   WCAG 1.4.1, and dim -> full is a luminance move, which 1.4.1 counts as colour too - so
+   the weight has to be the one doing the work. Width alone in the override, not the
+   shorthand: the shorthand would silently re-declare the colour and the style. */
+.slab__to[aria-current="page"]{
+  color:var(--color-ink);
+  border-bottom-width:var(--rule-slab);
+  cursor:default;
+}
+
 /* stamps: the theme picker is four rubber stamps, not a dropdown */
 .stamp{
   font-family:var(--font-display); font-size:var(--text-xs);
@@ -153,8 +181,14 @@ main.wrap{padding-bottom:var(--space-2xl)}
    the rhythm carries the joke the copy is making. */
 .stage{padding-top:var(--space-2xl);
   /* --topbar-h is measured at runtime by warning.js; the fallback is the tallest
-     the sticky wrapper gets, so a missed measurement over-clears rather than hides. */
-  scroll-margin-top:calc(var(--topbar-h, 204px) + var(--space-xs))}
+     the sticky wrapper gets, so a missed measurement over-clears rather than hides.
+     204px -> 290px on 2026-09-22, when the two-page cross-link became a three-item page
+     nav and the slab gained a row. Re-measured the same way the 204 was: across 14 widths
+     x 4 skins x 3 pages, the tallest is y2k at 280px, where the warning strip needs three
+     lines and the slab needs three rows. The runtime path self-corrects on every
+     ResizeObserver tick; this literal does not, so a stale value here lands a #stage
+     deep-link underneath the sticky bar. */
+  scroll-margin-top:calc(var(--topbar-h, 290px) + var(--space-xs))}
 /* Stage number ABOVE the title, same column. Never number-left / title-right. */
 .stage__mark{
   font-family:var(--font-num); font-size:var(--text-sm); font-weight:700;
@@ -569,9 +603,30 @@ form.khai input{appearance:none; -webkit-appearance:none}
 /* Provenance sits under the number it belongs to, so it reads as part of the figure. */
 .src{margin-top:var(--space-2xs)}
 .src a{color:inherit}
-/* Cross-link between the two pages. Sits beside the wordmark so the slab keeps its
-   shape: wordmark left, four stamps right. */
-.slab__to{font-family:var(--font-body); font-weight:800; font-size:var(--text-sm);
-  color:var(--color-ink-dim); text-decoration:none; padding:var(--space-2xs) 0;
-  border-bottom:var(--rule-hair) solid var(--color-rule); white-space:nowrap}
-.slab__to:hover,.slab__to:focus-visible{color:var(--color-accent)}
+
+/* ---------------- trader page ---------------- */
+/* The chart is the only canvas on this site, so it is also the only element whose contrast
+   cannot be measured from the DOM. Its height is fluid rather than fixed: a fixed pixel
+   height at 320px leaves a candle chart four candles tall, and 45vh at 1440px leaves it
+   taller than the reading column. The library's autoSize handles the width. */
+.chart{height:clamp(280px, 45vh, 460px); width:100%}
+/* The chart sits INSIDE a .block, so it inherits --color-paper-2 - which is the only
+   reason its axis text can reuse the .note-inside-a-.block contrast measurement instead
+   of claiming one nobody made. trader.js forces that token rather than letting the
+   library paint its default white. */
+.chart__foot{display:flex; flex-wrap:wrap; gap:var(--space-xs) var(--space-md);
+  margin-top:var(--space-xs); align-items:baseline}
+
+/* Vocabulary. A dl, not a row of cards: one left axis, hierarchy by colour and not by
+   indent - the footer's rule, reused, for the reason it was written there. */
+.gloss{margin:var(--space-sm) 0 0}
+.gloss dt{font-family:var(--font-body); font-weight:800; margin-top:var(--space-sm)}
+.gloss dd{margin:var(--space-2xs) 0 0; color:var(--color-ink-dim); font-size:var(--text-sm)}
+/* The threshold that defines a pattern, printed beside its name. --font-num because it is
+   a figure, and design.md's rule is that any figure uses it. */
+.gloss__rule{font-family:var(--font-num); font-weight:700; font-size:var(--text-xs);
+  color:var(--color-ink)}
+
+/* The verdict column of the honest table. Deliberately not a colour-only cue: the word
+   carries it, --font-num sets it apart, and it survives a monochrome print. */
+.cmp__flat{font-family:var(--font-num); font-weight:700; color:var(--color-ink-dim)}

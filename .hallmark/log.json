@@ -1,5 +1,18 @@
 [
   {
+    "date": "2026-09-22",
+    "verb": "nav rebuild",
+    "macrostructure": "Narrative Workflow (unchanged - design.md governs)",
+    "theme": "custom x4 (unchanged)",
+    "nav": "N7 brutal slab, three-item page nav (was one .slab__to cross-link)",
+    "footer": "Ft2 credit columns (unchanged)",
+    "findings": "a third page made the cross-link's premise false: .slab__to said 'the other page' and there were now two of them, with no way to reach the third from the second; it also carried no current-page state at all, so the bar never told you where you were; and at 22px tall it sat under the 24x24 WCAG 2.5.8 floor while sharing the bar with 44px stamps",
+    "fixed": "one .slab__to became a .slab__pages group of three with aria-current=page on the live one; the current-page cue is the bottom rule going --rule-hair -> --rule-slab, a 6x step, with ink-dim -> ink second and never colour alone; min-height:var(--tap) via inline-flex, the .slab__mark technique, which also lands all three underlines on one y so the group reads as a group; arrows dropped, since they encoded a direction that only means something between exactly two pages; .slab__to moved out of the finance section of page.css into the nav section so it is declared once; page.css's pre-JS --topbar-h fallback re-measured 204px -> 290px; .slab itself untouched - still three flex children, still space-between",
+    "measured": "wordmark 214.4px on veso and 249.3px on y2k, page group 182.6-209.0px, so one row needs 20 + wordmark + 12 + group + 20 and the widest skin governs: floors bisected to 1px are veso 461, thantai 420, viahe 397, y2k 484, each agreeing with its own arithmetic sum within a pixel, so 484px replaces the old 360px; stamps rejoin that row at 797px, giving three slab states; the page group never wraps internally - checked at 280, 300, 320, 360, 375, 390, 414, 430 in four skins, zero cases; contrast by canvas readback because getComputedStyle returns oklch verbatim - non-current 4.84 worst, current 8.79 worst, hover 4.62 worst, the rule itself 4.77 worst against the 3:1 of WCAG 1.4.11, every link 44px tall in every skin; topbar height max 290px at y2k/280px over 14 widths x 4 skins x 3 pages; zero horizontal overflow across the same grid, checked by element rects because overflow-x:clip makes scrollWidth blind",
+    "deferred": "the extra slab row costs up to 86px of sticky viewport, and every live phone width now pays it where before only 320px did. Not fixable without dropping a page link or hiding the nav behind a toggle, and a hidden nav is worse than a tall one",
+    "brief": "third page - the two-page cross-link has to become a real page nav"
+  },
+  {
     "date": "2026-08-22",
     "verb": "footer rebuild",
     "macrostructure": "Narrative Workflow (unchanged - design.md governs)",

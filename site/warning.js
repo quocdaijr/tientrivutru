@@ -42,6 +42,20 @@ const GATES = {
       'Tự chịu rủi ro — mọi quyết định tài chính là của riêng bạn',
     ],
   },
+  trader: {
+    ackKey: 'tientrivutru.ack.trader.v1',
+    eyebrow: '⚠ Đọc trước khi xem nến',
+    title: 'Trang này không dạy con kiếm tiền.<br>Nó dạy con đọc một cái biểu đồ.',
+    lede: 'Giá là thật, lấy thẳng từ Binance. Mẫu hình và lời phán là trò đùa — và ở chặng '
+        + 'cuối, trang tự đo xem mấy mẫu hình đó nói được gì về cây nến kế tiếp. Câu trả '
+        + 'lời là không gì cả.',
+    points: [
+      'Không phải khoá học, không phải khuyến nghị — không bán gì, không giới thiệu sàn nào',
+      'Không liên quan Binance hay TradingView — không liên kết, không tài trợ, không hoa hồng',
+      'Đòn bẩy làm mất tiền nhanh hơn mọi thứ trên hai trang kia cộng lại',
+      '18+ · tự chịu rủi ro',
+    ],
+  },
 };
 
 function gateCopy() {
@@ -134,9 +148,10 @@ function initWarningGate() {
 }
 
 /* The warning strip and the nav share one sticky wrapper, so the wrapper's height is
-   whatever the strip's text wraps to: 114px on a laptop, 131px at 375px, 204px once the
-   strip needs three lines at 280px. Any hardcoded scroll-margin is therefore wrong at
-   most widths, and it was - it said 96px. Measure it instead and let CSS read it. */
+   whatever the strip's text wraps to and however many rows the nav needs: 204px once the
+   strip needed three lines at 280px, and 290px there since the nav became three page links
+   on 2026-09-22. Any hardcoded scroll-margin is therefore wrong at most widths, and it was
+   - it said 96px. Measure it instead and let CSS read it. */
 function trackTopbarHeight() {
   const bar = document.querySelector('.topbar');
   if (!bar) return;
