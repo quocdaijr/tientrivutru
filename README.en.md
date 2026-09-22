@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 [![Ruff](https://img.shields.io/badge/lint-ruff-261230.svg)](https://docs.astral.sh/ruff/)
-[![tests](https://img.shields.io/badge/tests-892%20passing-brightgreen.svg)](tests/)
+[![tests](https://img.shields.io/badge/tests-924%20passing-brightgreen.svg)](tests/)
 [![draws analysed](https://img.shields.io/badge/draws%20analysed-31%2C470-informational.svg)](#what-the-honest-layer-found)
 [![chi-square](https://img.shields.io/badge/chi²%20p--value-0.10%20→%20random-informational.svg)](#what-the-honest-layer-found)
 [![prediction accuracy](https://img.shields.io/badge/prediction%20accuracy-0%25-critical.svg)](DISCLAIMER.md)
@@ -245,6 +245,7 @@ Python.
 | [`khiemdoan/vietnam-lottery-xsmb-analysis`](https://github.com/khiemdoan/vietnam-lottery-xsmb-analysis) (MIT) | **cross-check witness** for XSMB — no longer the ingest source | 7,526 draws since 2005 |
 | [`jbaranski/jeffs-lottery-utils`](https://github.com/jbaranski/jeffs-lottery-utils) (MIT) | Powerball & Mega Millions — statistics only | 1,395 + 918 draws |
 | CoinGecko / Open-Meteo | cosmic signals (BTC, weather) | — |
+| [Binance](https://www.binance.com/) | BTC/USDT candles for the trader page — REST + WebSocket, called in the browser, never committed | 1000 candles per load |
 
 `data.ny.gov` — the "official" source usually recommended — is **unusable**: the entire domain
 returns 403 from this network, including its plain HTML pages, with or without browser headers.
@@ -351,6 +352,55 @@ exist is correct.
 > predictive value is **zero**, exactly like the lottery oracle's. See
 > [DISCLAIMER.md](DISCLAIMER.md) section 2.
 
+## The trader page — `/trader.html`
+
+The third page, same two layers, with one thing neither of the others has: **the silent
+stage grades the loud stage, on the loud stage's own data, while the reader is looking at
+it.**
+
+A live BTC/USDT candlestick chart — Binance REST for 1000 historical candles, WebSocket for
+the one still forming. No API key, no proxy. It is the only genuinely realtime thing on the
+site, for a mundane reason: crypto trades 24/7 and Binance publishes an open API, whereas
+realtime Vietnamese equities go through SignalR sold on a vendor contract.
+
+Thầy teaches you to read candles, teaches MA20 and RSI14, and names five patterns. Then
+stage `02 · SỰ THẬT` measures those same five.
+
+**The right measurement, after the obvious one turned out to be wrong.** The first idea was
+to count patterns on real candles and compare against random ones. It fails two ways at
+once: a doji and a hammer are properties of **one** candle standing alone, so shuffling the
+order returns the **identical** count — vacuous by construction; and the multi-bar patterns
+do differ, but that difference says the market has bursts of clustered volatility, not that
+the pattern foretells anything.
+
+What answers the actual question is the **forward return**: after each firing, take the
+open-to-close return of the very next candle, compare it to the baseline, and get the
+p-value by relabelling 2000 times. Over 6000 hourly candles all five sit inside the noise
+(p from 0.21 to 0.65), even before the Bonferroni correction. And the **largest edge
+measured** is an order of magnitude smaller than the exchange's own round-trip taker fee.
+
+One detail is kept because it teaches itself: at a sample of 1000 candles, "engulfing" once
+came in at p = 0.038 — which looks like a finding. At 6000 it dissolves. The page prints
+both the corrected threshold and the number of tests, and says so out loud.
+
+Two figures the page **cannot** measure itself, so it borrows them and names the owner:
+
+| Figure | Source |
+|---|---|
+| **74–89%** of retail CFD accounts lose money, average loss 1,600–29,000 EUR | ESMA35-43-1135, analyses by EU national competent authorities |
+| **97%** of those who persisted past 300 sessions still lost; only **0.4%** earned more than a bank teller; **no** evidence of learning | Chague, De-Losso & Giovannetti, *"Day trading for a living?"* ([SSRN 3423101](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3423101)) |
+
+Both are other markets, not Vietnam, and the page leaves it that way.
+
+Like the money page: **not one candle is committed.** Binance attaches no terms that would
+permit redistribution, so the browser fetches and the tab forgets. A dead source is an empty
+block — each path was blocked in turn: without the CDN the numeric table still carries every
+figure, without REST thầy **gives no reading** and both citations stay intact.
+
+> This page is **not investment advice, not a recommendation, and not a course.** The prices
+> are real; the patterns and the reading are a joke, and the last stage measures them to
+> prove it.
+
 ## What the Honest Layer found
 
 Chi-square test, H₀ = "every number is equally likely":
@@ -434,11 +484,17 @@ Everything is **self-hosted in the repository** — the page makes no outbound r
 image or an emoji. Per-file provenance, download dates, and the list of sources that were
 considered and rejected are in [`site/img/CREDITS.md`](site/img/CREDITS.md).
 
+Beyond the fonts, the whole site makes exactly **one** outbound script request: the
+candlestick library on `/trader.html`, loaded from a CDN, pinned by both version and SRI
+hash, and credited in that page's footer because Apache-2.0's NOTICE asks for it. If it
+fails to load, the page's numeric table still carries every figure.
+
 | Asset | Source | Licence |
 |---|---|---|
 | Đông Hồ woodblock print *Đại Cát* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dong_Ho_painting_-_Dai_cat.jpg) | Public domain |
 | 13 emoji | [jdecked/twemoji](https://github.com/jdecked/twemoji) — © Twitter/X | graphics **CC-BY 4.0**, code MIT |
 | Fortune-teller figures (7 poses) | drawn by hand in this repo, `site/thay.js` | MIT, same repo |
+| TradingView Lightweight Charts™ v5.2.1 | [tradingview/lightweight-charts](https://github.com/tradingview/lightweight-charts) — © TradingView, Inc. | **Apache-2.0, attribution required** |
 
 This repository is MIT, which means anyone who clones it is granted the right to redistribute
 it. So it cannot contain anything it does not own: copyrighted meme characters, film stills,

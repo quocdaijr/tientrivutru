@@ -250,6 +250,29 @@ nhất", vốn luôn là jackpot.
 **Chưa mô hình hoá** (`tax.py` ghi rõ) — Vé bao tính là 1 vé hay 924 vé cho luật thuế-theo-vé,
 và jackpot chia cho nhiều người trúng. Không biết thì phải nói không biết, không được đoán.
 
+**Cây nến** (Candle) — Một khoảng thời gian trên biểu đồ giá, mang đúng bốn số: mở, cao,
+thấp, đóng. Danh tính là cặp `(mã, mốc mở)`. Mốc luôn là **giây UTC**, không bao giờ là
+mili-giây: thư viện vẽ nhận giây, và đưa nhầm mili-giây thì biểu đồ vẽ ở năm 50000 mà không
+báo lỗi gì.
+
+**Nến đã đóng** (Closed candle) — Cây nến mà khoảng thời gian của nó đã hết. Binance đánh
+dấu bằng cờ `k.x` trong khung WebSocket. Cây **chưa** đóng vẫn đổi số từng giây, nên nó
+không bao giờ được cộng vào chuỗi dùng để thống kê.
+
+**Mẫu hình nến** (Candlestick pattern) — Một điều kiện hình học trên một tới ba cây nến, ví
+dụ doji hay nhấn chìm. Trong project này mọi ngưỡng là **tỉ lệ so với biên độ cây nến**,
+không bao giờ là giá tuyệt đối — nếu không, chuỗi nến xáo thứ tự (nối lại ở mức giá khác) bị
+so sánh không công bằng và cả chặng `SỰ THẬT` của trang trader sụp.
+
+**Lợi suất nến kế tiếp** (Forward return) — Lợi suất mở-đến-đóng của cây nến **ngay sau**
+lần một mẫu hình nổ. Đây là con số trả lời được câu "mẫu hình có báo trước gì không", và nó
+thay cho phép so tần suất, vốn rỗng theo định nghĩa với mẫu một cây: doji là tính chất của
+một cây nến đứng riêng, nên xáo thứ tự cho ra **đúng** con số cũ.
+
+**Hiệu chỉnh Bonferroni** — Thử `k` mẫu hình cùng lúc thì ngưỡng ý nghĩa là `0,05 / k`, chứ
+không phải 0,05. Trang in cả ngưỡng đã chia lẫn số phép thử, vì năm phép thử song song thì
+thỉnh thoảng một cái ra số đẹp là chuyện bình thường, không phải phát hiện.
+
 ## Từ tránh dùng
 
 - **"số nóng" / "số lạnh" / "cầu" / "soi cầu"** — chỉ dùng khi đang trích dẫn để bóc phốt,
@@ -285,3 +308,11 @@ và jackpot chia cho nhiều người trúng. Không biết thì phải nói kh�
 - **"em"** khi oracle nói — oracle xưng **thầy**, gọi **con**. Không phải trợ lý.
 - **"thấy trên Facebook"** như một nguồn tài nguyên — mạng xã hội không phải giấy
   phép. Ảnh không có nguồn và licence xác minh được thì không vào repo.
+- **"kèo" / "lệnh chắc thắng" / "gồng lãi"** như lời khuyên — trang trader dạy đọc biểu đồ,
+  không đưa ra lệnh nào. Chỉ được dùng khi đang trích để bóc.
+- **"học phí"** như cách gọi khoản lỗ — đó là uyển ngữ của người bán khoá học, và nó ngụ ý
+  có thứ gì đó được học. Nghiên cứu Brazil trong `trader.html` nói thẳng là không có bằng
+  chứng người ta khá lên theo thời gian.
+- **"tín hiệu mua" / "tín hiệu bán"** cho một mẫu hình — trang đo rồi: lợi suất cây nến kế
+  tiếp sau mỗi mẫu đều nằm trong nhiễu, và lợi thế lớn nhất đo được nhỏ hơn phí vào-ra một
+  bậc. Gọi nó là tín hiệu là phát biểu một điều trang vừa tự bác bỏ.

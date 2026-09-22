@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tiên Tri Vũ Trụ — Thầy dạy đọc nến, nến dạy lại thầy</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%AE%3C/text%3E%3C/svg%3E">
+
+<!-- Skin must be on <html> before the first paint, or the page flashes the default. -->
+<script>
+  try {
+    var t = localStorage.getItem('tientrivutru.theme.v1');
+    document.documentElement.dataset.theme =
+      ['veso','thantai','viahe','y2k'].indexOf(t) >= 0 ? t : 'veso';
+  } catch (e) { document.documentElement.dataset.theme = 'veso'; }
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- The chart library is the only third-party script on this site, so its connection is
+     warmed alongside the fonts rather than paid for at first paint. -->
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Bungee+Shade&family=Anton&family=Playfair+Display:wght@700;900&family=Be+Vietnam+Pro:wght@400;600;800&family=Grandstander:wght@400;700&family=JetBrains+Mono:wght@400;700&family=Sriracha&display=swap">
+<link rel="stylesheet" href="./tokens.css">
+<link rel="stylesheet" href="./page.css">
+</head>
+<body id="top" data-page="trader">
+<div class="grain" aria-hidden="true"></div>
+
+<div class="topbar">
+<p class="warnstrip">
+  ⚠ Trò đùa — trang này <b>không phải tư vấn đầu tư</b>. Giá là thật, mẫu hình là thầy bịa ·
+  <a href="https://github.com/quocdaijr/tientrivutru/blob/main/DISCLAIMER.md" target="_blank" rel="noopener">miễn trừ trách nhiệm</a>
+</p>
+<nav class="slab" aria-label="Trang">
+  <a class="slab__mark" href="#top">Tiên Tri Vũ Trụ</a>
+  <div class="slab__pages">
+    <a class="slab__to" href="./index.html">Xổ số</a>
+    <a class="slab__to" href="./tai-chinh.html">Tài chính</a>
+    <a class="slab__to" href="./trader.html" aria-current="page">Trader</a>
+  </div>
+  <div class="slab__themes" role="radiogroup" aria-label="Chọn bộ da">
+    <button class="stamp" role="radio" type="button" data-set-theme="veso" aria-checked="true"><span class="stamp__full">VÉ SỐ</span><span class="stamp__short">V</span></button>
+    <button class="stamp" role="radio" type="button" data-set-theme="thantai" aria-checked="false"><span class="stamp__full">THẦN TÀI</span><span class="stamp__short">T</span></button>
+    <button class="stamp" role="radio" type="button" data-set-theme="viahe" aria-checked="false"><span class="stamp__full">VỈA HÈ</span><span class="stamp__short">H</span></button>
+    <button class="stamp" role="radio" type="button" data-set-theme="y2k" aria-checked="false"><span class="stamp__full">Y2K</span><span class="stamp__short">Y</span></button>
+  </div>
+</nav>
+</div>
+
+<header class="wrap masthead">
+  <h1 class="masthead__title">Thầy dạy đọc nến,<br>nến dạy lại thầy</h1>
+  <p class="masthead__lede">
+    Biểu đồ nến BTC chạy thật, từng giây. Thầy chỉ con cách đọc, rồi trang đo xem mấy mẫu
+    hình thầy vừa chỉ nói được gì về cây nến kế tiếp.
+  </p>
+  <p class="disclaim">
+    <b>Đọc trước:</b> đây <b>không phải</b> tư vấn đầu tư, khuyến nghị mua bán, hay khoá học.
+    Giá là thật, lấy thẳng từ API công khai của Binance — <b>không tài liệu, không cam kết</b>,
+    có thể sai, thiếu hoặc bị chặn theo vùng. <b>Mẫu hình và lời phán là trò đùa</b>, và
+    chặng cuối của trang đo chính chúng để chứng minh điều đó.
+    <br><br>
+    Không bán gì · không môi giới · không giới thiệu sàn · không affiliate ·
+    đòn bẩy làm mất tiền nhanh hơn mọi thứ trên hai trang kia cộng lại ·
+    <a href="https://github.com/quocdaijr/tientrivutru/blob/main/DISCLAIMER.md" target="_blank" rel="noopener">bản miễn trừ đầy đủ</a>
+  </p>
+</header>
+
+<main class="wrap" id="app">
+  <p class="note" id="boot">Thầy đang hỏi nến…</p>
+</main>
+
+<footer class="ft">
+  <div class="wrap colophon">
+    <div class="colophon__cols colophon__cols--2">
+      <section>
+        <h2>NGUỒN</h2>
+        <dl>
+          <dt><a href="https://www.binance.com/" target="_blank" rel="noopener">Binance</a></dt>
+          <dd>nến BTC/USDT — REST cho lịch sử, WebSocket cho cây đang chạy. API công khai, không khoá, không hợp đồng</dd>
+          <dt><a href="https://www.tradingview.com/" target="_blank" rel="noopener">TradingView Lightweight Charts™</a></dt>
+          <dd>thư viện vẽ nến · Apache-2.0 · © TradingView, Inc. — thứ duy nhất trên cả site này tải từ CDN bên thứ ba, ghim theo phiên bản và theo hash</dd>
+          <dt>ESMA · SSRN 3423101</dt>
+          <dd>hai con số ở chặng 02 mà trang này không tự đo được, nên đi mượn và ghi rõ của ai</dd>
+        </dl>
+      </section>
+      <section>
+        <h2>TRANG NÀY</h2>
+        <dl>
+          <dt><a href="./index.html">← Xổ số</a> · <a href="./tai-chinh.html">Tài chính</a></dt>
+          <dd>bên đó thầy phán số và phán giá, bên này thầy phán nến</dd>
+          <dt><a href="https://github.com/quocdaijr/tientrivutru">MIT</a> · 2026</dt>
+          <dd>không một cây nến nào của Binance được lưu lại — số liệu chỉ sống trong tab đang mở, đúng luật trang tài chính</dd>
+          <dt>không phải tư vấn đầu tư</dt>
+          <dd>18+ · <a href="https://github.com/quocdaijr/tientrivutru/blob/main/DISCLAIMER.md">miễn trừ trách nhiệm</a></dd>
+        </dl>
+      </section>
+    </div>
+    <p class="colophon__base">không bán gì · không môi giới · không giới thiệu sàn · không nhận hoa hồng của ai</p>
+  </div>
+</footer>
+
+<script src="./dom.js"></script>
+<script src="./thay.js"></script>
+<script src="./warning.js"></script>
+<script src="./theme.js"></script>
+<script src="./personal.js"></script>
+<!-- Not deferred, and not in <head>: classic scripts in the body run in document order, so
+     window.LightweightCharts is guaranteed present by the time trader.js runs. A deferred
+     script in <head> executes AFTER body scripts and would race the chart build.
+     SRI pins the exact 197,922 bytes that were reviewed - if unpkg ever serves anything
+     else the tag simply fails, and a missing chart is a state this page already handles. -->
+<script src="https://unpkg.com/lightweight-charts@5.2.1/dist/lightweight-charts.standalone.production.js"
+        integrity="sha384-KkYqTZlM13Zya6fVUF3IGCBOQ1ehFeJVVgxaVvD/0MebineF9EI8Jkd3NnWNChqN"
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="./trader.js"></script>
+</body>
+</html>

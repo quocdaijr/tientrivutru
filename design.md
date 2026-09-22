@@ -17,9 +17,10 @@ honesty.
 
 ## Macrostructure — Narrative Workflow
 
-A fortune-telling session is an ordered thing, so the page is too. There are **two pages**,
-and both run the same shape: the fortune-teller shouts through the opening stages, then goes
-silent for one stage of cold arithmetic. Same skins, same tokens, same stage frame.
+A fortune-telling session is an ordered thing, so the page is too. There are **three
+pages**, and all three run the same shape: the fortune-teller shouts through the opening
+stages, then goes silent for one stage of cold arithmetic. Same skins, same tokens, same
+stage frame.
 
 `site/index.html` — the lottery session:
 
@@ -41,26 +42,67 @@ themselves, so it has nothing to be scored against:
 | `01 · SỔ GIÁ` | gold (SJC bars and plain rings, plus world spot), the three indices, foreign net flows, crypto — each with its source and the API's own timestamp |
 | `02 · SỰ THẬT` | what is genuinely realtime and what is end-of-session, why there is no land price, and the page checking its own gold against world spot |
 
+`site/trader.html` — the trader page. Three stages, same reason as the money page, and one
+thing neither of the others has: its silent stage grades its own loud stage, on the loud
+stage's data, in the same second the reader is looking at it.
+
+| stage | content |
+|---|---|
+| `00 · PHÁN NẾN` | the fortune-teller names the shape the last candle made and builds a reading from it |
+| `01 · BẢNG NẾN` | the live BTC/USDT candles, the vocabulary needed to read them, and the technical analysis he teaches |
+| `02 · SỰ THẬT` | the forward return after each of those patterns with its permutation p-value, the same detector run on shuffled candles, ESMA and the Brazilian day-trading study, then the page on its own limits |
+
 Stage numbers sit **above** their titles in the same column. Number-left / title-right is
 the most reliable templated-editorial tell and is not used here.
 
-The two pages are **not** interchangeable in voice. Stage `04 · SỰ THẬT` on the lottery page
-and `02 · SỰ THẬT` on the money page are the silent stages; everything above them shouts.
-A page that let the fortune-teller into its statistics stage would lose the joke and the
-honesty in the same move.
+The three pages are **not** interchangeable in voice. Stage `04 · SỰ THẬT` on the lottery
+page and `02 · SỰ THẬT` on the money and trader pages are the silent stages; everything
+above them shouts. A page that let the fortune-teller into its statistics stage would lose
+the joke and the honesty in the same move.
 
-Nav: **N7 brutal slab** — thick sticky bar, wordmark left, four rubber stamps right, and one
-`.slab__to` text link between the wordmark and the stamps carrying the reader to the other
-page. It is body face, not a fifth stamp: five stamps would read as five skins.
+Nav: **N7 brutal slab** — thick sticky bar, wordmark left, a three-item page nav in the
+middle, four rubber stamps right. The page nav is **body face, never more stamps**: the
+stamps are the skin picker and only the skin picker, and seven bordered boxes in one bar
+would read as seven skins. Three cues hold the two groups apart and none of them is
+position — body face against display face, no border against a `--rule-mid` box on four
+sides, no rotation against `-4deg`.
 
-The wordmark became **Tiên Tri Vũ Trụ** on 2026-09-21 (was `trungso`), and that is a
-measured change, not a cosmetic one: 214px unwrapped at the bar's 23.2px body face, up
-from 119px. One row of the slab now needs `20 + 214 + 25 + 81 + 20 = 360px`, so **360px
-is the exact floor** for wordmark and `.slab__to` sharing a row. At 375px there is 40px
-of slack; below 360px the link wraps to its own row and the bar goes 130px → 174px. That
-wrap is left in: it stays on one left axis, collides with nothing, and adds no horizontal
-scroll — 320px is the only live width that sees it. A longer name would have to earn its
-own breakpoint by being measured, not by inheriting this one.
+The current page is marked by its bottom rule going `--rule-hair` → `--rule-slab`, a 6×
+step in the bar's own vocabulary, with `--color-ink-dim` → `--color-ink` as the second cue
+and `aria-current="page"` carrying it for assistive tech. The weight does the work and the
+ink does not: dim → full is a luminance move, which WCAG 1.4.1 counts as colour, so a
+treatment resting on it would be colour alone wearing a disguise. Measured by canvas
+readback across four skins — `getComputedStyle` returns `oklch(...)` verbatim and cannot be
+string-parsed — the worst case is non-current **4.84** (thantai), current **8.79**
+(thantai), hover **4.62** (veso), and the rule itself **4.77** (thantai) against the 3:1
+that WCAG 1.4.11 asks of a non-text indicator. Every link is **44px** tall in every skin.
+
+It went from one `.slab__to` cross-link to three page links on 2026-09-22, when
+`trader.html` made "the other page" meaningless, and that move is measured. One row of
+wordmark + page nav needs `20 + wordmark + 12 + 194…209 + 20`, and the **widest skin
+governs** because the floor has to hold in all four: y2k's Grandstander wordmark is 249.3px
+against veso's 214.4px, so **484px is the exact floor** for the two sharing a row — up from
+the 360px the single cross-link needed. Bisected to 1px, per skin: veso 461, thantai 420,
+viahe 397, y2k 484, each agreeing with its own arithmetic sum to within a pixel. The stamps
+join that row at 797px, so the slab has three states: one row above 797px, two rows from
+484 to 796, three rows below 484. The page nav itself never breaks internally — it needs
+182.6–209px against the 240px of inner width the narrowest live viewport gives it, and it
+was checked at 280, 300, 320, 360, 375, 390, 414 and 430px in all four skins.
+
+**Every live phone width now sees that wrap, where before only 320px did.** That is the
+price of the change and it is not free: `.topbar` is `position:sticky`, so the extra row is
+subtracted from usable viewport at every scroll position, on the phones that can least
+spare it. The tallest the wrapper gets went **204px → 290px**, re-measured across 14 widths
+× 4 skins × 3 pages at y2k/280px where the warning strip needs three lines. `warning.js`
+republishes that height on every `ResizeObserver` tick so `.stage`'s `scroll-margin-top`
+follows at runtime, but the pre-JS fallback in `page.css` is a literal and does not — it
+moved with it. Zero horizontal overflow at any of those cells, checked by scanning element
+rects, because `html,body{overflow-x:clip}` makes `scrollWidth` blind to exactly the bug
+being looked for.
+
+A longer label would have to earn its own breakpoint by being measured. "Trader" is the
+narrowest plausible name for the third page; "Chứng khoán" is wider and would move the floor.
+
 Footer: **Ft2 credit columns** — three columns of the same `<h2> + <dl>` shape (thanks ·
 assets · this page) over one full-width base strip. Every column head carries a hairline,
 so three rules of equal length landing on one y is what makes the grid legible; below the
@@ -154,7 +196,7 @@ Re-measured per-digit in the DOM across all four skins: spread **0**.
 
 ## Contrast floor — measured, not assumed
 
-Every text surface clears **AA 4.5:1 in all four skins**, on **both pages**; the lowest
+Every text surface clears **AA 4.5:1 in all four skins**, on **all three pages**; the lowest
 measured anywhere is 4.56 (`.note` on `veso`).
 Two tokens exist purely to hold that line:
 
@@ -170,6 +212,18 @@ is a contrast decision, not a decorative one: on `thantai` the paper **is** lacq
 
 Measure with a canvas, not by parsing `getComputedStyle().color` — it returns `oklch(...)`
 verbatim, and string-parsing that as RGB produces confident nonsense.
+
+**The trader page's chart is the one surface the DOM cannot measure**, because it is a
+canvas the library paints. Reading its pixels back is not a substitute: `getImageData` on
+those canvases returns a stale buffer and reported the veso background under all four skins
+during the browser pass — a false alarm that looked exactly like a real bug. What is true
+instead is stated rather than assumed: `trader.js` forces `layout.background` to
+`--color-paper-2` and `layout.textColor` to `--color-ink-dim`, which is the identical pair
+`.note` inside a `.block` already uses, so the chart's axis labels inherit that measured
+floor instead of claiming one of their own — **4.56** veso, 6.05 thantai, 5.48 viahe, 5.30
+y2k. Candle bodies, the MA line and the grid are non-text graphics and answer to WCAG
+1.4.11's 3:1: the worst is **4.07** (veso's MA20). Leaving the library's default white
+background in place is what would void all of it — on `thantai` the paper is lacquer red.
 
 ## Motion
 
@@ -198,9 +252,19 @@ A fifth primitive would need the same treatment, or it does not get added.
 `site/tokens.css` is the single source for every colour, face, space, and duration. No page
 CSS declares a raw colour or a `font-family` string; everything references a token by name.
 
-`site/page.css` holds the page styles and is **shared by both pages** — it was inline in
-`index.html` until the money page needed the same stage frame, and two copies of a
+`site/page.css` holds the page styles and is **shared by all three pages** — it was inline
+in `index.html` until the money page needed the same stage frame, and two copies of a
 stylesheet is how two pages start disagreeing. `site/dom.js` does the same job for the
 handful of helpers that build a stage or format a number. A component that only one page
 uses still lives in `page.css`; splitting per-page stylesheets would put the shared frame
 back at risk of drifting.
+
+One exception is written down rather than left to be rediscovered: `trader.html` loads
+**TradingView Lightweight Charts v5.2.1 from a CDN**, pinned by version and by SRI hash and
+credited in its colophon as Apache-2.0 requires. It is the only third-party script on the
+site and the only runtime request beyond the fonts. The tokens do not reach it by cascade —
+canvas takes colour strings, and the tokens are `oklch(...)` which the bundle carries no
+parser for — so `trader.js` resolves each token through a 1×1 canvas readback and hands the
+result over, then re-hands it on every skin change by observing `data-theme` on
+`documentElement`. `theme.js` dispatches no event and was deliberately left alone: a third
+page should not make the other two carry a change.
