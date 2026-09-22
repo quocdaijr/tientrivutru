@@ -12,6 +12,10 @@ Two honesty rules are enforced in code rather than left to whoever renders the v
    so a plausible wrong amount is worse than no amount.
 2. **The figure carries the moment it was read.** A jackpot grows with ticket sales
    between draws, so a number without a timestamp is a claim the page cannot support.
+3. **The money is filed under the draw the page itself names.** The caller says which
+   draw it wants the money for, but that id comes from the mirror, which lags the
+   official site by hours on a draw day. Trusting the caller would file the new draw's
+   jackpot under the previous draw's id, which is rule 1 broken by another route.
 
 What this can and cannot know, stated once so callers do not have to guess:
 
@@ -191,11 +195,42 @@ def _parse_tiers(spec: GameSpec, page: str) -> tuple[PrizeTier, ...]:
     return tuple(tiers)
 
 
+def _agreed_draw_id(spec: GameSpec, draw_id: str, page: str) -> str:
+    """The draw id both the caller and the page agree this money belongs to.
+
+    vietlott.vn renders only its own newest draw, while `draw_id` is the newest draw in
+    the store, which is filled from a mirror that publishes hours later. Every draw day
+    opens a window where the two disagree, and whoever asks second gets a page that has
+    already moved on. Without this check that window silently files one draw's jackpot
+    under another draw's number.
+
+    Refusing is the right answer rather than believing the page, because the draw record
+    the money would hang off does not exist in the store yet. The next run, once the
+    mirror has caught up, reads the same page and agrees.
+    """
+    title = vietlott_live.TITLE_PATTERN.search(page)
+    if not title:
+        raise PrizeParseError(
+            f"{spec.key}: could not find the draw title on the results page, so there is "
+            "no way to tell which draw this money belongs to - layout changed"
+        )
+
+    on_page = normalise_draw_id(title.group("draw_id"))
+    wanted = normalise_draw_id(draw_id)
+    if on_page != wanted:
+        raise PrizeParseError(
+            f"{spec.key}: the page states draw #{on_page} but the money was asked for "
+            f"#{wanted} - vietlott.vn is ahead of the mirror, and filing #{on_page}'s "
+            f"jackpot under #{wanted} would misattribute it"
+        )
+    return wanted
+
+
 def parse_prizes(spec: GameSpec, draw_id: str, page: str) -> DrawPrizes:
     """Extract every money figure the results page states for one draw."""
     return DrawPrizes(
         game=spec.key,
-        draw_id=normalise_draw_id(draw_id),
+        draw_id=_agreed_draw_id(spec, draw_id, page),
         jackpots=_parse_jackpots(spec, page),
         tiers=_parse_tiers(spec, page),
         fetched_at=utc_now().isoformat(),
