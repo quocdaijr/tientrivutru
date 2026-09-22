@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 [![Ruff](https://img.shields.io/badge/lint-ruff-261230.svg)](https://docs.astral.sh/ruff/)
-[![tests](https://img.shields.io/badge/tests-887%20passing-brightgreen.svg)](tests/)
+[![tests](https://img.shields.io/badge/tests-892%20passing-brightgreen.svg)](tests/)
 [![draws analysed](https://img.shields.io/badge/draws%20analysed-31%2C470-informational.svg)](#what-the-honest-layer-found)
 [![chi-square](https://img.shields.io/badge/chi²%20p--value-0.10%20→%20random-informational.svg)](#what-the-honest-layer-found)
 [![prediction accuracy](https://img.shields.io/badge/prediction%20accuracy-0%25-critical.svg)](DISCLAIMER.md)

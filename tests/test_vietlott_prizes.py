@@ -14,6 +14,7 @@ from tientrivutru.sources import vietlott_prizes as prizes
 
 # Trimmed to the two regions the parser reads, byte-for-byte from the live pages.
 POWER655_PAGE = """
+<div class="chitietketqua_title"><h5>Kỳ quay thưởng <b>#01386</b> ngày <b>18/08/2026</b></h5></div>
 <div class="gt_jackpot"><div class="row">
 <div class="col-md-5"><h5>Giá trị Jackpot 1</h5></div>
 <div class="col-md-7"><div class="so_tien"><h3>34.897.731.150</h3><p>VNĐ</p></div></div>
@@ -38,6 +39,7 @@ POWER655_PAGE = """
 """
 
 MEGA645_PAGE = """
+<div class="chitietketqua_title"><h5>Kỳ quay thưởng <b>#01551</b> ngày <b>19/08/2026</b></h5></div>
 <div class="gt_jackpot"><div class="row">
 <div class="col-md-5"><h5>Giá trị Jackpot</h5></div>
 <div class="col-md-7"><div class="so_tien"><h3>24.507.110.500</h3><p>VNĐ</p></div></div>
@@ -130,8 +132,10 @@ def test_fetched_at_is_recorded_because_the_figure_goes_stale():
 
 
 def test_missing_jackpot_block_raises_rather_than_guessing():
+    titled = MEGA645_PAGE.split("<div class=\"gt_jackpot\">")[0] + "<body>nothing here</body>"
+
     with pytest.raises(prizes.PrizeParseError, match="gt_jackpot"):
-        prizes.parse_prizes(MEGA645, "01551", "<html><body>nothing here</body></html>")
+        prizes.parse_prizes(MEGA645, "01551", titled)
 
 
 def test_missing_prize_table_raises():
@@ -218,3 +222,57 @@ def test_tier_values_rejects_a_label_the_game_does_not_have():
 
     with pytest.raises(ValueError, match="jackpot2"):
         result.tier_values(MEGA645)
+
+
+# --- The money must belong to the draw it is filed under -------------------------------
+#
+# vietlott.vn shows only its own newest draw, while the caller passes the newest draw in
+# the store, which comes from a mirror that lags. On a draw day those two disagree for a
+# few hours, and without a cross-check the new draw's jackpot gets written under the old
+# draw's id - a plausible wrong amount, which this module exists to make impossible.
+
+
+def test_money_from_a_newer_draw_is_refused_rather_than_mislabelled():
+    """The exact mirror-lag window: page has moved on, the store has not."""
+    page = POWER655_PAGE.replace("#01386", "#01387")
+
+    with pytest.raises(prizes.PrizeParseError) as excinfo:
+        prizes.parse_prizes(POWER655, "01386", page)
+
+    message = str(excinfo.value)
+    assert "01387" in message and "01386" in message
+
+
+def test_money_from_an_older_draw_is_refused_too():
+    """Symmetric: a cached or rolled-back page is just as wrong as a newer one."""
+    page = MEGA645_PAGE.replace("#01551", "#01550")
+
+    with pytest.raises(prizes.PrizeParseError, match="01550"):
+        prizes.parse_prizes(MEGA645, "01551", page)
+
+
+def test_page_without_a_draw_title_raises_rather_than_trusting_the_caller():
+    """No title means no way to tell whose money this is. Refuse, do not assume."""
+    untitled = MEGA645_PAGE.replace(
+        '<div class="chitietketqua_title"><h5>Kỳ quay thưởng <b>#01551</b> '
+        "ngày <b>19/08/2026</b></h5></div>\n",
+        "",
+    )
+
+    with pytest.raises(prizes.PrizeParseError, match="draw title"):
+        prizes.parse_prizes(MEGA645, "01551", untitled)
+
+
+def test_an_unpadded_page_id_still_matches_the_padded_caller_id():
+    """#1386 and 01386 are the same draw; padding is a storage convention, not a mismatch."""
+    page = POWER655_PAGE.replace("#01386", "#1386")
+
+    result = prizes.parse_prizes(POWER655, "01386", page)
+
+    assert result.draw_id == "01386"
+
+
+def test_the_stored_draw_id_is_the_one_the_page_states():
+    result = prizes.parse_prizes(MEGA645, "01551", MEGA645_PAGE)
+
+    assert result.draw_id == "01551"
