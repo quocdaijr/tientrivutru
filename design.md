@@ -51,7 +51,7 @@ is looking at it.
 | `00 · PHÁN NẾN` | the fortune-teller names the shape the last candle made and builds a reading from it |
 | `01 · BẢNG NẾN` | the live BTC/USDT candles, the vocabulary needed to read them, and the technical analysis he teaches |
 | `02 · HỘI ĐỒNG` | TradingAgents' twelve LLM agents and today's rating for each asset. Thầy only shows them in, on a still pose - the page's one looping figure is already in stage 00 - and the Council does not speak as thầy |
-| `03 · SỰ THẬT` | the forward return after each pattern with its permutation p-value, the same detector on shuffled candles, the Council scored against always-Buy and a coin, ESMA and the Brazilian day-trading study, then the page on its own limits |
+| `03 · SỰ THẬT` | the forward return after each pattern with its permutation p-value, the same detector on shuffled candles, the Council scored against always-Buy and a coin - and whether its edge over always-Buy grows from its first half of verdicts to its second, since it remembers its past ones - ESMA and the Brazilian day-trading study, then the page on its own limits |
 
 The Council's stage is loud but it is not the fortune-teller's: its rating is the model's
 output, labelled on the page as AI-generated, possibly wrong and for reference only, which is

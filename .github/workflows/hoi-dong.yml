@@ -46,6 +46,19 @@ jobs:
       - name: Sync dependencies
         run: uv sync --frozen
 
+      # The Council's memory (ticket 09): TradingAgents' decision log - past decisions in model
+      # prose, and the returns they earned from Yahoo prices. Neither may be committed, so it
+      # lives in the Actions cache instead. A cache entry is immutable, so every recorded run
+      # saves a new one and the next run restores the newest by prefix. GitHub evicts an entry
+      # unused for 7 days: a Council that stops sitting for a week starts over, and the page
+      # counts its verdicts as remembering only from the rows that say so.
+      - name: Restore the Council's memory
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ runner.temp }}/hoi-dong-memory
+          key: hoi-dong-memory-${{ github.run_id }}
+          restore-keys: hoi-dong-memory-
+
       # TradingAgents is not a dependency of this package. It is layered in for this one step,
       # at the exact commit of its v0.5.0 tag - never by name from PyPI, where `tradingagents`
       # is a different project by a different author.
@@ -67,6 +80,8 @@ jobs:
           # "free" on a project with no billing (Gemini's free tier): nothing can be charged,
           # so the provider's own limit is the cap and no dollar cap is needed.
           HOI_DONG_BILLING: ${{ vars.HOI_DONG_BILLING }}
+          # A dry run sits on a copy of this file, so a trial never becomes a memory.
+          HOI_DONG_MEMORY_PATH: ${{ runner.temp }}/hoi-dong-memory/trading_memory.md
           # A free tier answers bursts with 429. TradingAgents forwards this retry budget to
           # every provider client (its own knob for exactly this, upstream #1091).
           TRADINGAGENTS_LLM_MAX_RETRIES: "6"
@@ -81,6 +96,15 @@ jobs:
           if [ -n "${{ inputs.asset }}" ]; then args+=(--asset "${{ inputs.asset }}"); fi
           uv run --with "tradingagents @ git+https://github.com/TauricResearch/TradingAgents@2d17df8da1536c121e4d7395ac5a5dcec9e96d6f" \
             tientrivutru council "${args[@]}"
+
+      # Saved even after a failed sitting: the others' decisions are in it. Never after a dry
+      # run - it sat on a copy, but a save here is the only way a trial could leak in anyway.
+      - name: Keep the Council's memory
+        if: ${{ !cancelled() && !inputs.dry_run }}
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ runner.temp }}/hoi-dong-memory
+          key: hoi-dong-memory-${{ github.run_id }}
 
       # A dry run writes nothing, so there is nothing to bundle, commit or deploy.
       - name: Build site bundle

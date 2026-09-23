@@ -16,7 +16,14 @@ from pathlib import Path
 import pytest
 
 from tientrivutru.hoi_dong import ASSETS
-from tientrivutru.hoi_dong_run import Model, council_config, run_verdict
+from tientrivutru.hoi_dong_run import (
+    ENV_MEMORY,
+    REPO,
+    Model,
+    council_config,
+    memory_path,
+    run_verdict,
+)
 
 PRICES = {"cheap": (0.10, 0.50), "dear": (2.0, 10.0)}
 MODEL = Model(provider="openai", deep="cheap", quick="cheap")
@@ -49,7 +56,7 @@ class FakeGraph:
 
 
 def sit(asset="BTC-USD", *, signal="Overweight", boom=None, counter=None, graphs=None,
-        now=lambda: datetime(2026, 9, 23, 12, 14, 5, tzinfo=UTC)):
+        now=lambda: datetime(2026, 9, 23, 12, 14, 5, tzinfo=UTC), memory=None):
     graphs = [] if graphs is None else graphs
 
     def factory(config, callbacks):
@@ -60,7 +67,7 @@ def sit(asset="BTC-USD", *, signal="Overweight", boom=None, counter=None, graphs
     return run_verdict(
         ASSETS[asset], date(2026, 9, 23), model=MODEL, graph_factory=factory,
         counter_factory=lambda: counter or FakeCounter(), base_config=dict, prices=PRICES,
-        now=now,
+        now=now, memory=memory,
     )
 
 
@@ -77,7 +84,8 @@ def test_an_answer_becomes_an_ok_verdict_with_its_real_cost():
     v = sit()
     assert (v.status, v.rating) == ("ok", "Overweight")
     assert v.usage == {"llm_calls": 14, "tokens_in": 1_000_000, "tokens_out": 200_000,
-                       "billing": "paid", "cost_usd": pytest.approx(0.10 + 0.10)}
+                       "billing": "paid", "cost_usd": pytest.approx(0.10 + 0.10),
+                       "memory": False}
     assert v.model == {"provider": "openai", "deep": "cheap", "quick": "cheap"}
 
 
@@ -146,12 +154,40 @@ def test_no_model_prose_leaves_the_sitting():
 
 # --- the config the real graph would get ------------------------------------------------
 
-def test_memory_and_logs_never_land_in_the_repo(tmp_path):
-    """A council with no memory is the default; and a memory that did exist must not be written
-    somewhere a commit could pick it up."""
+def test_without_a_memory_path_the_council_forgets(tmp_path):
+    """No memory path, no memory: TradingAgents' default under ~/.tradingagents is replaced by
+    the throwaway directory, so a sitting remembers nothing and leaves nothing behind."""
     cfg = council_config({"memory_log_path": "/home/x/.tradingagents/memory.md"}, MODEL, tmp_path)
     for key in ("memory_log_path", "results_dir", "data_cache_dir"):
         assert Path(cfg[key]).is_relative_to(tmp_path), key
+
+
+def test_a_memory_path_is_kept_and_logs_still_are_not(tmp_path):
+    """Ticket 09: the Council remembers its past verdicts and how they turned out. The memory
+    file is its own and lives where it was put; the logs and cache still go with the sitting."""
+    memory = tmp_path / "kept" / "trading_memory.md"
+    cfg = council_config({}, MODEL, tmp_path / "sitting", memory=memory)
+    assert cfg["memory_log_path"] == str(memory)
+    for key in ("results_dir", "data_cache_dir"):
+        assert Path(cfg[key]).is_relative_to(tmp_path / "sitting"), key
+
+
+def test_the_memory_never_lives_in_the_repo(tmp_path):
+    """The memory is model prose plus returns computed from Yahoo prices - nothing this repo may
+    publish (ticket 04). A path inside the working tree is one `git add` away from a commit."""
+    assert memory_path({}) is None
+    assert memory_path({ENV_MEMORY: "  "}) is None
+    assert memory_path({ENV_MEMORY: str(tmp_path / "m.md")}) == tmp_path / "m.md"
+    for inside in (REPO / "data" / "memory.md", REPO / "m.md"):
+        with pytest.raises(ValueError):
+            memory_path({ENV_MEMORY: str(inside)})
+
+
+def test_a_verdict_says_whether_the_council_remembered(tmp_path):
+    """So the page can tell a Council that could have learned from one that could not."""
+    assert sit().usage["memory"] is False
+    assert sit(memory=tmp_path / "m.md").usage["memory"] is True
+    assert sit(boom=RuntimeError("x"), memory=tmp_path / "m.md").usage["memory"] is True
 
 
 def test_temperature_is_left_to_the_provider(tmp_path):

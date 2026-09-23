@@ -266,7 +266,8 @@ def council_payload(verdicts: Sequence[Verdict], now: datetime) -> dict[str, Any
                      if verdicts else None),
         "verdicts": [
             {"asset": v.asset, "trade_date": v.trade_date.isoformat(),
-             "committed_at": v.committed_at.isoformat(), "status": v.status, "rating": v.rating}
+             "committed_at": v.committed_at.isoformat(), "status": v.status, "rating": v.rating,
+             "memory": bool((v.usage or {}).get("memory"))}
             for v in sorted(verdicts, key=lambda v: (v.asset, v.trade_date))
         ],
     }

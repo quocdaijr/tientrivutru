@@ -8,7 +8,9 @@ therefore arguments, and the tests pass stand-ins.
 
 Only the rating leaves a sitting. The debate itself routinely quotes Yahoo news, StockTwits,
 Reddit and FRED, none of which licenses republication, so the final state is read for its
-signal and then dropped with the temporary directory.
+signal and then dropped with the temporary directory. The one thing that outlives a sitting is
+TradingAgents' own memory file (ticket 09), and it lives outside the repo: the workflow keeps it
+in the Actions cache, never in a commit.
 """
 
 from __future__ import annotations
@@ -58,6 +60,24 @@ ENV_QUICK = "TRADINGAGENTS_QUICK_THINK_LLM"
 ENV_CAP = "HOI_DONG_MONTHLY_CAP_USD"
 ENV_BILLING = "HOI_DONG_BILLING"
 BILLING_MODES = ("paid", "free")
+ENV_MEMORY = "HOI_DONG_MEMORY_PATH"
+REPO = Path(__file__).resolve().parents[2]
+
+
+def memory_path(env: Mapping[str, str], repo: Path = REPO) -> Path | None:
+    """Where the Council keeps its memory, or None for a Council that forgets.
+
+    The memory is TradingAgents' decision log: every past decision in model prose, with the
+    return it earned computed from Yahoo prices. Neither may be published from this repo, so a
+    path inside the working tree - one `git add` from a commit - is refused outright.
+    """
+    raw = (env.get(ENV_MEMORY) or "").strip()
+    if not raw:
+        return None
+    path = Path(raw).expanduser().resolve()
+    if path.is_relative_to(repo):
+        raise ValueError(f"{ENV_MEMORY} must be outside the repo, got {raw!r}")
+    return path
 
 
 def council_settings(env: Mapping[str, str], today: date,
@@ -116,20 +136,24 @@ def council_settings(env: Mapping[str, str], today: date,
     return Model(provider, deep, quick), cap, []
 
 
-def council_config(base: Mapping[str, Any], model: Model, workdir: Path) -> dict[str, Any]:
+def council_config(base: Mapping[str, Any], model: Model, workdir: Path,
+                   memory: Path | None = None) -> dict[str, Any]:
     """TradingAgents' config for one sitting.
 
-    Memory, logs and cache all go under a throwaway directory: the Council does not remember
-    past verdicts (ticket 09 may change that), and nothing it writes may land where a commit
-    could pick it up. `temperature` is deliberately not touched - a non-default value is an HTTP
-    400 on Claude Sonnet 5 and Opus 5 and makes Gemini 3 prone to looping (research 03).
+    Logs and cache go under a throwaway directory, and so does the memory unless one is given:
+    nothing a sitting writes may land where a commit could pick it up. Given a memory path,
+    TradingAgents reads its past decisions for this ticker before the debate and settles the
+    ones whose holding period has passed - that is the whole of "remembering".
+
+    `temperature` is deliberately not touched - a non-default value is an HTTP 400 on Claude
+    Sonnet 5 and Opus 5 and makes Gemini 3 prone to looping (research 03).
     """
     cfg = dict(base)
     cfg.update(
         llm_provider=model.provider,
         deep_think_llm=model.deep,
         quick_think_llm=model.quick,
-        memory_log_path=str(workdir / "memory" / "trading_memory.md"),
+        memory_log_path=str(memory or workdir / "memory" / "trading_memory.md"),
         results_dir=str(workdir / "logs"),
         data_cache_dir=str(workdir / "cache"),
         checkpoint_enabled=False,
@@ -194,13 +218,15 @@ def _error_text(exc: BaseException) -> str:
 
 
 def _usage(stats: Mapping[str, int], model: Model,
-           prices: Mapping[str, tuple[float, float]] | None) -> dict[str, Any]:
+           prices: Mapping[str, tuple[float, float]] | None, memory: bool) -> dict[str, Any]:
     """prices=None is the free tier: nothing is billed, so the cost is 0 - but the tokens are
-    kept, because they are what would be billed if the project ever turned billing on."""
+    kept, because they are what would be billed if the project ever turned billing on.
+    `memory` says whether this sitting could read its past verdicts."""
     usage: dict[str, Any] = {
         "llm_calls": stats["llm_calls"],
         "tokens_in": stats["tokens_in"],
         "tokens_out": stats["tokens_out"],
+        "memory": memory,
     }
     if prices is None:
         return {**usage, "cost_usd": 0.0, "billing": "free"}
@@ -219,6 +245,7 @@ def run_verdict(
     base_config: Callable[[], Mapping[str, Any]] | None = None,
     prices: Mapping[str, tuple[float, float]] | None = PRICES,
     now: Callable[[], datetime] = utc_now,
+    memory: Path | None = None,
 ) -> Verdict:
     """One sitting. Always returns a Verdict - a crash is a 'failed' row that still carries the
     tokens it burned, because they were bought whether or not an answer came back.
@@ -233,14 +260,15 @@ def run_verdict(
               "upstream": UPSTREAM}
 
     with tempfile.TemporaryDirectory(prefix="hoi-dong-") as tmp:
-        config = council_config((base_config or _default_base_config)(), model, Path(tmp))
+        config = council_config((base_config or _default_base_config)(), model, Path(tmp),
+                                memory=memory)
         try:
             graph = graph_factory(config, [counter])
             _state, signal = graph.propagate(asset.key, trade_date.isoformat(),
                                              asset_type=asset_type)
         except Exception as exc:  # noqa: BLE001 - every failure must become a row, not a crash
             return Verdict(committed_at=now(), status="failed",
-                           usage=_usage(counter.stats(), model, prices),
+                           usage=_usage(counter.stats(), model, prices, memory is not None),
                            error=_error_text(exc), **common)
 
     readable = signal in RATINGS
@@ -248,6 +276,6 @@ def run_verdict(
         committed_at=now(),
         status="ok" if readable else "review",
         rating=signal if readable else None,
-        usage=_usage(counter.stats(), model, prices),
+        usage=_usage(counter.stats(), model, prices, memory is not None),
         **common,
     )

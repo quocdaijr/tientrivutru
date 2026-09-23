@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 [![Ruff](https://img.shields.io/badge/lint-ruff-261230.svg)](https://docs.astral.sh/ruff/)
-[![tests](https://img.shields.io/badge/tests-1019%20passing-brightgreen.svg)](tests/)
+[![tests](https://img.shields.io/badge/tests-1029%20passing-brightgreen.svg)](tests/)
 [![draws analysed](https://img.shields.io/badge/draws%20analysed-31%2C470-informational.svg)](#kết-quả-tầng-thật-trên-dữ-liệu-thật)
 [![chi-square](https://img.shields.io/badge/chi²%20p--value-0.10%20→%20random-informational.svg)](#kết-quả-tầng-thật-trên-dữ-liệu-thật)
 [![prediction accuracy](https://img.shields.io/badge/prediction%20accuracy-0%25-critical.svg)](DISCLAIMER.md)
@@ -354,6 +354,13 @@ Reddit, FRED, và không nguồn nào cho phát lại. **Điểm được chấm
 chiều; cổ phiếu 0,15% + thuế bán 0,1%), cửa sổ mở ở nến đầu tiên sau giờ ghi — nên ghi trễ chỉ
 bị đẩy sang cửa sổ sau, không gian lận được. So với *luôn Buy* và *tung đồng xu* cùng cửa sổ;
 p-value chỉ in khi đủ 30 phán quyết.
+
+Hội đồng **có nhớ**: trước mỗi phiên nó đọc lại phán quyết cũ của chính nó và chúng lời lỗ ra
+sao — decision log có sẵn của TradingAgents. File đó là văn xuôi của model và lợi suất tính từ
+giá Yahoo, nên nó được giữ giữa các lần chạy bằng Actions cache, không bao giờ commit. Trang hỏi
+câu mà nghiên cứu Brazil đã trả lời cho người thật: nó có khá lên theo thời gian không — so lợi
+thế trên *luôn Buy* của nửa đầu với nửa sau các phán quyết đã chấm, và nói "chưa đủ" khi chưa có
+20 phán quyết.
 
 Hai điều trang nói thẳng: để ra bậc, Hội đồng tự đọc Yahoo Finance bằng máy, điều mà điều khoản
 của Yahoo không cho phép; và chính sách LLM mỗi hãng khác nhau về chuyện tự động đăng output,

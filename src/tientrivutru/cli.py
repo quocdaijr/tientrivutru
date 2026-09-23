@@ -657,7 +657,7 @@ def cmd_council(args: argparse.Namespace) -> int:
     import os
     from dataclasses import replace
 
-    from .hoi_dong_run import council_settings, run_verdict
+    from .hoi_dong_run import council_settings, memory_path, run_verdict
 
     if args.asset and not args.dry_run:
         # Choosing which asset gets a RECORDED sitting would be choosing the record.
@@ -665,13 +665,17 @@ def cmd_council(args: argparse.Namespace) -> int:
 
     now = utc_now()
     model, cap, problems = council_settings(os.environ, now.date())
+    try:
+        memory = memory_path(os.environ)
+    except ValueError as exc:
+        problems = [*problems, str(exc)]
     if problems:
         for problem in problems:
             console.print(f"[red]không họp:[/red] {problem}")
         return 2
 
     if args.dry_run:
-        return _council_dry_run(args, model, cap, now, run_verdict)
+        return _council_dry_run(args, model, cap, now, run_verdict, memory)
 
     verdicts = list(store.read_verdicts())
     month = now.strftime("%Y-%m")
@@ -685,9 +689,9 @@ def cmd_council(args: argparse.Namespace) -> int:
     for asset in due:
         day = hoi_dong.local_date(asset, now)
         if free:
-            verdict = run_verdict(asset, day, model=model, prices=None)
+            verdict = run_verdict(asset, day, model=model, prices=None, memory=memory)
         elif hoi_dong.can_afford(verdicts, cap, model.deep, month):
-            verdict = run_verdict(asset, day, model=model)
+            verdict = run_verdict(asset, day, model=model, memory=memory)
         else:
             verdict = hoi_dong.Verdict(asset=asset.key, trade_date=day, committed_at=utc_now(),
                                        status="skipped_budget", model=model.as_dict(),
@@ -712,34 +716,42 @@ def cmd_council(args: argparse.Namespace) -> int:
     return 1 if failed else 0
 
 
-def _council_dry_run(args, model, cap, now, run_verdict) -> int:
+def _council_dry_run(args, model, cap, now, run_verdict, memory) -> int:
     """Real sittings, printed in full, never appended.
 
     For testing a key, a model or a provider on a day whose sittings are already on record.
     It ignores "already sat today" on purpose and writes nothing, so the ledger keeps its one
     row per asset per day - a dry run cannot replace a recorded verdict, only look at another
-    sample of what the Council would say.
+    sample of what the Council would say. It sits on a copy of the memory, so it remembers what
+    the recorded Council remembers and the recorded Council never remembers it.
     """
+    import shutil
+    import tempfile
     import time
+    from pathlib import Path
 
     assets = ([hoi_dong.ASSETS[args.asset]] if args.asset
               else list(hoi_dong.due_assets([], now)))
     console.print(f"[bold]dry-run[/bold] · {model.provider}/{model.deep} · không ghi gì vào sổ")
     failed = 0
-    for asset in assets:
-        started = time.monotonic()
-        verdict = run_verdict(asset, hoi_dong.local_date(asset, now), model=model,
-                              **({"prices": None} if cap is None else {}))
-        usage = verdict.usage or {}
-        console.print(
-            f"{asset.key:8s} {verdict.status:8s} {verdict.rating or '—':12s} "
-            f"{time.monotonic() - started:6.1f}s  calls={usage.get('llm_calls', 0)} "
-            f"in={usage.get('tokens_in', 0)} out={usage.get('tokens_out', 0)} "
-            f"${usage.get('cost_usd', 0.0):.4f}"
-        )
-        if verdict.error:
-            console.print(f"         {verdict.error}")
-        failed += verdict.status == "failed"
+    with tempfile.TemporaryDirectory(prefix="hoi-dong-dry-") as tmp:
+        copy = None if memory is None else Path(tmp) / memory.name
+        if copy is not None and memory.exists():
+            shutil.copy2(memory, copy)
+        for asset in assets:
+            started = time.monotonic()
+            verdict = run_verdict(asset, hoi_dong.local_date(asset, now), model=model,
+                                  memory=copy, **({"prices": None} if cap is None else {}))
+            usage = verdict.usage or {}
+            console.print(
+                f"{asset.key:8s} {verdict.status:8s} {verdict.rating or '—':12s} "
+                f"{time.monotonic() - started:6.1f}s  calls={usage.get('llm_calls', 0)} "
+                f"in={usage.get('tokens_in', 0)} out={usage.get('tokens_out', 0)} "
+                f"${usage.get('cost_usd', 0.0):.4f}"
+            )
+            if verdict.error:
+                console.print(f"         {verdict.error}")
+            failed += verdict.status == "failed"
     return 1 if failed else 0
 
 

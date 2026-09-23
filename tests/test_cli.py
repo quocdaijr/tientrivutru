@@ -555,7 +555,7 @@ def _council(monkeypatch, env, *, sittings=None, now="2026-09-23T12:10:00+00:00"
     from tientrivutru import hoi_dong_run
     from tientrivutru.hoi_dong import Verdict
 
-    for key in (*COUNCIL_ENV, "HOI_DONG_BILLING"):
+    for key in (*COUNCIL_ENV, "HOI_DONG_BILLING", "HOI_DONG_MEMORY_PATH"):
         monkeypatch.delenv(key, raising=False)
     for key, value in env.items():
         monkeypatch.setenv(key, value)
@@ -563,8 +563,12 @@ def _council(monkeypatch, env, *, sittings=None, now="2026-09-23T12:10:00+00:00"
     monkeypatch.setattr(cli, "utc_now", lambda: moment)
     calls = [] if sittings is None else sittings
 
-    def fake_run(asset, day, *, model, prices=None):
+    def fake_run(asset, day, *, model, prices=None, memory=None):
         calls.append(asset.key)
+        if memory is not None:               # what TradingAgents does: append this decision
+            memory.parent.mkdir(parents=True, exist_ok=True)
+            with memory.open("a") as f:
+                f.write(f"[{day} | {asset.key} | Hold | pending]\n")
         return Verdict(asset=asset.key, trade_date=day, committed_at=moment, status="ok",
                        rating="Hold", model=model.as_dict(), usage={"cost_usd": cost})
 
@@ -632,6 +636,33 @@ def test_a_dry_run_can_sit_on_one_asset(monkeypatch):
                            argv=["--dry-run", "--asset", "BTC-USD"])
     assert (code, calls) == (0, ["BTC-USD"])
     assert store.read_verdicts() == ()
+
+
+def test_a_recorded_sitting_remembers(monkeypatch, tmp_path):
+    memory = tmp_path / "memory" / "trading_memory.md"
+    code, _ = _council(monkeypatch, {**COUNCIL_ENV, "HOI_DONG_MEMORY_PATH": str(memory)})
+    assert code == 0
+    assert memory.read_text().count("pending") == 4
+
+
+def test_a_dry_run_reads_the_memory_but_never_changes_it(monkeypatch, tmp_path):
+    """A trial sitting that wrote into the memory would become part of what the recorded
+    Council remembers - an unrecorded verdict steering recorded ones. It sits on a copy."""
+    memory = tmp_path / "trading_memory.md"
+    memory.write_text("[2026-09-22 | BTC-USD | Buy | pending]\n")
+    env = {**COUNCIL_ENV, "HOI_DONG_MEMORY_PATH": str(memory)}
+    code, calls = _council(monkeypatch, env, argv=["--dry-run", "--asset", "BTC-USD"])
+    assert (code, calls) == (0, ["BTC-USD"])
+    assert memory.read_text() == "[2026-09-22 | BTC-USD | Buy | pending]\n"
+
+
+def test_a_memory_inside_the_repo_is_refused(monkeypatch, capsys):
+    from tientrivutru.hoi_dong_run import REPO
+
+    env = {**COUNCIL_ENV, "HOI_DONG_MEMORY_PATH": str(REPO / "data" / "memory.md")}
+    code, calls = _council(monkeypatch, env)
+    assert (code, calls) == (2, [])
+    assert "HOI_DONG_MEMORY_PATH" in capsys.readouterr().out
 
 
 def test_asset_without_dry_run_is_refused(monkeypatch):

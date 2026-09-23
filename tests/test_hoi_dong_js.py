@@ -334,6 +334,38 @@ def test_summary_reports_all_three_side_by_side():
 
 # --- the page itself ----------------------------------------------------------------------
 
+# --- does it get better? ---------------------------------------------------------------
+
+def test_the_trend_says_too_few_below_its_minimum():
+    """Two halves of a handful are two coin flips; the page says so instead of comparing."""
+    got = out("[H.trend(rowsOf(H.MIN_SCORED_FOR_TREND - 1, 's', false)),"
+              " H.trend(rowsOf(H.MIN_SCORED_FOR_TREND, 's', false)) !== null]")
+    assert got == [None, True]
+
+
+def test_the_trend_compares_early_and_late_edge_over_always_buy():
+    """The edge is the Council net of what always-Buy made on the same window, so a market that
+    rose in the second half does not pass for a Council that learned. Odd n drops the middle."""
+    got = out("""(() => {
+      const rows = rowsOf(21, 't', false);
+      const edge = (r) => r.council - r.alwaysBuy;
+      const mean = (xs) => xs.reduce((a, r) => a + edge(r), 0) / xs.length;
+      const t = H.trend(rows);
+      return [t.half, Math.abs(t.early - mean(rows.slice(0, 10))) < 1e-12,
+              Math.abs(t.late - mean(rows.slice(11))) < 1e-12];
+    })()""")
+    assert got == [10, True, True]
+
+
+def test_a_council_that_learns_shows_up_in_the_trend():
+    got = out("""(() => {
+      const rows = rowsOf(10, 'r', false).concat(rowsOf(10, 'a', true));
+      const t = H.trend(rows);
+      return t.late > t.early;
+    })()""")
+    assert got is True
+
+
 def test_the_trader_page_loads_the_council_before_trader_js():
     html = (SITE / "trader.html").read_text(encoding="utf-8")
     assert (html.index('src="./personal.js"') < html.index('src="./hoi-dong.js"')
