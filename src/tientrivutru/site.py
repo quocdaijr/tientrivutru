@@ -12,7 +12,17 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-from . import astrology, kienthiet_scoreboard, prize_health, scoreboard, stats, store, tax, wheel
+from . import (
+    astrology,
+    hoi_dong,
+    kienthiet_scoreboard,
+    prize_health,
+    scoreboard,
+    stats,
+    store,
+    tax,
+    wheel,
+)
 from .games import PROPHECY_GAMES, GameSpec
 from .kienthiet_oracle import VeProphecy
 from .models import Draw, Prophecy, utc_now
@@ -287,6 +297,7 @@ def build_bundle() -> dict[str, Any]:
         "kienthiet": kien_thiet,
         "top_n": TOP_N,
         "astrology": _astrology_payload(),
+        "council": hoi_dong.council_payload(store.read_verdicts(), utc_now()),
         "privacy": (
             "Ngày sinh, tên và giới tính chỉ nằm trong trình duyệt của bạn "
             "(localStorage). Không có server, không có tài khoản, không request nào "

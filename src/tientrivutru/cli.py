@@ -12,6 +12,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 from . import (
+    hoi_dong,
     kienthiet_commands,
     kienthiet_report,
     notify,
@@ -24,7 +25,7 @@ from . import (
     wheel,
 )
 from .games import GAMES, PROPHECY_GAMES, GameSpec, get_game
-from .models import Draw, Prophecy
+from .models import Draw, Prophecy, utc_now
 from .oracle import prophesy
 from .schedule import VN_TZ, draw_has_happened, next_target, now_vn, today_vn
 from .sources import kienthiet, us_lottery, vietlott_live, vietlott_prizes, xsmb
@@ -644,6 +645,66 @@ def cmd_pulse(args: argparse.Namespace) -> int:
     return 1
 
 
+def cmd_council(args: argparse.Namespace) -> int:
+    """One sitting of the Council for every asset that is due today.
+
+    Refuses outright - exit 2, nothing spent - unless the model, its looked-up price and a
+    monthly cap are all set. A day that cannot be afforded is still written, as skipped_budget,
+    so the page can say the Council stopped rather than silently going quiet. Exit 1 if any
+    sitting failed: its row is still written (the tokens were bought), and the workflow commits
+    it before going red.
+    """
+    import os
+    from dataclasses import replace
+
+    from .hoi_dong_run import council_settings, run_verdict
+
+    now = utc_now()
+    model, cap, problems = council_settings(os.environ, now.date())
+    if problems:
+        for problem in problems:
+            console.print(f"[red]không họp:[/red] {problem}")
+        return 2
+
+    verdicts = list(store.read_verdicts())
+    month = now.strftime("%Y-%m")
+    due = hoi_dong.due_assets(verdicts, now)
+    if not due:
+        console.print("Hôm nay không có mã nào đến lượt Hội đồng họp.")
+        return 0
+
+    free = cap is None               # a no-billing project: the provider's limit is the cap
+    failed = 0
+    for asset in due:
+        day = hoi_dong.local_date(asset, now)
+        if free:
+            verdict = run_verdict(asset, day, model=model, prices=None)
+        elif hoi_dong.can_afford(verdicts, cap, model.deep, month):
+            verdict = run_verdict(asset, day, model=model)
+        else:
+            verdict = hoi_dong.Verdict(asset=asset.key, trade_date=day, committed_at=utc_now(),
+                                       status="skipped_budget", model=model.as_dict(),
+                                       usage={"cost_usd": 0.0})
+        if not free:
+            verdict = replace(verdict, usage={**(verdict.usage or {}), "cap_usd": cap})
+        store.append_verdict(verdict)
+        verdicts.append(verdict)
+        failed += verdict.status == "failed"
+        console.print(
+            f"{asset.key:8s} {day}  {verdict.status:15s} {verdict.rating or '—':12s} "
+            f"${verdict.cost_usd:.4f}"
+        )
+    if free:
+        console.print(f"Tháng {month}: gói miễn phí — không tính tiền, "
+                      "giới hạn là của nhà cung cấp.")
+    else:
+        console.print(
+            f"Tháng {month}: đã đốt ${hoi_dong.month_spend(verdicts, month):.4f} / trần ${cap:.2f}."
+        )
+    console.print(DISCLAIMER)
+    return 1 if failed else 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="tientrivutru", description="Máy tiên tri xổ số tự vả mặt. Không dự đoán được gì."
@@ -683,6 +744,8 @@ def build_parser() -> argparse.ArgumentParser:
     add("today", "dashboard kỳ quay tới", cmd_today)
 
     add("site", "sinh site/data.json cho trang tĩnh", cmd_site)
+
+    add("council", "Hội đồng TradingAgents họp một phiên cho các mã đến lượt", cmd_council)
 
     notify_cmd = add("notify", "đẩy tiên tri / kết quả lên Telegram", cmd_notify)
     notify_cmd.add_argument(

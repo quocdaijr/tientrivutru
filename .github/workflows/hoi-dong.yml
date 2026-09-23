@@ -1,0 +1,106 @@
+name: Hội đồng
+
+on:
+  workflow_dispatch:
+  # No schedule yet, on purpose. How verdicts get published - unattended, or as a daily PR a
+  # human merges - is still open (.scratch/hoi-dong, ticket 13): OpenAI's sharing policy asks
+  # for manual review, Anthropic's AUP lists automatic publishing as high-risk, Google's Gemini
+  # API terms do not. The cron is added once that is decided, not before.
+
+# Serialised with oracle.yml: both rebuild and commit site/data.json, and two pushes racing
+# for main is how one of them silently loses its data.
+concurrency:
+  group: oracle
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Sync dependencies
+        run: uv sync --frozen
+
+      # TradingAgents is not a dependency of this package. It is layered in for this one step,
+      # at the exact commit of its v0.5.0 tag - never by name from PyPI, where `tradingagents`
+      # is a different project by a different author.
+      #
+      # One secret holds the key; the variable HOI_DONG_KEY_ENV names the env var the chosen
+      # provider reads (GOOGLE_API_KEY, DEEPSEEK_API_KEY, OPENAI_API_KEY, ANTHROPIC_API_KEY),
+      # so switching provider never means editing this file. FRED_API_KEY stays unset: FRED
+      # series owned by third parties would need their owners' permission.
+      #
+      # `council` exits 2 and spends nothing unless model, price and cap are all set; exits 1
+      # if a sitting failed, after writing its row - so the steps below still run and commit
+      # it, and the job goes red afterwards instead of hiding the failure.
+      - name: Council sits
+        id: council
+        env:
+          HOI_DONG_API_KEY: ${{ secrets.HOI_DONG_API_KEY }}
+          HOI_DONG_KEY_ENV: ${{ vars.HOI_DONG_KEY_ENV }}
+          HOI_DONG_MONTHLY_CAP_USD: ${{ secrets.HOI_DONG_MONTHLY_CAP_USD }}
+          # "free" on a project with no billing (Gemini's free tier): nothing can be charged,
+          # so the provider's own limit is the cap and no dollar cap is needed.
+          HOI_DONG_BILLING: ${{ vars.HOI_DONG_BILLING }}
+          # A free tier answers bursts with 429. TradingAgents forwards this retry budget to
+          # every provider client (its own knob for exactly this, upstream #1091).
+          TRADINGAGENTS_LLM_MAX_RETRIES: "6"
+          TRADINGAGENTS_LLM_PROVIDER: ${{ vars.HOI_DONG_PROVIDER }}
+          TRADINGAGENTS_DEEP_THINK_LLM: ${{ vars.HOI_DONG_MODEL }}
+          TRADINGAGENTS_QUICK_THINK_LLM: ${{ vars.HOI_DONG_MODEL }}
+        run: |
+          if [ -n "$HOI_DONG_KEY_ENV" ]; then export "$HOI_DONG_KEY_ENV=$HOI_DONG_API_KEY"; fi
+          unset HOI_DONG_API_KEY
+          uv run --with "tradingagents @ git+https://github.com/TauricResearch/TradingAgents@2d17df8da1536c121e4d7395ac5a5dcec9e96d6f" \
+            tientrivutru council
+
+      - name: Build site bundle
+        if: ${{ !cancelled() }}
+        run: uv run tientrivutru site
+
+      - name: Commit verdicts
+        if: ${{ !cancelled() }}
+        run: |
+          git config user.name  "tientrivutru-hoi-dong"
+          git config user.email "hoi-dong@tientrivutru.invalid"
+          git add data/hoi_dong site/data.json
+          if git diff --staged --quiet; then
+            echo "Hội đồng không ghi gì mới."
+            exit 0
+          fi
+          git commit -m "hoi-dong: $(date -u +%F) — hội đồng đã họp"
+          git pull --rebase
+          git push
+
+      - name: Upload Pages artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+  deploy-pages:
+    needs: run
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    # Shared with ci.yml and oracle.yml - Pages allows one deployment in flight.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v5

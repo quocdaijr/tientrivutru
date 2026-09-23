@@ -422,7 +422,8 @@ def test_the_trader_page_loads_the_scripts_it_needs_in_order():
     """trader.js reads the TienTriVuTru* namespaces at load, and builds the chart against
     window.LightweightCharts, so all of them have to be on the page before it."""
     html = (SITE / "trader.html").read_text(encoding="utf-8")
-    local = ("dom.js", "thay.js", "warning.js", "theme.js", "personal.js", "trader.js")
+    local = ("dom.js", "thay.js", "warning.js", "theme.js", "personal.js", "hoi-dong.js",
+             "trader.js")
     # src="./x", not a bare substring: "theme.js" also appears inside the anti-FOUC
     # localStorage key at the top of the document.
     order = [s for s in local if f'src="./{s}"' in html]

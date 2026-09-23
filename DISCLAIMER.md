@@ -52,6 +52,19 @@ vàng, chỉ số chứng khoán và giá crypto:
 
 Cần số chính xác để giao dịch thì tra thẳng nguồn gốc, đừng dùng trang này.
 
+Và cho trang trader (`/trader.html`):
+
+- **Mẫu hình nến và lời phán là trò đùa.** Chặng cuối của trang tự đo chúng trên chính dữ liệu
+  đó và cho thấy chúng không nói gì về cây nến kế tiếp.
+- **Hội đồng là một hệ thống AI, và bậc nó ra (Buy, Overweight, Hold, Underweight, Sell) do AI
+  tạo, có thể sai hoặc thiếu sót, chỉ để tham khảo.** Nó không phải khuyến nghị mua bán của
+  bất kỳ ai. Hội đồng là TradingAgents (TauricResearch, Apache-2.0) chạy nguyên bản; để ra bậc
+  nó tự đọc dữ liệu Yahoo Finance bằng máy, điều mà điều khoản của Yahoo không cho phép. Repo
+  chỉ ghi lại bậc và giờ ghi — không một con số nào Hội đồng đọc được đưa lên trang.
+- **Điểm của Hội đồng được chấm ngay trong trình duyệt của bạn**, bằng giá lấy từ Binance và
+  VNDIRECT lúc bạn mở trang, và không được lưu lại ở đâu. Phí và thuế trong phép chấm là mức
+  phổ biến, không phải mức của tài khoản bạn; spread và trượt giá không được tính.
+
 ### 3. Không bán gì
 
 Không thu tiền. Không tài khoản. Không thanh toán. Không quảng cáo. Không affiliate. Không
@@ -160,6 +173,20 @@ prices, stock indices, and crypto prices:
   substituted.
 
 If you need accurate figures to trade on, go to the source. Do not use this page.
+
+And to the trader page (`/trader.html`):
+
+- **The candlestick patterns and the fortune-teller's reading are a joke.** The page's last
+  stage measures them on the same data and shows they say nothing about the next candle.
+- **The Council is an AI system, and its ratings (Buy, Overweight, Hold, Underweight, Sell) are
+  AI-generated, may contain errors or omissions, and are for reference only.** They are no one's
+  buy or sell recommendation. The Council is TradingAgents (TauricResearch, Apache-2.0), run
+  unmodified; to reach a rating it reads Yahoo Finance data automatically, which Yahoo's terms
+  do not permit. The repository records only the rating and the time it was written — no
+  figure the Council read is published.
+- **The Council is scored in your own browser**, on prices fetched from Binance and VNDIRECT
+  when you open the page, and stored nowhere. The fees and taxes in that scoring are typical
+  rates, not your account's; spread and slippage are not counted.
 
 ### 3. Nothing is for sale
 

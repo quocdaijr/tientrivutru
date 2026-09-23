@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 [![Ruff](https://img.shields.io/badge/lint-ruff-261230.svg)](https://docs.astral.sh/ruff/)
-[![tests](https://img.shields.io/badge/tests-924%20passing-brightgreen.svg)](tests/)
+[![tests](https://img.shields.io/badge/tests-1015%20passing-brightgreen.svg)](tests/)
 [![draws analysed](https://img.shields.io/badge/draws%20analysed-31%2C470-informational.svg)](#what-the-honest-layer-found)
 [![chi-square](https://img.shields.io/badge/chi²%20p--value-0.10%20→%20random-informational.svg)](#what-the-honest-layer-found)
 [![prediction accuracy](https://img.shields.io/badge/prediction%20accuracy-0%25-critical.svg)](DISCLAIMER.md)
@@ -400,6 +400,29 @@ figure, without REST thầy **gives no reading** and both citations stay intact.
 > This page is **not investment advice, not a recommendation, and not a course.** The prices
 > are real; the patterns and the reading are a joke, and the last stage measures them to
 > prove it.
+
+### The Council — TradingAgents, scored in public
+
+Stage `02 · HỘI ĐỒNG` is one more oracle to be graded:
+[TradingAgents](https://github.com/TauricResearch/TradingAgents) (Apache-2.0) — twelve LLM
+agents, four reading numbers, two arguing, one deciding, three on risk, one approving — issuing a
+five-tier rating each day for BTC, FPT, VNM and VCB. It runs unmodified at commit `2d17df8`
+(tag `v0.5.0`), installed straight from git: `tradingagents` on PyPI is **a different project**
+by someone else.
+
+The repository records only **the rating and when it was written**, append-only, in
+`data/hoi_dong/verdicts.jsonl`. No prices, no returns, not one sentence of the debate — the debate
+quotes Yahoo news, StockTwits, Reddit and FRED, none of which licenses republication. **The
+scoring happens in the reader's browser**, on prices fetched from Binance and VNDIRECT when the
+page opens: paper trades net of real costs (BTC 0.10% per side; stocks 0.15% plus the 0.1% sale
+tax), with the window opening at the first bar after the write — so a late write only moves the
+window, it cannot cheat. Graded against *always Buy* and *a coin flip* on the same windows; a
+p-value appears once 30 verdicts are scored.
+
+Two things the page says outright: to reach a rating, the Council reads Yahoo Finance
+automatically, which Yahoo's terms do not permit; and LLM providers differ on whether their
+output may be published unattended, so the `Hội đồng` workflow is manual-only for now. A hard
+monthly cost cap applies — a day past the cap is written as `skipped_budget`, not silence.
 
 ## What the Honest Layer found
 

@@ -273,6 +273,27 @@ một cây nến đứng riêng, nên xáo thứ tự cho ra **đúng** con số
 không phải 0,05. Trang in cả ngưỡng đã chia lẫn số phép thử, vì năm phép thử song song thì
 thỉnh thoảng một cái ra số đẹp là chuyện bình thường, không phải phát hiện.
 
+**Hội đồng** (Council) — Mười hai agent LLM của TradingAgents (analyst, bull, bear, trader,
+risk, portfolio manager), được project coi như **một** oracle nữa để chấm điểm công khai. Nó
+không phải thầy: thầy là một phép cộng chữ số tái lập được, Hội đồng là một cuộc gọi LLM tốn
+tiền thật và không bao giờ cho cùng một kết quả hai lần.
+
+**Phán quyết** (Verdict) — Một lần Hội đồng ra quyết định năm bậc (Buy, Overweight, Hold,
+Underweight, Sell) cho một mã, ghi append-only **trước** khi cửa sổ chấm mở. Danh tính là cặp
+`(mã, ngày)`. Phán quyết **không phải** Lời tiên tri: Lời tiên tri tái sinh được từ seed nên ai
+cũng kiểm lại được; Phán quyết thì không tái sinh được, nên nó chỉ đáng tin vì đã được ghi
+trước. Một kết quả không đọc được bậc là **REVIEW**, không phải Hold — Hold là một lệnh, REVIEW
+là không có lệnh nào.
+
+**Cửa sổ chấm** (Scoring window) — Nến đầu tiên mở **sau** mốc ghi Phán quyết là nến vào lệnh;
+BTC ra ở cuối chính nến đó, mã VN ra ở cuối phiên T+2 — phiên sớm nhất cổ phiếu mua ở T bán
+được. Vì cửa sổ tính từ mốc ghi, ghi trễ không gian lận được: nó chỉ bị đẩy sang cửa sổ sau.
+
+**Lệnh giấy** (Paper trade) — Cách một Phán quyết được chấm: bậc thành vị thế (+1, +½, 0, −½,
+−1), giữ đúng một cửa sổ, trừ phí hai chiều và thuế bán. Mã VN không có vị thế âm, vì nhà đầu
+tư cá nhân không bán khống được cổ phiếu cơ sở. Mỗi Phán quyết là một lệnh khứ hồi riêng; lệnh
+gối nhau không được ròng với nhau.
+
 ## Từ tránh dùng
 
 - **"số nóng" / "số lạnh" / "cầu" / "soi cầu"** — chỉ dùng khi đang trích dẫn để bóc phốt,

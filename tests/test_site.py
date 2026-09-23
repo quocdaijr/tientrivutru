@@ -421,3 +421,22 @@ def test_one_draw_behind_is_not_flagged_stale_on_the_site():
 
     assert game["prizes"]["draws_behind"] == 1
     assert game["prizes"]["is_stale"] is False
+
+
+def test_bundle_carries_the_council_without_any_price():
+    """The page scores the Council itself; the bundle only hands it ratings and the budget."""
+    from datetime import date, datetime
+
+    from tientrivutru.hoi_dong import Verdict
+
+    store.append_verdict(Verdict(asset="BTC-USD", trade_date=date(2026, 9, 21),
+                                 committed_at=datetime.fromisoformat("2026-09-21T12:10:00+00:00"),
+                                 status="ok", rating="Sell", usage={"cost_usd": 0.2}))
+    council = site.build_bundle()["council"]
+    assert [v["rating"] for v in council["verdicts"]] == ["Sell"]
+    assert "price" not in json.dumps(council) and "close" not in json.dumps(council)
+
+
+def test_bundle_council_is_empty_before_the_first_sitting():
+    council = site.build_bundle()["council"]
+    assert council["verdicts"] == [] and council["cap_usd"] is None
