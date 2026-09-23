@@ -207,7 +207,18 @@ def test_the_page_gets_ratings_and_the_month_s_budget():
     assert payload["stopped"] is True
     assert {v["asset"] for v in payload["verdicts"]} == {"BTC-USD", "FPT.VN"}
     first = payload["verdicts"][0]
-    assert set(first) == {"asset", "trade_date", "committed_at", "status", "rating"}
+    assert set(first) == {"asset", "trade_date", "committed_at", "status", "rating", "memory"}
+
+
+def test_the_page_is_told_which_verdicts_could_remember():
+    """Rows written before ticket 09 have no memory flag: that Council could not remember."""
+    from tientrivutru.hoi_dong import council_payload
+
+    old = verdict(day="2026-09-21")
+    new = Verdict.from_dict({**verdict(day="2026-09-22").to_dict(),
+                             "usage": {"cost_usd": 0.0, "memory": True}})
+    rows = council_payload([old, new], at("2026-09-23T13:00:00+00:00"))["verdicts"]
+    assert [r["memory"] for r in rows] == [False, True]
 
 
 def test_an_empty_council_is_a_valid_payload():

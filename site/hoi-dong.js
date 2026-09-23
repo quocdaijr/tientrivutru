@@ -29,6 +29,8 @@ const DAY = 86400;
 const RATINGS = ['Buy', 'Overweight', 'Hold', 'Underweight', 'Sell'];
 const POSITION = { Buy: 1, Overweight: 0.5, Hold: 0, Underweight: -0.5, Sell: -1 };
 const MIN_SCORED_FOR_P = 30;
+/* Ten a half: below that, "better later" is the order two short runs of luck happened in. */
+const MIN_SCORED_FOR_TREND = 20;
 const PERMUTATIONS = 10000;
 /* The code the Council runs, mirrored from hoi_dong.UPSTREAM for a bundle that predates it. */
 const UPSTREAM = 'TauricResearch/TradingAgents@2d17df8da1536c121e4d7395ac5a5dcec9e96d6f';
@@ -198,6 +200,22 @@ function summarize(rows, asset, seed) {
   };
 }
 
+/* ============================ does it get better? ============================ */
+
+/**
+ * Ticket 09: the Council remembers its past verdicts and how they turned out. Whether that
+ * makes it any better is the question the Brazil study answered for people - no evidence they
+ * improve. Rows are scoreAsset's, in trade-date order. The edge is the Council net of always-Buy
+ * on the same window, so a market that rose later does not pass for a Council that learned.
+ * The middle row of an odd count is dropped, so both halves are the same size.
+ */
+function trend(rows) {
+  if (rows.length < MIN_SCORED_FOR_TREND) return null;
+  const half = Math.floor(rows.length / 2);
+  const edge = (xs) => xs.reduce((s, r) => s + r.council - r.alwaysBuy, 0) / xs.length;
+  return { half, early: edge(rows.slice(0, half)), late: edge(rows.slice(rows.length - half)) };
+}
+
 /* ============================ parsers ============================ */
 
 /**
@@ -322,6 +340,8 @@ function fillStage(body, council) {
     body.appendChild(grid);
   }
   body.appendChild(el('p', 'note', AI_LABEL));
+  const remembers = memoryLine(council.verdicts);
+  if (remembers) body.appendChild(el('p', 'note', remembers));
   body.appendChild(el('p', 'note',
     'Hội đồng là <a href="https://github.com/TauricResearch/TradingAgents" target="_blank" '
     + 'rel="noopener">TradingAgents</a> (Apache-2.0), chạy nguyên bản ở commit '
@@ -370,6 +390,29 @@ function scoreTable(summary) {
   return table;
 }
 
+/** Two numbers and no verdict on them: nothing here tests whether the gap is more than luck. */
+function trendLine(t, n) {
+  const q = 'Có khá lên theo thời gian không? ';
+  if (!t) {
+    return q + 'Chưa đủ ' + MIN_SCORED_FOR_TREND + ' phán quyết đã chấm để so nửa đầu với nửa '
+      + 'sau — mới có ' + n + '.';
+  }
+  return q + t.half + ' lệnh đầu hơn Luôn Buy ' + signed(t.early, 3) + ' mỗi lệnh; '
+    + t.half + ' lệnh gần nhất ' + signed(t.late, 3) + '. Chưa kiểm định gì: đó chỉ là hai '
+    + 'con số. Với người thật, nghiên cứu Brazil trên trang này không tìm thấy bằng chứng nào '
+    + 'cho thấy họ khá lên.';
+}
+
+/** Since when the Council has read its own past verdicts before sitting, if it ever has. */
+function memoryLine(verdicts) {
+  const since = verdicts.filter((v) => v.memory).map((v) => v.trade_date).sort()[0];
+  if (!since) return null;
+  return 'Từ phiên ' + since + ', trước mỗi phiên Hội đồng đọc lại các phán quyết cũ của chính '
+    + 'nó và chúng đã lời lỗ ra sao — trí nhớ có sẵn của TradingAgents. Trí nhớ đó không nằm '
+    + 'trong repo: nó là văn xuôi của model và lợi suất tính từ giá Yahoo, không thứ nào được '
+    + 'phép đăng lại.';
+}
+
 function countsLine(c) {
   const parts = [c.scored + ' đã chấm'];
   if (c.pending) parts.push(c.pending + ' đang chờ cửa sổ đóng');
@@ -410,6 +453,7 @@ async function fillTruth(box, council, now) {
         : 'p = ' + s.p.toLocaleString('vi-VN', { maximumFractionDigits: 3 })
           + ' (hoán vị ' + PERMUTATIONS.toLocaleString('vi-VN') + ' lần): xác suất một hội đồng '
           + 'phán bừa mà vẫn đạt được mức này hoặc hơn.'));
+      box.appendChild(el('p', 'note', trendLine(trend(rows), rows.length)));
     }
     box.appendChild(el('p', 'note', countsLine(counts)));
   }
@@ -444,8 +488,8 @@ async function load(stageEl, truthEl) {
 }
 
 window.TienTriVuTruHoiDong = {
-  RATINGS, POSITION, MIN_SCORED_FOR_P, PERMUTATIONS, ASSETS, UPSTREAM,
-  position, net, windowFor, coinRating, scoreAsset, permutationP, summarize,
+  RATINGS, POSITION, MIN_SCORED_FOR_P, MIN_SCORED_FOR_TREND, PERMUTATIONS, ASSETS, UPSTREAM,
+  position, net, windowFor, coinRating, scoreAsset, permutationP, summarize, trend,
   parseVndirect, parseBinanceDaily,
   freeLine, stage, truthBlock, load,
 };

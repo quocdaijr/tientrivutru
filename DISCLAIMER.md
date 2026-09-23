@@ -61,6 +61,8 @@ Và cho trang trader (`/trader.html`):
   bất kỳ ai. Hội đồng là TradingAgents (TauricResearch, Apache-2.0) chạy nguyên bản; để ra bậc
   nó tự đọc dữ liệu Yahoo Finance bằng máy, điều mà điều khoản của Yahoo không cho phép. Repo
   chỉ ghi lại bậc và giờ ghi — không một con số nào Hội đồng đọc được đưa lên trang.
+  Hội đồng nhớ các quyết định cũ của nó và chúng lời lỗ ra sao; trí nhớ đó nằm ngoài repo và
+  không được đăng.
 - **Điểm của Hội đồng được chấm ngay trong trình duyệt của bạn**, bằng giá lấy từ Binance và
   VNDIRECT lúc bạn mở trang, và không được lưu lại ở đâu. Phí và thuế trong phép chấm là mức
   phổ biến, không phải mức của tài khoản bạn; spread và trượt giá không được tính.
@@ -184,6 +186,8 @@ And to the trader page (`/trader.html`):
   unmodified; to reach a rating it reads Yahoo Finance data automatically, which Yahoo's terms
   do not permit. The repository records only the rating and the time it was written — no
   figure the Council read is published.
+  The Council remembers its past decisions and how they turned out; that memory is kept
+  outside the repository and not published.
 - **The Council is scored in your own browser**, on prices fetched from Binance and VNDIRECT
   when you open the page, and stored nowhere. The fees and taxes in that scoring are typical
   rates, not your account's; spread and slippage are not counted.

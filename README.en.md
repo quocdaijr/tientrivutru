@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 [![Ruff](https://img.shields.io/badge/lint-ruff-261230.svg)](https://docs.astral.sh/ruff/)
-[![tests](https://img.shields.io/badge/tests-1019%20passing-brightgreen.svg)](tests/)
+[![tests](https://img.shields.io/badge/tests-1029%20passing-brightgreen.svg)](tests/)
 [![draws analysed](https://img.shields.io/badge/draws%20analysed-31%2C470-informational.svg)](#what-the-honest-layer-found)
 [![chi-square](https://img.shields.io/badge/chi²%20p--value-0.10%20→%20random-informational.svg)](#what-the-honest-layer-found)
 [![prediction accuracy](https://img.shields.io/badge/prediction%20accuracy-0%25-critical.svg)](DISCLAIMER.md)
@@ -418,6 +418,13 @@ page opens: paper trades net of real costs (BTC 0.10% per side; stocks 0.15% plu
 tax), with the window opening at the first bar after the write — so a late write only moves the
 window, it cannot cheat. Graded against *always Buy* and *a coin flip* on the same windows; a
 p-value appears once 30 verdicts are scored.
+
+The Council **remembers**: before each sitting it rereads its own past verdicts and how they
+turned out — TradingAgents' built-in decision log. That file is model prose plus returns computed
+from Yahoo prices, so it is kept between runs in the Actions cache and never committed. The page
+asks the question the Brazilian study answered for people: does it get better over time — the
+edge over *always Buy* in the first half of scored verdicts against the second, and "not enough
+yet" below 20.
 
 Two things the page says outright: to reach a rating, the Council reads Yahoo Finance
 automatically, which Yahoo's terms do not permit; and LLM providers differ on whether their

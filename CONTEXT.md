@@ -276,7 +276,11 @@ thỉnh thoảng một cái ra số đẹp là chuyện bình thường, không 
 **Hội đồng** (Council) — Mười hai agent LLM của TradingAgents (analyst, bull, bear, trader,
 risk, portfolio manager), được project coi như **một** oracle nữa để chấm điểm công khai. Nó
 không phải thầy: thầy là một phép cộng chữ số tái lập được, Hội đồng là một cuộc gọi LLM tốn
-tiền thật và không bao giờ cho cùng một kết quả hai lần.
+tiền thật và không bao giờ cho cùng một kết quả hai lần. Hội đồng **có nhớ**: trước mỗi phiên
+nó đọc lại các Phán quyết cũ của chính nó và chúng đã lời lỗ ra sao (decision log có sẵn của
+TradingAgents). Trí nhớ đó là văn xuôi của model cộng lợi suất tính từ giá Yahoo, nên nó sống
+trong Actions cache, **không bao giờ** trong repo; Phán quyết chỉ ghi lại là phiên đó có nhớ hay
+không.
 
 **Phán quyết** (Verdict) — Một lần Hội đồng ra quyết định năm bậc (Buy, Overweight, Hold,
 Underweight, Sell) cho một mã, ghi append-only **trước** khi cửa sổ chấm mở. Danh tính là cặp
