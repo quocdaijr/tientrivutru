@@ -659,12 +659,19 @@ def cmd_council(args: argparse.Namespace) -> int:
 
     from .hoi_dong_run import council_settings, run_verdict
 
+    if args.asset and not args.dry_run:
+        # Choosing which asset gets a RECORDED sitting would be choosing the record.
+        raise SystemExit("--asset chỉ dùng được cùng --dry-run")
+
     now = utc_now()
     model, cap, problems = council_settings(os.environ, now.date())
     if problems:
         for problem in problems:
             console.print(f"[red]không họp:[/red] {problem}")
         return 2
+
+    if args.dry_run:
+        return _council_dry_run(args, model, cap, now, run_verdict)
 
     verdicts = list(store.read_verdicts())
     month = now.strftime("%Y-%m")
@@ -702,6 +709,37 @@ def cmd_council(args: argparse.Namespace) -> int:
             f"Tháng {month}: đã đốt ${hoi_dong.month_spend(verdicts, month):.4f} / trần ${cap:.2f}."
         )
     console.print(DISCLAIMER)
+    return 1 if failed else 0
+
+
+def _council_dry_run(args, model, cap, now, run_verdict) -> int:
+    """Real sittings, printed in full, never appended.
+
+    For testing a key, a model or a provider on a day whose sittings are already on record.
+    It ignores "already sat today" on purpose and writes nothing, so the ledger keeps its one
+    row per asset per day - a dry run cannot replace a recorded verdict, only look at another
+    sample of what the Council would say.
+    """
+    import time
+
+    assets = ([hoi_dong.ASSETS[args.asset]] if args.asset
+              else list(hoi_dong.due_assets([], now)))
+    console.print(f"[bold]dry-run[/bold] · {model.provider}/{model.deep} · không ghi gì vào sổ")
+    failed = 0
+    for asset in assets:
+        started = time.monotonic()
+        verdict = run_verdict(asset, hoi_dong.local_date(asset, now), model=model,
+                              **({"prices": None} if cap is None else {}))
+        usage = verdict.usage or {}
+        console.print(
+            f"{asset.key:8s} {verdict.status:8s} {verdict.rating or '—':12s} "
+            f"{time.monotonic() - started:6.1f}s  calls={usage.get('llm_calls', 0)} "
+            f"in={usage.get('tokens_in', 0)} out={usage.get('tokens_out', 0)} "
+            f"${usage.get('cost_usd', 0.0):.4f}"
+        )
+        if verdict.error:
+            console.print(f"         {verdict.error}")
+        failed += verdict.status == "failed"
     return 1 if failed else 0
 
 
@@ -745,7 +783,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     add("site", "sinh site/data.json cho trang tĩnh", cmd_site)
 
-    add("council", "Hội đồng TradingAgents họp một phiên cho các mã đến lượt", cmd_council)
+    council_cmd = add("council", "Hội đồng TradingAgents họp một phiên cho các mã đến lượt",
+                      cmd_council)
+    council_cmd.add_argument("--dry-run", action="store_true",
+                             help="họp thật nhưng không ghi gì vào sổ (để thử key, model)")
+    council_cmd.add_argument("--asset", choices=sorted(hoi_dong.ASSETS),
+                             help="chỉ một mã — chỉ dùng cùng --dry-run")
 
     notify_cmd = add("notify", "đẩy tiên tri / kết quả lên Telegram", cmd_notify)
     notify_cmd.add_argument(

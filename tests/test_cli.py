@@ -549,7 +549,8 @@ COUNCIL_ENV = {
 }
 
 
-def _council(monkeypatch, env, *, sittings=None, now="2026-09-23T12:10:00+00:00", cost=0.3):
+def _council(monkeypatch, env, *, sittings=None, now="2026-09-23T12:10:00+00:00", cost=0.3,
+             argv=()):
     """Run `tientrivutru council` with the real sitting replaced by a recorder."""
     from tientrivutru import hoi_dong_run
     from tientrivutru.hoi_dong import Verdict
@@ -568,7 +569,7 @@ def _council(monkeypatch, env, *, sittings=None, now="2026-09-23T12:10:00+00:00"
                        rating="Hold", model=model.as_dict(), usage={"cost_usd": cost})
 
     monkeypatch.setattr(hoi_dong_run, "run_verdict", fake_run)
-    return cli.main(["council"]), calls
+    return cli.main(["council", *argv]), calls
 
 
 def test_council_refuses_without_its_settings(monkeypatch, capsys):
@@ -612,3 +613,28 @@ def test_council_on_the_free_tier_never_skips_for_money(monkeypatch):
     assert code == 0
     assert calls == ["BTC-USD", "FPT.VN", "VNM.VN", "VCB.VN"]
     assert all("cap_usd" not in r.usage for r in store.read_verdicts())
+
+
+def test_a_dry_run_sits_but_writes_nothing(monkeypatch, capsys):
+    """For testing a key or a model on a day whose sittings are already on record: a real
+    sitting, printed, never appended. The ledger stays one row per asset per day."""
+    code, calls = _council(monkeypatch, COUNCIL_ENV)
+    before = store.read_verdicts()
+    code, calls = _council(monkeypatch, COUNCIL_ENV, sittings=[], argv=["--dry-run"])
+    assert code == 0
+    assert calls == ["BTC-USD", "FPT.VN", "VNM.VN", "VCB.VN"], "already sat today, sits anyway"
+    assert store.read_verdicts() == before
+    assert "dry-run" in capsys.readouterr().out
+
+
+def test_a_dry_run_can_sit_on_one_asset(monkeypatch):
+    code, calls = _council(monkeypatch, COUNCIL_ENV, sittings=[],
+                           argv=["--dry-run", "--asset", "BTC-USD"])
+    assert (code, calls) == (0, ["BTC-USD"])
+    assert store.read_verdicts() == ()
+
+
+def test_asset_without_dry_run_is_refused(monkeypatch):
+    """Picking which asset gets a recorded sitting would be choosing the record."""
+    with pytest.raises(SystemExit):
+        _council(monkeypatch, COUNCIL_ENV, argv=["--asset", "BTC-USD"])

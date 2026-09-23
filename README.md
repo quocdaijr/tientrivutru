@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 [![Ruff](https://img.shields.io/badge/lint-ruff-261230.svg)](https://docs.astral.sh/ruff/)
-[![tests](https://img.shields.io/badge/tests-1015%20passing-brightgreen.svg)](tests/)
+[![tests](https://img.shields.io/badge/tests-1019%20passing-brightgreen.svg)](tests/)
 [![draws analysed](https://img.shields.io/badge/draws%20analysed-31%2C470-informational.svg)](#kết-quả-tầng-thật-trên-dữ-liệu-thật)
 [![chi-square](https://img.shields.io/badge/chi²%20p--value-0.10%20→%20random-informational.svg)](#kết-quả-tầng-thật-trên-dữ-liệu-thật)
 [![prediction accuracy](https://img.shields.io/badge/prediction%20accuracy-0%25-critical.svg)](DISCLAIMER.md)
@@ -357,8 +357,9 @@ p-value chỉ in khi đủ 30 phán quyết.
 
 Hai điều trang nói thẳng: để ra bậc, Hội đồng tự đọc Yahoo Finance bằng máy, điều mà điều khoản
 của Yahoo không cho phép; và chính sách LLM mỗi hãng khác nhau về chuyện tự động đăng output,
-nên workflow `Hội đồng` hiện chỉ chạy tay. Mỗi tháng có trần chi phí cứng — chạm trần thì ngày
-đó ghi `skipped_budget` chứ không im lặng.
+nên Hội đồng chạy trên Gemini API — hãng duy nhất trong bốn không đòi duyệt từng cái — gói miễn phí, mỗi ngày 17:30 giờ VN. Trên gói miễn phí, trần là hạn mức của Google (vượt thì bị chặn, không bị tính tiền); nếu
+chuyển sang trả phí thì có trần đô cứng — chạm trần thì ngày đó ghi `skipped_budget` chứ không
+im lặng.
 
 ## Kết quả Tầng Thật trên dữ liệu thật
 

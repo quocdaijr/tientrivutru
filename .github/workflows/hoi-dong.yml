@@ -2,10 +2,23 @@ name: Hội đồng
 
 on:
   workflow_dispatch:
-  # No schedule yet, on purpose. How verdicts get published - unattended, or as a daily PR a
-  # human merges - is still open (.scratch/hoi-dong, ticket 13): OpenAI's sharing policy asks
-  # for manual review, Anthropic's AUP lists automatic publishing as high-risk, Google's Gemini
-  # API terms do not. The cron is added once that is decided, not before.
+    inputs:
+      dry_run:
+        description: "Họp thật nhưng không ghi gì vào sổ, không commit, không deploy"
+        type: boolean
+        default: false
+      asset:
+        description: "Chỉ một mã (chỉ dùng cùng dry_run), vd BTC-USD"
+        type: string
+        default: ""
+  # 10:30 UTC = 17:30 in Vietnam: after HOSE's 15:00 close and well after Gemini's daily quota
+  # resets at midnight Pacific. oracle.yml's 11:45 run shares the `oracle` concurrency group, so
+  # the two queue rather than race for main. Unattended on purpose: Google's
+  # Gemini API terms, unlike OpenAI's and Anthropic's, ask for no per-item review (ticket 12).
+  # Measured on the free tier with gemini-3.5-flash-lite (2026-09-23): one sitting = 21 calls,
+  # ~128K tokens in, ~97 s; four assets = 84 of the 500 requests a day the tier allows.
+  schedule:
+    - cron: '30 10 * * *'
 
 # Serialised with oracle.yml: both rebuild and commit site/data.json, and two pushes racing
 # for main is how one of them silently loses its data.
@@ -63,15 +76,19 @@ jobs:
         run: |
           if [ -n "$HOI_DONG_KEY_ENV" ]; then export "$HOI_DONG_KEY_ENV=$HOI_DONG_API_KEY"; fi
           unset HOI_DONG_API_KEY
+          args=()
+          if [ "${{ inputs.dry_run }}" = "true" ]; then args+=(--dry-run); fi
+          if [ -n "${{ inputs.asset }}" ]; then args+=(--asset "${{ inputs.asset }}"); fi
           uv run --with "tradingagents @ git+https://github.com/TauricResearch/TradingAgents@2d17df8da1536c121e4d7395ac5a5dcec9e96d6f" \
-            tientrivutru council
+            tientrivutru council "${args[@]}"
 
+      # A dry run writes nothing, so there is nothing to bundle, commit or deploy.
       - name: Build site bundle
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && !inputs.dry_run }}
         run: uv run tientrivutru site
 
       - name: Commit verdicts
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && !inputs.dry_run }}
         run: |
           git config user.name  "tientrivutru-hoi-dong"
           git config user.email "hoi-dong@tientrivutru.invalid"
@@ -85,14 +102,14 @@ jobs:
           git push
 
       - name: Upload Pages artifact
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && !inputs.dry_run }}
         uses: actions/upload-pages-artifact@v5
         with:
           path: site
 
   deploy-pages:
     needs: run
-    if: ${{ !cancelled() }}
+    if: ${{ !cancelled() && !inputs.dry_run }}
     runs-on: ubuntu-latest
     # Shared with ci.yml and oracle.yml - Pages allows one deployment in flight.
     concurrency:

@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 [![Ruff](https://img.shields.io/badge/lint-ruff-261230.svg)](https://docs.astral.sh/ruff/)
-[![tests](https://img.shields.io/badge/tests-1015%20passing-brightgreen.svg)](tests/)
+[![tests](https://img.shields.io/badge/tests-1019%20passing-brightgreen.svg)](tests/)
 [![draws analysed](https://img.shields.io/badge/draws%20analysed-31%2C470-informational.svg)](#what-the-honest-layer-found)
 [![chi-square](https://img.shields.io/badge/chi²%20p--value-0.10%20→%20random-informational.svg)](#what-the-honest-layer-found)
 [![prediction accuracy](https://img.shields.io/badge/prediction%20accuracy-0%25-critical.svg)](DISCLAIMER.md)
@@ -421,8 +421,9 @@ p-value appears once 30 verdicts are scored.
 
 Two things the page says outright: to reach a rating, the Council reads Yahoo Finance
 automatically, which Yahoo's terms do not permit; and LLM providers differ on whether their
-output may be published unattended, so the `Hội đồng` workflow is manual-only for now. A hard
-monthly cost cap applies — a day past the cap is written as `skipped_budget`, not silence.
+output may be published unattended, so the Council runs on the Gemini API — the only one of the four that asks for no per-item review — on its free tier, daily at 17:30 Vietnam time. On the free
+tier the cap is Google's quota (exceeding it is refused, never billed); on a paid key a hard
+monthly dollar cap applies — a day past it is written as `skipped_budget`, not silence.
 
 ## What the Honest Layer found
 
