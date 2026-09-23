@@ -538,3 +538,67 @@ def test_today_says_nothing_when_the_jackpot_is_current(capsys):
     cli.cmd_today(cli.build_parser().parse_args(["today", "--game", "power655"]))
 
     assert "đang chậm" not in capsys.readouterr().out
+
+
+# --- the Council ----------------------------------------------------------------------------
+
+COUNCIL_ENV = {
+    "TRADINGAGENTS_LLM_PROVIDER": "openai",
+    "TRADINGAGENTS_DEEP_THINK_LLM": "gpt-5.6-luna",
+    "HOI_DONG_MONTHLY_CAP_USD": "5",
+}
+
+
+def _council(monkeypatch, env, *, sittings=None, now="2026-09-23T12:10:00+00:00", cost=0.3):
+    """Run `tientrivutru council` with the real sitting replaced by a recorder."""
+    from tientrivutru import hoi_dong_run
+    from tientrivutru.hoi_dong import Verdict
+
+    for key in COUNCIL_ENV:
+        monkeypatch.delenv(key, raising=False)
+    for key, value in env.items():
+        monkeypatch.setenv(key, value)
+    moment = datetime.fromisoformat(now)
+    monkeypatch.setattr(cli, "utc_now", lambda: moment)
+    calls = [] if sittings is None else sittings
+
+    def fake_run(asset, day, *, model):
+        calls.append(asset.key)
+        return Verdict(asset=asset.key, trade_date=day, committed_at=moment, status="ok",
+                       rating="Hold", model=model.as_dict(), usage={"cost_usd": cost})
+
+    monkeypatch.setattr(hoi_dong_run, "run_verdict", fake_run)
+    return cli.main(["council"]), calls
+
+
+def test_council_refuses_without_its_settings(monkeypatch, capsys):
+    """No model, no cap: exit 2 and not one token spent."""
+    code, calls = _council(monkeypatch, {})
+    assert code == 2 and calls == []
+    assert store.read_verdicts() == ()
+    assert "HOI_DONG_MONTHLY_CAP_USD" in capsys.readouterr().out
+
+
+def test_council_sits_on_what_is_due_and_records_the_cap(monkeypatch):
+    code, calls = _council(monkeypatch, COUNCIL_ENV)   # a Wednesday
+    assert code == 0
+    assert calls == ["BTC-USD", "FPT.VN", "VNM.VN", "VCB.VN"]
+    rows = store.read_verdicts()
+    assert {r.asset for r in rows} == set(calls)
+    assert all(r.usage["cap_usd"] == 5.0 for r in rows)
+
+
+def test_council_writes_a_skip_rather_than_going_quiet(monkeypatch):
+    """With $5 a month and every sitting costing $2, the reserve stops the third one - and the
+    page must be able to say so, so the stop is a row, not an absence."""
+    code, calls = _council(monkeypatch, COUNCIL_ENV, cost=2.0)
+    rows = {r.asset: r for r in store.read_verdicts()}
+    assert calls == ["BTC-USD", "FPT.VN"]
+    assert rows["VNM.VN"].status == "skipped_budget" and rows["VCB.VN"].status == "skipped_budget"
+    assert code == 0
+
+
+def test_council_runs_once_a_day(monkeypatch):
+    _council(monkeypatch, COUNCIL_ENV)
+    code, calls = _council(monkeypatch, COUNCIL_ENV, sittings=[])
+    assert code == 0 and calls == []

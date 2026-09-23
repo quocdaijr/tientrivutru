@@ -42,22 +42,28 @@ themselves, so it has nothing to be scored against:
 | `01 · SỔ GIÁ` | gold (SJC bars and plain rings, plus world spot), the three indices, foreign net flows, crypto — each with its source and the API's own timestamp |
 | `02 · SỰ THẬT` | what is genuinely realtime and what is end-of-session, why there is no land price, and the page checking its own gold against world spot |
 
-`site/trader.html` — the trader page. Three stages, same reason as the money page, and one
-thing neither of the others has: its silent stage grades its own loud stage, on the loud
-stage's data, in the same second the reader is looking at it.
+`site/trader.html` — the trader page. Four stages, and one thing the others do not have: its
+silent stage grades the loud stages above it, on their own data, in the same second the reader
+is looking at it.
 
 | stage | content |
 |---|---|
 | `00 · PHÁN NẾN` | the fortune-teller names the shape the last candle made and builds a reading from it |
 | `01 · BẢNG NẾN` | the live BTC/USDT candles, the vocabulary needed to read them, and the technical analysis he teaches |
-| `02 · SỰ THẬT` | the forward return after each of those patterns with its permutation p-value, the same detector run on shuffled candles, ESMA and the Brazilian day-trading study, then the page on its own limits |
+| `02 · HỘI ĐỒNG` | TradingAgents' twelve LLM agents and today's rating for each asset. Thầy only shows them in, on a still pose - the page's one looping figure is already in stage 00 - and the Council does not speak as thầy |
+| `03 · SỰ THẬT` | the forward return after each pattern with its permutation p-value, the same detector on shuffled candles, the Council scored against always-Buy and a coin, ESMA and the Brazilian day-trading study, then the page on its own limits |
+
+The Council's stage is loud but it is not the fortune-teller's: its rating is the model's
+output, labelled on the page as AI-generated, possibly wrong and for reference only, which is
+the strictest wording any of the providers asks for. If `hoi-dong.js` fails to load, the page
+drops the stage and numbers SỰ THẬT `02` again rather than leave a gap.
 
 Stage numbers sit **above** their titles in the same column. Number-left / title-right is
 the most reliable templated-editorial tell and is not used here.
 
 The three pages are **not** interchangeable in voice. Stage `04 · SỰ THẬT` on the lottery
-page and `02 · SỰ THẬT` on the money and trader pages are the silent stages; everything
-above them shouts. A page that let the fortune-teller into its statistics stage would lose
+page, `02 · SỰ THẬT` on the money page and `03 · SỰ THẬT` on the trader page are the silent
+stages; everything above them shouts. A page that let the fortune-teller into its statistics stage would lose
 the joke and the honesty in the same move.
 
 Nav: **N7 brutal slab** — thick sticky bar, wordmark left, a three-item page nav in the

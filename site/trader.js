@@ -785,7 +785,7 @@ function stagePhanNen(d) {
 
   block.appendChild(el('p', 'note',
     'Quẻ trên sinh ra từ chính mấy cây nến ở dưới, bằng một phép cộng chữ số. Cùng bộ nến '
-    + 'thì cùng lời phán — nó ổn định, chứ không đúng. Chặng 02 đo xem cái hình thầy vừa '
+    + 'thì cùng lời phán — nó ổn định, chứ không đúng. Chặng Sự thật đo xem cái hình thầy vừa '
     + 'gọi tên nói được gì về cây nến kế tiếp.'));
   section.appendChild(block);
   return section;
@@ -931,7 +931,7 @@ function analysisBlock(d) {
 
   box.appendChild(el('p', 'note',
     'Ngưỡng ở trên là do trang tự đặt. Đổi ngưỡng thì đổi số đếm — nên chúng được in ra, và '
-    + 'chặng 02 chấm đúng bộ ngưỡng này chứ không phải một bộ khác. Nến búa ở đây không kèm '
+    + 'chặng Sự thật chấm đúng bộ ngưỡng này chứ không phải một bộ khác. Nến búa ở đây không kèm '
     + 'điều kiện "phải có xu hướng giảm trước" mà sách hay đòi: một bộ lọc xu hướng là thêm '
     + 'một tham số tự do nữa, và hai chặng phải chạy đúng cùng một hàm.'));
   return box;
@@ -946,7 +946,7 @@ function stageBangNen(d) {
   return section;
 }
 
-/* ============================ 02 · SỰ THẬT ============================
+/* ============================ SỰ THẬT (02, or 03 once the Council has a stage) ============
  * The fortune-teller is not allowed in this section.
  */
 
@@ -1130,8 +1130,8 @@ function honestyBlock(d) {
   return box;
 }
 
-function stageSuThat(d) {
-  const section = stage('02', tw('1f4c9', '📉') + ' Sự thật',
+function stageSuThat(d, mark) {
+  const section = stage(mark, tw('1f4c9', '📉') + ' Sự thật',
     'Phần này không có thầy. Chỉ có số của chính mấy cây nến ở trên.');
   section.appendChild(measuredBlock(d));
   section.appendChild(citationsBlock());
@@ -1146,9 +1146,22 @@ function render(d) {
   app.innerHTML = '';
   app.appendChild(stagePhanNen(d));
   app.appendChild(stageBangNen(d));
-  app.appendChild(stageSuThat(d));
+  /* The Council lives in its own file and degrades on its own: if hoi-dong.js did not load,
+     the page is the three stages it was before, numbered without a gap. */
+  const H = window.TienTriVuTruHoiDong;
+  const council = H ? H.stage('02') : null;
+  if (council) app.appendChild(council);
+  const truth = stageSuThat(d, council ? '03' : '02');
+  const scored = H ? H.truthBlock() : null;
+  if (scored) {
+    // Right after the pattern table: both are the page grading a loud stage above it.
+    const blocks = truth.querySelectorAll('.block');
+    truth.insertBefore(scored, blocks[1] || null);
+  }
+  app.appendChild(truth);
   window.TienTriVuTruDom.observeReveals();
   window.TienTriVuTruDom.observeFlips();
+  if (H) H.load(council, scored);
 }
 
 async function boot() {

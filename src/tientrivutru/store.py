@@ -16,6 +16,7 @@ from typing import TYPE_CHECKING
 from .models import Draw, Prophecy
 
 if TYPE_CHECKING:  # pragma: no cover
+    from .hoi_dong import Verdict
     from .kienthiet_oracle import VeProphecy
     from .sources.kienthiet import Board
     from .sources.vietlott_prizes import DrawPrizes
@@ -26,6 +27,10 @@ ENV_DATA_DIR = "TIENTRIVUTRU_DATA_DIR"
 
 class ProphecyConflict(RuntimeError):
     """Raised when a prophecy would overwrite history or predict a settled draw."""
+
+
+class VerdictConflict(RuntimeError):
+    """Raised when a Council verdict would give one asset a second sitting on the same day."""
 
 
 def data_dir() -> Path:
@@ -343,3 +348,38 @@ def latest_xsmb_special() -> int | None:
     from .sources.xsmb import latest_special
 
     return latest_special(read_xsmb())
+
+
+# --- the Council ----------------------------------------------------------------------------
+# Kept in its own folder: a bug in the newest, LLM-driven oracle must never be able to touch a
+# prophecy file, and nothing here is read by the lottery pipeline.
+
+def verdicts_path() -> Path:
+    return data_dir() / "hoi_dong" / "verdicts.jsonl"
+
+
+def read_verdicts() -> tuple[Verdict, ...]:
+    from .hoi_dong import Verdict
+
+    rows = (Verdict.from_dict(row) for row in _read_jsonl(verdicts_path()))
+    return tuple(sorted(rows, key=lambda v: (v.asset, v.trade_date)))
+
+
+def append_verdict(verdict: Verdict) -> None:
+    """Append a verdict, refusing a second sitting for the same asset and day.
+
+    Unlike a prophecy there is no 'already drawn' check to make here: the scoring window opens
+    at the first bar after committed_at, so a verdict written late is not cheating, it is
+    simply judged on a later bar. What must never happen is a do-over - a skipped or failed day
+    re-run until it produced a better-looking row.
+    """
+    for existing in read_verdicts():
+        if (existing.asset, existing.trade_date) == (verdict.asset, verdict.trade_date):
+            raise VerdictConflict(
+                f"{verdict.asset} {verdict.trade_date} already has a {existing.status} verdict "
+                f"written at {existing.committed_at.isoformat()}. Verdicts are append-only."
+            )
+    path = verdicts_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(verdict.to_dict(), ensure_ascii=False) + "\n")

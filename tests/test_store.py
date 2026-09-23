@@ -208,3 +208,38 @@ def test_somebody_winning_gets_written_even_at_the_same_amount():
 
     assert store.write_prizes(_prizes(winners=1)) is True
     assert store.read_prizes("power655")["rolled_over"] is False
+
+
+# --- the Council's verdicts --------------------------------------------------------------
+
+def _verdict(asset="BTC-USD", day="2026-09-21", status="ok", rating="Buy"):
+    from datetime import date, datetime
+
+    from tientrivutru.hoi_dong import Verdict
+
+    return Verdict(asset=asset, trade_date=date.fromisoformat(day),
+                   committed_at=datetime.fromisoformat(f"{day}T12:10:00+00:00"),
+                   status=status, rating=rating)
+
+
+def test_verdicts_round_trip_through_the_store():
+    store.append_verdict(_verdict())
+    store.append_verdict(_verdict(asset="FPT.VN"))
+    assert [(v.asset, v.rating) for v in store.read_verdicts()] == [
+        ("BTC-USD", "Buy"), ("FPT.VN", "Buy")]
+
+
+def test_a_second_verdict_for_the_same_day_is_refused():
+    """Append-only, and one sitting per asset per day - whatever the first sitting's status.
+    Otherwise a bad-looking day could be re-run until it looked good."""
+    store.append_verdict(_verdict(status="failed", rating=None))
+    with pytest.raises(store.VerdictConflict):
+        store.append_verdict(_verdict())
+    assert len(store.read_verdicts()) == 1
+
+
+def test_verdicts_live_in_their_own_folder():
+    """Kept apart from the lottery data so a Council bug can never touch a prophecy file."""
+    store.append_verdict(_verdict())
+    assert store.verdicts_path().parent.name == "hoi_dong"
+    assert store.verdicts_path().exists()
