@@ -2,6 +2,15 @@ name: Hội đồng
 
 on:
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Họp thật nhưng không ghi gì vào sổ, không commit, không deploy"
+        type: boolean
+        default: false
+      asset:
+        description: "Chỉ một mã (chỉ dùng cùng dry_run), vd BTC-USD"
+        type: string
+        default: ""
   # No schedule yet, on purpose. How verdicts get published - unattended, or as a daily PR a
   # human merges - is still open (.scratch/hoi-dong, ticket 13): OpenAI's sharing policy asks
   # for manual review, Anthropic's AUP lists automatic publishing as high-risk, Google's Gemini
@@ -63,15 +72,19 @@ jobs:
         run: |
           if [ -n "$HOI_DONG_KEY_ENV" ]; then export "$HOI_DONG_KEY_ENV=$HOI_DONG_API_KEY"; fi
           unset HOI_DONG_API_KEY
+          args=()
+          if [ "${{ inputs.dry_run }}" = "true" ]; then args+=(--dry-run); fi
+          if [ -n "${{ inputs.asset }}" ]; then args+=(--asset "${{ inputs.asset }}"); fi
           uv run --with "tradingagents @ git+https://github.com/TauricResearch/TradingAgents@2d17df8da1536c121e4d7395ac5a5dcec9e96d6f" \
-            tientrivutru council
+            tientrivutru council "${args[@]}"
 
+      # A dry run writes nothing, so there is nothing to bundle, commit or deploy.
       - name: Build site bundle
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && !inputs.dry_run }}
         run: uv run tientrivutru site
 
       - name: Commit verdicts
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && !inputs.dry_run }}
         run: |
           git config user.name  "tientrivutru-hoi-dong"
           git config user.email "hoi-dong@tientrivutru.invalid"
@@ -85,14 +98,14 @@ jobs:
           git push
 
       - name: Upload Pages artifact
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && !inputs.dry_run }}
         uses: actions/upload-pages-artifact@v5
         with:
           path: site
 
   deploy-pages:
     needs: run
-    if: ${{ !cancelled() }}
+    if: ${{ !cancelled() && !inputs.dry_run }}
     runs-on: ubuntu-latest
     # Shared with ci.yml and oracle.yml - Pages allows one deployment in flight.
     concurrency:

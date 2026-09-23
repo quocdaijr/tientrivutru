@@ -105,7 +105,7 @@ def test_a_crash_message_cannot_publish_a_key():
 
 def test_a_long_crash_message_is_cut():
     v = sit(boom=ValueError("x" * 5_000))
-    assert len(v.error) <= 240
+    assert len(v.error) <= 500
 
 
 def test_the_verdict_is_stamped_after_the_sitting_ends():
@@ -252,3 +252,11 @@ def test_a_free_sitting_costs_nothing_but_keeps_its_tokens():
     assert v.usage["cost_usd"] == 0.0
     assert v.usage["billing"] == "free"
     assert v.usage["tokens_in"] == 1_000_000
+
+
+def test_an_error_keeps_enough_to_read_the_provider_s_instruction():
+    """The trial run lost Google's actual instruction behind a 200-character cut ('Plea...').
+    Long enough to read it; still bounded, still redacted."""
+    msg = "429 RESOURCE_EXHAUSTED. " + "Your project has exceeded its monthly spending cap. " * 5
+    v = sit(boom=RuntimeError(msg))
+    assert len(v.error) > 250 and len(v.error) <= 500

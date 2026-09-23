@@ -34,7 +34,9 @@ from .hoi_dong import (
 )
 from .models import utc_now
 
-ERROR_CHARS = 200
+# Long enough to keep a provider's instruction - the first trial run lost Google's behind a
+# 200-character cut - and still bounded, because the row is committed to a public repo.
+ERROR_CHARS = 500
 # Anything an SDK might echo back that looks like a credential. The error text is committed to
 # a public repo, so it is scrubbed before it is written rather than trusted not to contain one.
 _SECRETISH = re.compile(r"\b(?:sk|key|token|bearer)[-_A-Za-z0-9]{12,}", re.IGNORECASE)
