@@ -235,6 +235,14 @@ def due_assets(existing: Iterable[Verdict], now: datetime,
 
 # ---- what the page receives ----------------------------------------------------------------
 
+def _billing(verdicts: Sequence[Verdict]) -> str | None:
+    """How the newest sitting was paid for: 'free', 'paid', or None before the first one."""
+    if not verdicts:
+        return None
+    latest = max(verdicts, key=lambda v: v.committed_at)
+    return (latest.usage or {}).get("billing", "paid")
+
+
 def council_payload(verdicts: Sequence[Verdict], now: datetime) -> dict[str, Any]:
     """The Council's part of site/data.json: every rating with its write time, and the month's
     spend against the cap in force. The trader page scores these itself, with prices it fetches
@@ -253,6 +261,9 @@ def council_payload(verdicts: Sequence[Verdict], now: datetime) -> dict[str, Any
         "spent_usd": round(month_spend(verdicts, month), 4),
         "cap_usd": caps[-1] if caps else None,
         "stopped": any(v.status == "skipped_budget" for v in this_month),
+        "billing": _billing(verdicts),
+        "provider": ((max(verdicts, key=lambda v: v.committed_at).model or {}).get("provider")
+                     if verdicts else None),
         "verdicts": [
             {"asset": v.asset, "trade_date": v.trade_date.isoformat(),
              "committed_at": v.committed_at.isoformat(), "status": v.status, "rating": v.rating}

@@ -54,6 +54,8 @@ ENV_PROVIDER = "TRADINGAGENTS_LLM_PROVIDER"
 ENV_DEEP = "TRADINGAGENTS_DEEP_THINK_LLM"
 ENV_QUICK = "TRADINGAGENTS_QUICK_THINK_LLM"
 ENV_CAP = "HOI_DONG_MONTHLY_CAP_USD"
+ENV_BILLING = "HOI_DONG_BILLING"
+BILLING_MODES = ("paid", "free")
 
 
 def council_settings(env: Mapping[str, str], today: date,
@@ -61,12 +63,21 @@ def council_settings(env: Mapping[str, str], today: date,
                      ) -> tuple[Model | None, float | None, list[str]]:
     """Everything a real sitting needs, or every reason it cannot happen.
 
-    There is no default model and no default cap. A sitting spends real money, and one run on a
-    guessed model against a guessed ceiling is the single thing this command must never do - so
-    every missing or suspicious setting is reported, all at once, and nothing runs.
-    The variable names are TradingAgents' own, so the same env configures both sides.
+    There is no default model and, on a paid key, no default cap. A sitting spends real money,
+    and one run on a guessed model against a guessed ceiling is the single thing this command
+    must never do - so every missing or suspicious setting is reported, all at once, and nothing
+    runs. The model variables are TradingAgents' own, so the same env configures both sides.
+
+    HOI_DONG_BILLING=free is for a key on a project with no billing account - Google's Gemini
+    free tier. There is nothing to charge, so there is no money cap to enforce: going past the
+    provider's limit is a rate-limit error, and that limit is the cap. The returned cap is then
+    None, and no price lookup is needed because nothing will be priced.
     """
     problems: list[str] = []
+    billing = (env.get(ENV_BILLING) or "paid").strip().lower()
+    if billing not in BILLING_MODES:
+        problems.append(f"{ENV_BILLING} must be one of {BILLING_MODES}, got {billing!r}")
+        billing = "paid"
     provider = (env.get(ENV_PROVIDER) or "").strip()
     deep = (env.get(ENV_DEEP) or "").strip()
     quick = (env.get(ENV_QUICK) or "").strip() or deep
@@ -74,6 +85,11 @@ def council_settings(env: Mapping[str, str], today: date,
         problems.append(f"{ENV_PROVIDER} is not set")
     if not deep:
         problems.append(f"{ENV_DEEP} is not set")
+    if billing == "free":
+        if problems:
+            return None, None, problems
+        return Model(provider, deep, quick), None, []
+
     for model_id in {deep, quick} - {""}:
         if model_id not in prices:
             problems.append(f"no looked-up price for model {model_id!r} in hoi_dong.PRICES")
@@ -176,14 +192,19 @@ def _error_text(exc: BaseException) -> str:
 
 
 def _usage(stats: Mapping[str, int], model: Model,
-           prices: Mapping[str, tuple[float, float]]) -> dict[str, float]:
-    return {
+           prices: Mapping[str, tuple[float, float]] | None) -> dict[str, Any]:
+    """prices=None is the free tier: nothing is billed, so the cost is 0 - but the tokens are
+    kept, because they are what would be billed if the project ever turned billing on."""
+    usage: dict[str, Any] = {
         "llm_calls": stats["llm_calls"],
         "tokens_in": stats["tokens_in"],
         "tokens_out": stats["tokens_out"],
-        "cost_usd": sitting_cost(stats["tokens_in"], stats["tokens_out"], model.deep,
-                                 model.quick, prices=prices),
     }
+    if prices is None:
+        return {**usage, "cost_usd": 0.0, "billing": "free"}
+    return {**usage, "billing": "paid",
+            "cost_usd": sitting_cost(stats["tokens_in"], stats["tokens_out"], model.deep,
+                                     model.quick, prices=prices)}
 
 
 def run_verdict(
@@ -194,7 +215,7 @@ def run_verdict(
     graph_factory: Callable[[dict, list], Any] | None = None,
     counter_factory: Callable[[], Any] | None = None,
     base_config: Callable[[], Mapping[str, Any]] | None = None,
-    prices: Mapping[str, tuple[float, float]] = PRICES,
+    prices: Mapping[str, tuple[float, float]] | None = PRICES,
     now: Callable[[], datetime] = utc_now,
 ) -> Verdict:
     """One sitting. Always returns a Verdict - a crash is a 'failed' row that still carries the

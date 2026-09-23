@@ -354,3 +354,10 @@ def test_the_js_and_python_pin_the_same_upstream():
     from tientrivutru.hoi_dong import UPSTREAM
 
     assert out("H.UPSTREAM") == UPSTREAM
+
+
+def test_the_free_tier_is_named_and_its_data_use_disclosed():
+    """No invented spend on a free key; and Google's free-tier data use said out loud."""
+    got = out("[H.freeLine('google'), H.freeLine('deepseek')]")
+    assert "không tốn đồng nào" in got[0] and "cải thiện sản phẩm" in got[0]
+    assert "không tốn đồng nào" in got[1] and "Google" not in got[1]

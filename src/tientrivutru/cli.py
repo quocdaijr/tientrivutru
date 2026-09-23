@@ -673,16 +673,20 @@ def cmd_council(args: argparse.Namespace) -> int:
         console.print("Hôm nay không có mã nào đến lượt Hội đồng họp.")
         return 0
 
+    free = cap is None               # a no-billing project: the provider's limit is the cap
     failed = 0
     for asset in due:
         day = hoi_dong.local_date(asset, now)
-        if hoi_dong.can_afford(verdicts, cap, model.deep, month):
+        if free:
+            verdict = run_verdict(asset, day, model=model, prices=None)
+        elif hoi_dong.can_afford(verdicts, cap, model.deep, month):
             verdict = run_verdict(asset, day, model=model)
         else:
             verdict = hoi_dong.Verdict(asset=asset.key, trade_date=day, committed_at=utc_now(),
                                        status="skipped_budget", model=model.as_dict(),
                                        usage={"cost_usd": 0.0})
-        verdict = replace(verdict, usage={**(verdict.usage or {}), "cap_usd": cap})
+        if not free:
+            verdict = replace(verdict, usage={**(verdict.usage or {}), "cap_usd": cap})
         store.append_verdict(verdict)
         verdicts.append(verdict)
         failed += verdict.status == "failed"
@@ -690,9 +694,13 @@ def cmd_council(args: argparse.Namespace) -> int:
             f"{asset.key:8s} {day}  {verdict.status:15s} {verdict.rating or '—':12s} "
             f"${verdict.cost_usd:.4f}"
         )
-    console.print(
-        f"Tháng {month}: đã đốt ${hoi_dong.month_spend(verdicts, month):.4f} / trần ${cap:.2f}."
-    )
+    if free:
+        console.print(f"Tháng {month}: gói miễn phí — không tính tiền, "
+                      "giới hạn là của nhà cung cấp.")
+    else:
+        console.print(
+            f"Tháng {month}: đã đốt ${hoi_dong.month_spend(verdicts, month):.4f} / trần ${cap:.2f}."
+        )
     console.print(DISCLAIMER)
     return 1 if failed else 0
 

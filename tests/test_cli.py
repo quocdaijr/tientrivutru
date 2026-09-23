@@ -554,7 +554,7 @@ def _council(monkeypatch, env, *, sittings=None, now="2026-09-23T12:10:00+00:00"
     from tientrivutru import hoi_dong_run
     from tientrivutru.hoi_dong import Verdict
 
-    for key in COUNCIL_ENV:
+    for key in (*COUNCIL_ENV, "HOI_DONG_BILLING"):
         monkeypatch.delenv(key, raising=False)
     for key, value in env.items():
         monkeypatch.setenv(key, value)
@@ -562,7 +562,7 @@ def _council(monkeypatch, env, *, sittings=None, now="2026-09-23T12:10:00+00:00"
     monkeypatch.setattr(cli, "utc_now", lambda: moment)
     calls = [] if sittings is None else sittings
 
-    def fake_run(asset, day, *, model):
+    def fake_run(asset, day, *, model, prices=None):
         calls.append(asset.key)
         return Verdict(asset=asset.key, trade_date=day, committed_at=moment, status="ok",
                        rating="Hold", model=model.as_dict(), usage={"cost_usd": cost})
@@ -602,3 +602,13 @@ def test_council_runs_once_a_day(monkeypatch):
     _council(monkeypatch, COUNCIL_ENV)
     code, calls = _council(monkeypatch, COUNCIL_ENV, sittings=[])
     assert code == 0 and calls == []
+
+
+def test_council_on_the_free_tier_never_skips_for_money(monkeypatch):
+    env = {"TRADINGAGENTS_LLM_PROVIDER": "google",
+           "TRADINGAGENTS_DEEP_THINK_LLM": "gemini-3.1-flash-lite", "HOI_DONG_BILLING": "free"}
+    monkeypatch.setenv("HOI_DONG_BILLING", "free")
+    code, calls = _council(monkeypatch, env, cost=0.0)
+    assert code == 0
+    assert calls == ["BTC-USD", "FPT.VN", "VNM.VN", "VCB.VN"]
+    assert all("cap_usd" not in r.usage for r in store.read_verdicts())

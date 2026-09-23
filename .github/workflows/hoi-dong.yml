@@ -51,6 +51,12 @@ jobs:
           HOI_DONG_API_KEY: ${{ secrets.HOI_DONG_API_KEY }}
           HOI_DONG_KEY_ENV: ${{ vars.HOI_DONG_KEY_ENV }}
           HOI_DONG_MONTHLY_CAP_USD: ${{ secrets.HOI_DONG_MONTHLY_CAP_USD }}
+          # "free" on a project with no billing (Gemini's free tier): nothing can be charged,
+          # so the provider's own limit is the cap and no dollar cap is needed.
+          HOI_DONG_BILLING: ${{ vars.HOI_DONG_BILLING }}
+          # A free tier answers bursts with 429. TradingAgents forwards this retry budget to
+          # every provider client (its own knob for exactly this, upstream #1091).
+          TRADINGAGENTS_LLM_MAX_RETRIES: "6"
           TRADINGAGENTS_LLM_PROVIDER: ${{ vars.HOI_DONG_PROVIDER }}
           TRADINGAGENTS_DEEP_THINK_LLM: ${{ vars.HOI_DONG_MODEL }}
           TRADINGAGENTS_QUICK_THINK_LLM: ${{ vars.HOI_DONG_MODEL }}

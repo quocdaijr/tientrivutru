@@ -293,6 +293,17 @@ function latestOf(verdicts, key) {
   return mine.length ? mine.reduce((a, b) => (a.trade_date >= b.trade_date ? a : b)) : null;
 }
 
+/** On a project with no billing there is nothing to charge: past the limit the provider
+    refuses, it does not bill. Google's free tier also says its input is "used to improve our
+    products" - true here too, and harmless only because all that goes in is public prices. */
+function freeLine(provider) {
+  const google = provider === 'google';
+  return 'Hội đồng chạy trên gói miễn phí' + (google ? ' của Gemini API' : '') + ': không tốn '
+    + 'đồng nào, và vượt giới hạn thì nhà cung cấp chặn chứ không tính tiền.'
+    + (google ? ' Đổi lại, Google được dùng dữ liệu gửi lên để cải thiện sản phẩm của họ — ở đây '
+      + 'chỉ có dữ liệu thị trường công khai.' : '');
+}
+
 function fillStage(body, council) {
   body.innerHTML = '';
   if (!council.verdicts.length) {
@@ -319,6 +330,10 @@ function fillStage(body, council) {
     + 'này nói thẳng ra thay vì giấu. Không một con số nào Hội đồng đọc được đưa lên đây: chỉ có '
     + 'bậc, và giờ nó được ghi.'));
   if (!council.month) return;
+  if (council.billing === 'free') {
+    body.appendChild(el('p', 'note', freeLine(council.provider)));
+    return;
+  }
   const spent = 'Tháng ' + council.month + ' Hội đồng đã đốt ' + usd(council.spent_usd)
     + (council.cap_usd != null ? ' của trần ' + usd(council.cap_usd) : '') + '.';
   body.appendChild(el('p', council.stopped ? 'note err' : 'note',
@@ -432,6 +447,6 @@ window.TienTriVuTruHoiDong = {
   RATINGS, POSITION, MIN_SCORED_FOR_P, PERMUTATIONS, ASSETS, UPSTREAM,
   position, net, windowFor, coinRating, scoreAsset, permutationP, summarize,
   parseVndirect, parseBinanceDaily,
-  stage, truthBlock, load,
+  freeLine, stage, truthBlock, load,
 };
 })();

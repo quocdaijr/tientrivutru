@@ -77,7 +77,7 @@ def test_an_answer_becomes_an_ok_verdict_with_its_real_cost():
     v = sit()
     assert (v.status, v.rating) == ("ok", "Overweight")
     assert v.usage == {"llm_calls": 14, "tokens_in": 1_000_000, "tokens_out": 200_000,
-                       "cost_usd": pytest.approx(0.10 + 0.10)}
+                       "billing": "paid", "cost_usd": pytest.approx(0.10 + 0.10)}
     assert v.model == {"provider": "openai", "deep": "cheap", "quick": "cheap"}
 
 
@@ -212,3 +212,43 @@ def test_an_unpriced_model_is_refused():
 def test_a_stale_price_table_blocks_the_sitting():
     _, _, problems = council_settings(GOOD_ENV, date(2027, 6, 1))
     assert any("PRICES" in p for p in problems)
+
+
+# --- the free tier ---------------------------------------------------------------------------
+
+FREE_ENV = {
+    "TRADINGAGENTS_LLM_PROVIDER": "google",
+    "TRADINGAGENTS_DEEP_THINK_LLM": "gemini-3.1-flash-lite",
+    "HOI_DONG_BILLING": "free",
+}
+
+
+def test_the_free_tier_needs_no_money_cap():
+    """On a Google project without billing there is no account to charge: going past the limit
+    gets a rate-limit error, never a bill. That is the cap, and it is Google's, not ours."""
+    model, cap, problems = council_settings(FREE_ENV, TODAY)
+    assert problems == []
+    assert model == Model("google", "gemini-3.1-flash-lite", "gemini-3.1-flash-lite")
+    assert cap is None
+
+
+def test_a_billing_mode_nobody_defined_is_refused():
+    _, _, problems = council_settings({**FREE_ENV, "HOI_DONG_BILLING": "maybe"}, TODAY)
+    assert any("HOI_DONG_BILLING" in p for p in problems)
+
+
+def test_paid_is_the_default_and_still_needs_its_cap():
+    env = {k: v for k, v in FREE_ENV.items() if k != "HOI_DONG_BILLING"}
+    _, _, problems = council_settings(env, TODAY)
+    assert any("HOI_DONG_MONTHLY_CAP_USD" in p for p in problems)
+
+
+def test_a_free_sitting_costs_nothing_but_keeps_its_tokens():
+    """The page must not say the Council burned money it did not burn - and the tokens are still
+    worth recording, because they are what would be billed if the project ever turned it on."""
+    v = run_verdict(ASSETS["BTC-USD"], date(2026, 9, 23), model=MODEL,
+                    graph_factory=lambda cfg, cbs: FakeGraph(cfg, cbs),
+                    counter_factory=FakeCounter, base_config=dict, prices=None)
+    assert v.usage["cost_usd"] == 0.0
+    assert v.usage["billing"] == "free"
+    assert v.usage["tokens_in"] == 1_000_000

@@ -216,3 +216,15 @@ def test_an_empty_council_is_a_valid_payload():
     payload = council_payload([], at("2026-09-23T13:00:00+00:00"))
     assert payload["verdicts"] == [] and payload["spent_usd"] == 0 and payload["cap_usd"] is None
     assert payload["stopped"] is False
+
+
+def test_the_page_is_told_when_the_council_runs_for_free():
+    from tientrivutru.hoi_dong import council_payload
+
+    free = Verdict.from_dict({**verdict().to_dict(),
+                              "usage": {"cost_usd": 0.0, "billing": "free"}})
+    assert council_payload([free], at("2026-09-21T13:00:00+00:00"))["billing"] == "free"
+    assert council_payload([free], at("2026-09-21T13:00:00+00:00"))["provider"] == "p"
+    paid = verdict(cost=0.2)
+    assert council_payload([paid], at("2026-09-21T13:00:00+00:00"))["billing"] == "paid"
+    assert council_payload([], at("2026-09-21T13:00:00+00:00"))["billing"] is None
