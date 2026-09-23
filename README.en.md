@@ -421,8 +421,9 @@ p-value appears once 30 verdicts are scored.
 
 Two things the page says outright: to reach a rating, the Council reads Yahoo Finance
 automatically, which Yahoo's terms do not permit; and LLM providers differ on whether their
-output may be published unattended, so the `Hội đồng` workflow is manual-only for now. A hard
-monthly cost cap applies — a day past the cap is written as `skipped_budget`, not silence.
+output may be published unattended, so the Council runs on the Gemini API — the only one of the four that asks for no per-item review — on its free tier, daily at 19:10 Vietnam time. On the free
+tier the cap is Google's quota (exceeding it is refused, never billed); on a paid key a hard
+monthly dollar cap applies — a day past it is written as `skipped_budget`, not silence.
 
 ## What the Honest Layer found
 

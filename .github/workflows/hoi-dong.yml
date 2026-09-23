@@ -11,10 +11,13 @@ on:
         description: "Chỉ một mã (chỉ dùng cùng dry_run), vd BTC-USD"
         type: string
         default: ""
-  # No schedule yet, on purpose. How verdicts get published - unattended, or as a daily PR a
-  # human merges - is still open (.scratch/hoi-dong, ticket 13): OpenAI's sharing policy asks
-  # for manual review, Anthropic's AUP lists automatic publishing as high-risk, Google's Gemini
-  # API terms do not. The cron is added once that is decided, not before.
+  # 12:10 UTC = 19:10 in Vietnam: after HOSE's 15:00 close, after oracle.yml's 11:45 run, and
+  # well after Gemini's daily quota resets at midnight Pacific. Unattended on purpose: Google's
+  # Gemini API terms, unlike OpenAI's and Anthropic's, ask for no per-item review (ticket 12).
+  # Measured on the free tier with gemini-3.5-flash-lite (2026-09-23): one sitting = 21 calls,
+  # ~128K tokens in, ~97 s; four assets = 84 of the 500 requests a day the tier allows.
+  schedule:
+    - cron: '10 12 * * *'
 
 # Serialised with oracle.yml: both rebuild and commit site/data.json, and two pushes racing
 # for main is how one of them silently loses its data.
