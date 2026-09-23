@@ -357,7 +357,7 @@ p-value chỉ in khi đủ 30 phán quyết.
 
 Hai điều trang nói thẳng: để ra bậc, Hội đồng tự đọc Yahoo Finance bằng máy, điều mà điều khoản
 của Yahoo không cho phép; và chính sách LLM mỗi hãng khác nhau về chuyện tự động đăng output,
-nên Hội đồng chạy trên Gemini API — hãng duy nhất trong bốn không đòi duyệt từng cái — gói miễn phí, mỗi ngày 19:10 giờ VN. Trên gói miễn phí, trần là hạn mức của Google (vượt thì bị chặn, không bị tính tiền); nếu
+nên Hội đồng chạy trên Gemini API — hãng duy nhất trong bốn không đòi duyệt từng cái — gói miễn phí, mỗi ngày 17:30 giờ VN. Trên gói miễn phí, trần là hạn mức của Google (vượt thì bị chặn, không bị tính tiền); nếu
 chuyển sang trả phí thì có trần đô cứng — chạm trần thì ngày đó ghi `skipped_budget` chứ không
 im lặng.
 
