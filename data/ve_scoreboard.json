@@ -1,28 +1,28 @@
 {
-  "generated_at": "2026-09-27T15:49:23+00:00",
+  "generated_at": "2026-09-28T18:44:12+00:00",
   "disclaimer": "Paper trading, moi ky mot ve. Co cau giai tra ve dung 50% doanh thu, nen ROI ky vong la -50%. Con so thuc te lech nhieu vi giai dac biet chiem 40% quy giai va rat lau moi ve mot lan.",
   "per_region": {
     "all": {
       "region": null,
       "display": "Kiến thiết",
-      "tickets": 184,
-      "paper_burned_vnd": 1840000,
-      "paper_won_vnd": 100000,
-      "roi": -0.9456521739130435,
-      "paper_won_excluding_headline_vnd": 100000,
-      "roi_excluding_headline": -0.9456521739130435,
+      "tickets": 189,
+      "paper_burned_vnd": 1890000,
+      "paper_won_vnd": 200000,
+      "roi": -0.8941798941798942,
+      "paper_won_excluding_headline_vnd": 200000,
+      "roi_excluding_headline": -0.8941798941798942,
       "theoretical_roi": -0.5,
       "theoretical_roi_excluding_headline": -0.745,
       "prize_counts_total": {
-        "g8": 1
+        "g8": 2
       },
-      "winning_tickets": 1,
+      "winning_tickets": 2,
       "best": {
-        "draw_date": "2026-08-30",
+        "draw_date": "2026-09-28",
         "province": "thua-thien-hue",
         "display": "Huế",
-        "ve": "016839",
-        "special": "036995",
+        "ve": "755781",
+        "special": "233622",
         "prize_counts": {
           "g8": 1
         },
@@ -34,8 +34,8 @@
     "mn": {
       "region": "mn",
       "display": "Miền Nam",
-      "tickets": 104,
-      "paper_burned_vnd": 1040000,
+      "tickets": 107,
+      "paper_burned_vnd": 1070000,
       "paper_won_vnd": 0,
       "roi": -1.0,
       "paper_won_excluding_headline_vnd": 0,
@@ -45,11 +45,11 @@
       "prize_counts_total": {},
       "winning_tickets": 0,
       "best": {
-        "draw_date": "2026-09-27",
-        "province": "da-lat",
-        "display": "Đà Lạt",
-        "ve": "150282",
-        "special": "450102",
+        "draw_date": "2026-09-28",
+        "province": "ca-mau",
+        "display": "Cà Mau",
+        "ve": "679853",
+        "special": "281551",
         "prize_counts": {},
         "prizes": "",
         "payout_vnd": 0,
@@ -59,24 +59,24 @@
     "mt": {
       "region": "mt",
       "display": "Miền Trung",
-      "tickets": 80,
-      "paper_burned_vnd": 800000,
-      "paper_won_vnd": 100000,
-      "roi": -0.875,
-      "paper_won_excluding_headline_vnd": 100000,
-      "roi_excluding_headline": -0.875,
+      "tickets": 82,
+      "paper_burned_vnd": 820000,
+      "paper_won_vnd": 200000,
+      "roi": -0.7560975609756098,
+      "paper_won_excluding_headline_vnd": 200000,
+      "roi_excluding_headline": -0.7560975609756098,
       "theoretical_roi": -0.5,
       "theoretical_roi_excluding_headline": -0.745,
       "prize_counts_total": {
-        "g8": 1
+        "g8": 2
       },
-      "winning_tickets": 1,
+      "winning_tickets": 2,
       "best": {
-        "draw_date": "2026-08-30",
+        "draw_date": "2026-09-28",
         "province": "thua-thien-hue",
         "display": "Huế",
-        "ve": "016839",
-        "special": "036995",
+        "ve": "755781",
+        "special": "233622",
         "prize_counts": {
           "g8": 1
         },
