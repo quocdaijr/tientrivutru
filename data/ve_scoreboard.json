@@ -1,16 +1,16 @@
 {
-  "generated_at": "2026-10-01T09:45:53+00:00",
+  "generated_at": "2026-10-01T17:30:15+00:00",
   "disclaimer": "Paper trading, moi ky mot ve. Co cau giai tra ve dung 50% doanh thu, nen ROI ky vong la -50%. Con so thuc te lech nhieu vi giai dac biet chiem 40% quy giai va rat lau moi ve mot lan.",
   "per_region": {
     "all": {
       "region": null,
       "display": "Kiến thiết",
-      "tickets": 202,
-      "paper_burned_vnd": 2020000,
+      "tickets": 205,
+      "paper_burned_vnd": 2050000,
       "paper_won_vnd": 200000,
-      "roi": -0.900990099009901,
+      "roi": -0.9024390243902439,
       "paper_won_excluding_headline_vnd": 200000,
-      "roi_excluding_headline": -0.900990099009901,
+      "roi_excluding_headline": -0.9024390243902439,
       "theoretical_roi": -0.5,
       "theoretical_roi_excluding_headline": -0.745,
       "prize_counts_total": {
@@ -59,12 +59,12 @@
     "mt": {
       "region": "mt",
       "display": "Miền Trung",
-      "tickets": 86,
-      "paper_burned_vnd": 860000,
+      "tickets": 89,
+      "paper_burned_vnd": 890000,
       "paper_won_vnd": 200000,
-      "roi": -0.7674418604651163,
+      "roi": -0.7752808988764045,
       "paper_won_excluding_headline_vnd": 200000,
-      "roi_excluding_headline": -0.7674418604651163,
+      "roi_excluding_headline": -0.7752808988764045,
       "theoretical_roi": -0.5,
       "theoretical_roi_excluding_headline": -0.745,
       "prize_counts_total": {
