@@ -1,82 +1,87 @@
 {
-  "generated_at": "2026-10-02T16:50:21+00:00",
+  "generated_at": "2026-10-03T15:15:00+00:00",
   "disclaimer": "Paper trading, moi ky mot ve. Co cau giai tra ve dung 50% doanh thu, nen ROI ky vong la -50%. Con so thuc te lech nhieu vi giai dac biet chiem 40% quy giai va rat lau moi ve mot lan.",
   "per_region": {
     "all": {
       "region": null,
       "display": "Kiến thiết",
-      "tickets": 210,
-      "paper_burned_vnd": 2100000,
-      "paper_won_vnd": 200000,
-      "roi": -0.9047619047619048,
-      "paper_won_excluding_headline_vnd": 200000,
-      "roi_excluding_headline": -0.9047619047619048,
+      "tickets": 217,
+      "paper_burned_vnd": 2170000,
+      "paper_won_vnd": 500000,
+      "roi": -0.7695852534562212,
+      "paper_won_excluding_headline_vnd": 500000,
+      "roi_excluding_headline": -0.7695852534562212,
       "theoretical_roi": -0.5,
       "theoretical_roi_excluding_headline": -0.745,
       "prize_counts_total": {
-        "g8": 2
+        "g8": 3,
+        "g7": 1
       },
-      "winning_tickets": 2,
+      "winning_tickets": 4,
       "best": {
-        "draw_date": "2026-09-28",
-        "province": "thua-thien-hue",
-        "display": "Huế",
-        "ve": "755781",
-        "special": "233622",
+        "draw_date": "2026-10-03",
+        "province": "long-an",
+        "display": "Long An",
+        "ve": "724538",
+        "special": "018356",
         "prize_counts": {
-          "g8": 1
+          "g7": 1
         },
-        "prizes": "Giải tám",
-        "payout_vnd": 100000,
+        "prizes": "Giải bảy",
+        "payout_vnd": 200000,
         "cost_vnd": 10000
       }
     },
     "mn": {
       "region": "mn",
       "display": "Miền Nam",
-      "tickets": 119,
-      "paper_burned_vnd": 1190000,
-      "paper_won_vnd": 0,
-      "roi": -1.0,
-      "paper_won_excluding_headline_vnd": 0,
-      "roi_excluding_headline": -1.0,
+      "tickets": 123,
+      "paper_burned_vnd": 1230000,
+      "paper_won_vnd": 200000,
+      "roi": -0.8373983739837398,
+      "paper_won_excluding_headline_vnd": 200000,
+      "roi_excluding_headline": -0.8373983739837398,
       "theoretical_roi": -0.5,
       "theoretical_roi_excluding_headline": -0.745,
-      "prize_counts_total": {},
-      "winning_tickets": 0,
+      "prize_counts_total": {
+        "g7": 1
+      },
+      "winning_tickets": 1,
       "best": {
-        "draw_date": "2026-10-02",
-        "province": "binh-duong",
-        "display": "Bình Dương",
-        "ve": "200473",
-        "special": "313004",
-        "prize_counts": {},
-        "prizes": "",
-        "payout_vnd": 0,
+        "draw_date": "2026-10-03",
+        "province": "long-an",
+        "display": "Long An",
+        "ve": "724538",
+        "special": "018356",
+        "prize_counts": {
+          "g7": 1
+        },
+        "prizes": "Giải bảy",
+        "payout_vnd": 200000,
         "cost_vnd": 10000
       }
     },
     "mt": {
       "region": "mt",
       "display": "Miền Trung",
-      "tickets": 91,
-      "paper_burned_vnd": 910000,
-      "paper_won_vnd": 200000,
-      "roi": -0.7802197802197802,
-      "paper_won_excluding_headline_vnd": 200000,
-      "roi_excluding_headline": -0.7802197802197802,
+      "tickets": 94,
+      "paper_burned_vnd": 940000,
+      "paper_won_vnd": 300000,
+      "roi": -0.6808510638297872,
+      "paper_won_excluding_headline_vnd": 300000,
+      "roi_excluding_headline": -0.6808510638297872,
       "theoretical_roi": -0.5,
       "theoretical_roi_excluding_headline": -0.745,
       "prize_counts_total": {
-        "g8": 2
+        "g8": 3
       },
-      "winning_tickets": 2,
+      "winning_tickets": 3,
       "best": {
-        "draw_date": "2026-09-28",
-        "province": "thua-thien-hue",
-        "display": "Huế",
-        "ve": "755781",
-        "special": "233622",
+        "draw_date": "2026-10-03",
+        "province": "dak-nong",
+        "display": "Đắk Nông",
+        "ve": "627971",
+        "special": "206949",
         "prize_counts": {
           "g8": 1
         },
