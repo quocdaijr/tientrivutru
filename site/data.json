@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-12T20:25:50+00:00",
+ "generated_at": "2026-10-13T03:30:30+00:00",
  "disclaimer": "Xổ số là biến cố độc lập. Mỗi kỳ quay reset về 0. Không có số nóng, không có số lạnh. Phần mềm này không dự đoán được gì — nó chỉ tự tin quá mức và tự chấm điểm độ sai của chính mình. Bảng Phong Thần là paper-trading: tiền đốt trên giấy.",
  "games": [
   {
@@ -376,21 +376,21 @@
    },
    "prizes": {
     "game": "power655",
-    "draw_id": "01400",
+    "draw_id": "01409",
     "jackpots": {
-     "Jackpot 1": 73333632900,
-     "Jackpot 2": 3968560000
+     "Jackpot 1": 136743859650,
+     "Jackpot 2": 3785670500
     },
     "tiers": [
      {
       "label": "Jackpot 1",
       "winners": 0,
-      "value_vnd": 73333632900
+      "value_vnd": 136743859650
      },
      {
       "label": "Jackpot 2",
-      "winners": 0,
-      "value_vnd": 3968560000
+      "winners": 1,
+      "value_vnd": 3785670500
      },
      {
       "label": "Giải Nhất",
@@ -399,25 +399,25 @@
      },
      {
       "label": "Giải Nhì",
-      "winners": 1521,
+      "winners": 1777,
       "value_vnd": 500000
      },
      {
       "label": "Giải Ba",
-      "winners": 27719,
+      "winners": 38563,
       "value_vnd": 50000
      }
     ],
-    "top_jackpot_vnd": 73333632900,
+    "top_jackpot_vnd": 136743859650,
     "rolled_over": true,
-    "fetched_at": "2026-09-19T16:01:19+00:00",
+    "fetched_at": "2026-10-13T03:30:21+00:00",
     "source": "live:vietlott.vn",
-    "matches_latest_draw": false,
-    "draws_behind": 9,
-    "is_stale": true,
+    "matches_latest_draw": true,
+    "draws_behind": 0,
+    "is_stale": false,
     "latest_draw_id": "01409",
-    "top_jackpot_tax_vnd": 7332363290,
-    "top_jackpot_take_home_vnd": 66001269610
+    "top_jackpot_tax_vnd": 13673385965,
+    "top_jackpot_take_home_vnd": 123070473685
    },
    "payout_if_hit": [
     {
@@ -493,8 +493,8 @@
       "second": 225,
       "third": 400
      },
-     "payout_vnd": 74906132900,
-     "net_vnd": 74896892900,
+     "payout_vnd": 138316359650,
+     "net_vnd": 138307119650,
      "uses_live_jackpot": true
     }
    ],
@@ -871,42 +871,42 @@
    },
    "prizes": {
     "game": "mega645",
-    "draw_id": "01565",
+    "draw_id": "01574",
     "jackpots": {
-     "Jackpot": 96163598000
+     "Jackpot": 17917606500
     },
     "tiers": [
      {
       "label": "Jackpot",
       "winners": 0,
-      "value_vnd": 96163598000
+      "value_vnd": 17917606500
      },
      {
       "label": "Giải Nhất",
-      "winners": 68,
+      "winners": 38,
       "value_vnd": 10000000
      },
      {
       "label": "Giải Nhì",
-      "winners": 3255,
+      "winners": 1566,
       "value_vnd": 300000
      },
      {
       "label": "Giải Ba",
-      "winners": 53165,
+      "winners": 24656,
       "value_vnd": 30000
      }
     ],
-    "top_jackpot_vnd": 96163598000,
+    "top_jackpot_vnd": 17917606500,
     "rolled_over": true,
-    "fetched_at": "2026-09-20T16:01:04+00:00",
+    "fetched_at": "2026-10-13T03:30:22+00:00",
     "source": "live:vietlott.vn",
-    "matches_latest_draw": false,
-    "draws_behind": 9,
-    "is_stale": true,
+    "matches_latest_draw": true,
+    "draws_behind": 0,
+    "is_stale": false,
     "latest_draw_id": "01574",
-    "top_jackpot_tax_vnd": 9615359800,
-    "top_jackpot_take_home_vnd": 86548238200
+    "top_jackpot_tax_vnd": 1790760650,
+    "top_jackpot_take_home_vnd": 16126845850
    },
    "payout_if_hit": [
     {
@@ -982,8 +982,8 @@
       "second": 225,
       "third": 400
      },
-     "payout_vnd": 96603098000,
-     "net_vnd": 96593858000,
+     "payout_vnd": 18357106500,
+     "net_vnd": 18347866500,
      "uses_live_jackpot": true
     }
    ],
