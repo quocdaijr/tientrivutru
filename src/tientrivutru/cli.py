@@ -574,6 +574,33 @@ def _parse_now(raw: str | None) -> datetime:
     return moment if moment.tzinfo else moment.replace(tzinfo=VN_TZ)
 
 
+def _pulse_markets(args: argparse.Namespace, now: datetime) -> int:
+    """Gold and crypto, always, whatever hour it is: the fixed ping, not the random one.
+
+    Exits 1 when a source is silent so a dead price feed shows up as a red run instead of
+    a quiet gap, which is exactly how this went unnoticed before.
+    """
+    if not args.dry_run:
+        try:
+            notify.require_config()
+        except notify.TelegramNotConfigured as exc:
+            console.print(f"[red]{exc}[/red]")
+            return 1
+    cards = pulse.build_market_cards(allow_network=not args.offline)
+    failed = [name for name, card in zip(("gold", "crypto"), cards, strict=True) if card is None]
+    for card in filter(None, cards):
+        if args.dry_run:
+            console.print(Panel(pulse.format_card(card, now=now), border_style="cyan"))
+        elif pulse.send_card(card, now=now):
+            console.print(f"[green]đã gửi Telegram:[/green] {card.key}")
+        else:
+            failed.append(card.key)
+    if failed:
+        console.print(f"[red]thiếu:[/red] {' '.join(failed)}")
+    console.print(DISCLAIMER)
+    return 1 if failed else 0
+
+
 def cmd_pulse(args: argparse.Namespace) -> int:
     """Push one random card at a randomly-chosen hour of the day.
 
@@ -588,6 +615,9 @@ def cmd_pulse(args: argparse.Namespace) -> int:
         console.print(f"Kế hoạch {day}: [cyan]{plan}[/cyan]")
         console.print(DISCLAIMER)
         return 0
+
+    if args.markets:
+        return _pulse_markets(args, now)
 
     index = pulse.slot_index(now)
     if index is None and not args.force:
@@ -813,6 +843,9 @@ def build_parser() -> argparse.ArgumentParser:
     pulse_cmd = add("pulse", "tin random trong ngày lên Telegram", cmd_pulse)
     pulse_cmd.add_argument(
         "--plan", action="store_true", help="chỉ in các giờ đã chọn cho hôm nay"
+    )
+    pulse_cmd.add_argument(
+        "--markets", action="store_true", help="gửi giá vàng + crypto (cố định, bỏ qua kế hoạch)"
     )
     pulse_cmd.add_argument("--force", action="store_true", help="gửi bất kể giờ nào")
     pulse_cmd.add_argument("--dry-run", action="store_true", help="in tin ra, không gửi")

@@ -599,10 +599,6 @@ def build_cards(
         allow_network=allow_network,
         xsmb_special=xsmb_source.latest_special(xsmb_draws),
     )
-    board = markets.fetch_gold_board() if allow_network else None
-    coins = markets.fetch_coins() if allow_network else ()
-    world = markets.fetch_world_gold_usd_per_oz() if allow_network else None
-
     tickets = store.read_ve()
     kien_thiet_boards = []
     for region in kienthiet.REGIONS:
@@ -614,11 +610,21 @@ def build_cards(
         card_xsmb(xsmb_draws),
         card_ve(kienthiet_scoreboard.build(tickets, kien_thiet_boards)),
         card_vibes(signals, day=day),
-        card_gold(board, world_usd_per_oz=world, usd_vnd=markets.implied_usd_vnd(coins)),
-        card_crypto(coins),
+        *build_market_cards(allow_network=allow_network),
         card_fortune(fortune, day=day),
     ]
     return tuple(card for card in cards if card is not None)
+
+
+def build_market_cards(*, allow_network: bool = True) -> tuple[Card | None, Card | None]:
+    """The gold and crypto cards, in that order. None where a source did not answer."""
+    board = markets.fetch_gold_board() if allow_network else None
+    coins = markets.fetch_coins() if allow_network else ()
+    world = markets.fetch_world_gold_usd_per_oz() if allow_network else None
+    return (
+        card_gold(board, world_usd_per_oz=world, usd_vnd=markets.implied_usd_vnd(coins)),
+        card_crypto(coins),
+    )
 
 
 def day_order(cards: Sequence[Card], day: date) -> tuple[Card, ...]:
