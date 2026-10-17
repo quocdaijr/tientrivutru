@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-16T15:34:32+00:00",
+ "generated_at": "2026-10-17T07:31:09+00:00",
  "disclaimer": "Xổ số là biến cố độc lập. Mỗi kỳ quay reset về 0. Không có số nóng, không có số lạnh. Phần mềm này không dự đoán được gì — nó chỉ tự tin quá mức và tự chấm điểm độ sai của chính mình. Bảng Phong Thần là paper-trading: tiền đốt trên giấy.",
  "games": [
   {
@@ -517,38 +517,23 @@
     "expected_roi": -0.715682,
     "expected_roi_excluding_jackpot": -0.86301
    },
-   "draw_count": 1378,
+   "draw_count": 1379,
    "latest": {
     "game": "mega645",
-    "draw_id": "01575",
-    "date": "2026-10-14",
+    "draw_id": "01576",
+    "date": "2026-10-16",
     "main": [
-     6,
-     16,
-     19,
-     21,
-     34,
-     43
+     9,
+     20,
+     26,
+     35,
+     36,
+     38
     ],
     "bonus": null,
     "source": "mirror:thanhnhu/vietlott"
    },
    "recent": [
-    {
-     "game": "mega645",
-     "draw_id": "01564",
-     "date": "2026-09-18",
-     "main": [
-      7,
-      12,
-      26,
-      27,
-      41,
-      43
-     ],
-     "bonus": null,
-     "source": "mirror:thanhnhu/vietlott"
-    },
     {
      "game": "mega645",
      "draw_id": "01565",
@@ -713,6 +698,21 @@
      ],
      "bonus": null,
      "source": "mirror:thanhnhu/vietlott"
+    },
+    {
+     "game": "mega645",
+     "draw_id": "01576",
+     "date": "2026-10-16",
+     "main": [
+      9,
+      20,
+      26,
+      35,
+      36,
+      38
+     ],
+     "bonus": null,
+     "source": "mirror:thanhnhu/vietlott"
     }
    ],
    "frequency": {
@@ -724,7 +724,7 @@
     "6": 185,
     "7": 201,
     "8": 177,
-    "9": 176,
+    "9": 177,
     "10": 202,
     "11": 185,
     "12": 169,
@@ -735,13 +735,13 @@
     "17": 161,
     "18": 183,
     "19": 200,
-    "20": 196,
+    "20": 197,
     "21": 168,
     "22": 201,
     "23": 184,
     "24": 200,
     "25": 179,
-    "26": 184,
+    "26": 185,
     "27": 189,
     "28": 197,
     "29": 188,
@@ -750,10 +750,10 @@
     "32": 164,
     "33": 181,
     "34": 185,
-    "35": 186,
-    "36": 180,
+    "35": 187,
+    "36": 181,
     "37": 198,
-    "38": 162,
+    "38": 163,
     "39": 172,
     "40": 169,
     "41": 193,
@@ -763,108 +763,110 @@
     "45": 189
    },
    "chi_square": {
-    "statistic": 30.266,
+    "statistic": 30.072,
     "degrees_of_freedom": 44,
-    "p_value": 0.9428,
-    "observations": 8268,
+    "p_value": 0.9458,
+    "observations": 8274,
     "rejects_uniform": false,
-    "verdict": "p = 0.9428 > 0.05. Không có số nào nóng. Không có số nào lạnh. Toàn bộ ngành thống kê vừa nhìn anh và lắc đầu."
+    "verdict": "p = 0.9458 > 0.05. Không có số nào nóng. Không có số nào lạnh. Toàn bộ ngành thống kê vừa nhìn anh và lắc đầu."
    },
    "pending_prophecy": {
     "game": "mega645",
-    "draw_id": "01576",
-    "draw_date": "2026-10-16",
+    "draw_id": "01577",
+    "draw_date": "2026-10-18",
     "numbers": [
-     4,
-     7,
+     5,
+     6,
+     11,
+     13,
      15,
+     17,
      20,
-     21,
-     26,
-     28,
-     33,
+     30,
+     32,
      35,
-     36,
-     38,
-     40
+     39,
+     43
     ],
-    "seed": "82701d180a1656fa2164822af92f12e97e981d9d63fb2d1e9a27810fea3cbf58",
+    "seed": "18d7695d7ed5d7cd6461c39ac7b21c04a9217b7523d78d226fc3a62eef56aa2f",
     "signals": {
-     "btc_usd": 81615,
-     "hanoi_temp_c": 26,
-     "lunar_day": 7,
+     "btc_usd": 81597,
+     "hanoi_temp_c": 25,
+     "lunar_day": 9,
      "lunar_month": 9,
      "zodiac": "Ngọ",
-     "day_can_chi": "Quý Hợi",
-     "xsmb_special": 59
+     "day_can_chi": "Ất Sửu",
+     "xsmb_special": 56
     },
     "sermon": {
-     "4": "Con đừng hỏi nhiều. Thầy nhìn là biết.",
-     "7": "Số gốc 7. Thầy tính rồi, con khỏi tính lại.",
-     "15": "Giải đặc biệt hôm qua về 59. Thầy quy nó về đây cho con.",
-     "20": "Thầy thấy nó rung rung, là nó muốn về với con.",
-     "21": "Thầy nói trước: đừng khoe với ai.",
-     "26": "Hà Nội 26°C. Trời nóng thế này thì số nó phải nóng theo.",
-     "28": "Nó im im vậy thôi chứ nó có căn.",
-     "33": "Đêm qua thầy nằm mơ thấy nó.",
-     "35": "Con đừng hỏi nhiều. Thầy nhìn là biết.",
-     "36": "Thầy chỉ nói một lần thôi đấy.",
-     "38": "Con hỏi vì sao thì thầy chịu. Nhưng cứ đánh.",
-     "40": "Nó im im vậy thôi chứ nó có căn."
+     "5": "Số này thầy giữ lâu rồi, nay cho con.",
+     "6": "Đêm qua thầy nằm mơ thấy nó.",
+     "11": "Số này nặng vía, con cầm cho chắc.",
+     "13": "Giá bitcoin $81,597 chia ra dư đúng nó. Tây nó cũng phải theo thầy.",
+     "15": "Số này hợp vía con, thầy cảm được.",
+     "17": "Thầy không giải thích. Giải thích là mất thiêng.",
+     "20": "Con cứ ghi đi, đúng sai tính sau.",
+     "30": "Số này hợp vía con, thầy cảm được.",
+     "32": "Trúng là phúc nhà con. Trượt là do con đi ngang qua đám ma.",
+     "35": "Thầy thấy nó rung rung, là nó muốn về với con.",
+     "39": "Thầy chỉ nói một lần thôi đấy.",
+     "43": "Con tin thầy một lần đi, có mất gì đâu."
     },
     "oracle_version": "1.3.0",
-    "created_at": "2026-10-14T15:58:12+00:00",
+    "created_at": "2026-10-16T15:34:30+00:00",
     "ranked": [
-     7,
-     26,
-     15,
-     36,
+     13,
+     30,
+     17,
      35,
-     38,
+     6,
+     39,
      20,
-     4,
-     28,
-     40,
-     21,
-     33
+     5,
+     11,
+     32,
+     43,
+     15
     ],
-    "reasoned": 3,
+    "reasoned": 1,
     "basic_pick": [
-     7,
-     15,
-     26,
+     6,
+     13,
+     17,
+     30,
      35,
-     36,
-     38
+     39
     ],
-    "basic_reasoned": 3
+    "basic_reasoned": 1
    },
    "score": {
     "game": "mega645",
     "display": "Mega 6/45",
-    "draws_scored": 25,
-    "hits_total": 47,
-    "hits_per_draw_actual": 1.88,
+    "draws_scored": 26,
+    "hits_total": 52,
+    "hits_per_draw_actual": 2.0,
     "hits_per_draw_expected": 1.6,
-    "paper_burned_vnd": 231000000,
-    "paper_won_vnd": 55440000,
-    "roi": -0.76,
-    "paper_won_excluding_jackpot_vnd": 55440000,
-    "roi_excluding_jackpot": -0.76,
+    "paper_burned_vnd": 240240000,
+    "paper_won_vnd": 167440000,
+    "roi": -0.30303,
+    "paper_won_excluding_jackpot_vnd": 167440000,
+    "roi_excluding_jackpot": -0.30303,
     "prize_counts_total": {
-     "second": 84,
-     "third": 1008
+     "first": 7,
+     "second": 189,
+     "third": 1358
     },
     "best_draw": {
-     "draw_id": "01551",
-     "draw_date": "2026-08-19",
-     "hits": 4,
+     "draw_id": "01576",
+     "draw_date": "2026-10-16",
+     "hits": 5,
      "bonus_hit": false,
      "prize_counts": {
-      "second": 28,
-      "third": 224
+      "first": 7,
+      "second": 105,
+      "third": 350
      },
-     "payout_vnd": 15120000,
+     "payout_vnd": 112000000,
      "cost_vnd": 9240000
     },
     "jackpot_hits": 0
@@ -902,9 +904,9 @@
     "fetched_at": "2026-10-13T03:30:22+00:00",
     "source": "live:vietlott.vn",
     "matches_latest_draw": false,
-    "draws_behind": 1,
-    "is_stale": false,
-    "latest_draw_id": "01575",
+    "draws_behind": 2,
+    "is_stale": true,
+    "latest_draw_id": "01576",
     "top_jackpot_tax_vnd": 1790760650,
     "top_jackpot_take_home_vnd": 16126845850
    },
