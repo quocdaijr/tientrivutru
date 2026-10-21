@@ -847,3 +847,34 @@ def test_market_cards_carry_their_own_disclaimer_not_the_lottery_one():
         assert notify.DISCLAIMER not in text
         assert pulse.MARKET_DISCLAIMER in text
         assert "tư vấn đầu tư" in text
+
+
+def test_cli_markets_sends_gold_and_crypto_on_any_hour(counting_send, monkeypatch):
+    monkeypatch.setenv(notify.ENV_TOKEN, "tok")
+    monkeypatch.setenv(notify.ENV_CHAT_ID, "42")
+    board = markets.GoldBoard(
+        quotes=(markets.GoldQuote("SJC", "SJC", 15_000_000, 15_200_000),),
+        updated_at="08:00",
+    )
+    coins = (markets.CoinQuote("BTC", "Bitcoin", 100_000.0, 2_500_000_000.0, 1.5),)
+    monkeypatch.setattr(markets, "fetch_gold_board", lambda: board)
+    monkeypatch.setattr(markets, "fetch_coins", lambda: coins)
+    monkeypatch.setattr(markets, "fetch_world_gold_usd_per_oz", lambda: None)
+    off_plan = next(h for h in range(24) if h not in pulse.slots_for(A_DAY))
+
+    assert run_cli("--markets", "--now", at(off_plan).isoformat()) == 0
+    assert [("Giá vàng" in m, "Giá crypto" in m) for m in counting_send.messages] == [
+        (True, False),
+        (False, True),
+    ]
+
+
+def test_cli_markets_fails_loudly_when_no_price_source_answers(counting_send, monkeypatch):
+    monkeypatch.setenv(notify.ENV_TOKEN, "tok")
+    monkeypatch.setenv(notify.ENV_CHAT_ID, "42")
+    monkeypatch.setattr(markets, "fetch_gold_board", lambda: None)
+    monkeypatch.setattr(markets, "fetch_coins", lambda: ())
+    monkeypatch.setattr(markets, "fetch_world_gold_usd_per_oz", lambda: None)
+
+    assert run_cli("--markets", "--now", at(9).isoformat()) == 1
+    assert counting_send.calls == 0
