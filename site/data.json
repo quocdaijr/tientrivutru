@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-21T06:57:33+00:00",
+ "generated_at": "2026-10-21T15:46:26+00:00",
  "disclaimer": "Xổ số là biến cố độc lập. Mỗi kỳ quay reset về 0. Không có số nóng, không có số lạnh. Phần mềm này không dự đoán được gì — nó chỉ tự tin quá mức và tự chấm điểm độ sai của chính mình. Bảng Phong Thần là paper-trading: tiền đốt trên giấy.",
  "games": [
   {
@@ -2553,6 +2553,14 @@
     "memory": true
    },
    {
+    "asset": "BTC-USD",
+    "trade_date": "2026-10-21",
+    "committed_at": "2026-10-21T15:31:01+00:00",
+    "status": "ok",
+    "rating": "Overweight",
+    "memory": true
+   },
+   {
     "asset": "FPT.VN",
     "trade_date": "2026-09-23",
     "committed_at": "2026-09-23T04:28:10+00:00",
@@ -2654,6 +2662,14 @@
     "committed_at": "2026-10-19T17:06:26+00:00",
     "status": "failed",
     "rating": null,
+    "memory": true
+   },
+   {
+    "asset": "FPT.VN",
+    "trade_date": "2026-10-21",
+    "committed_at": "2026-10-21T15:33:32+00:00",
+    "status": "ok",
+    "rating": "Overweight",
     "memory": true
    },
    {
@@ -2761,6 +2777,14 @@
     "memory": true
    },
    {
+    "asset": "VCB.VN",
+    "trade_date": "2026-10-21",
+    "committed_at": "2026-10-21T15:46:23+00:00",
+    "status": "ok",
+    "rating": "Overweight",
+    "memory": true
+   },
+   {
     "asset": "VNM.VN",
     "trade_date": "2026-09-23",
     "committed_at": "2026-09-23T04:28:44+00:00",
@@ -2862,6 +2886,14 @@
     "committed_at": "2026-10-19T17:06:26+00:00",
     "status": "failed",
     "rating": null,
+    "memory": true
+   },
+   {
+    "asset": "VNM.VN",
+    "trade_date": "2026-10-21",
+    "committed_at": "2026-10-21T15:38:20+00:00",
+    "status": "ok",
+    "rating": "Overweight",
     "memory": true
    }
   ]
