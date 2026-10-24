@@ -1,16 +1,16 @@
 {
-  "generated_at": "2026-10-23T15:55:58+00:00",
+  "generated_at": "2026-10-24T14:54:27+00:00",
   "disclaimer": "Paper trading, moi ky mot ve. Co cau giai tra ve dung 50% doanh thu, nen ROI ky vong la -50%. Con so thuc te lech nhieu vi giai dac biet chiem 40% quy giai va rat lau moi ve mot lan.",
   "per_region": {
     "all": {
       "region": null,
       "display": "Kiến thiết",
-      "tickets": 321,
-      "paper_burned_vnd": 3210000,
+      "tickets": 328,
+      "paper_burned_vnd": 3280000,
       "paper_won_vnd": 500000,
-      "roi": -0.8442367601246106,
+      "roi": -0.8475609756097561,
       "paper_won_excluding_headline_vnd": 500000,
-      "roi_excluding_headline": -0.8442367601246106,
+      "roi_excluding_headline": -0.8475609756097561,
       "theoretical_roi": -0.5,
       "theoretical_roi_excluding_headline": -0.745,
       "prize_counts_total": {
@@ -35,12 +35,12 @@
     "mn": {
       "region": "mn",
       "display": "Miền Nam",
-      "tickets": 179,
-      "paper_burned_vnd": 1790000,
+      "tickets": 183,
+      "paper_burned_vnd": 1830000,
       "paper_won_vnd": 200000,
-      "roi": -0.888268156424581,
+      "roi": -0.8907103825136612,
       "paper_won_excluding_headline_vnd": 200000,
-      "roi_excluding_headline": -0.888268156424581,
+      "roi_excluding_headline": -0.8907103825136612,
       "theoretical_roi": -0.5,
       "theoretical_roi_excluding_headline": -0.745,
       "prize_counts_total": {
@@ -64,12 +64,12 @@
     "mt": {
       "region": "mt",
       "display": "Miền Trung",
-      "tickets": 142,
-      "paper_burned_vnd": 1420000,
+      "tickets": 145,
+      "paper_burned_vnd": 1450000,
       "paper_won_vnd": 300000,
-      "roi": -0.7887323943661972,
+      "roi": -0.7931034482758621,
       "paper_won_excluding_headline_vnd": 300000,
-      "roi_excluding_headline": -0.7887323943661972,
+      "roi_excluding_headline": -0.7931034482758621,
       "theoretical_roi": -0.5,
       "theoretical_roi_excluding_headline": -0.745,
       "prize_counts_total": {
