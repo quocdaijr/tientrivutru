@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-11-04T10:28:10+00:00",
+  "generated_at": "2026-11-05T10:20:10+00:00",
   "disclaimer": "Paper trading. Xo so la bien co doc lap; ROI am la ket qua dung, khong phai bug.",
   "per_game": {
     "mega645": {
       "game": "mega645",
       "display": "Mega 6/45",
-      "draws_scored": 33,
-      "hits_total": 64,
-      "hits_per_draw_actual": 1.9394,
+      "draws_scored": 34,
+      "hits_total": 65,
+      "hits_per_draw_actual": 1.9118,
       "hits_per_draw_expected": 1.6,
-      "paper_burned_vnd": 304920000,
+      "paper_burned_vnd": 314160000,
       "paper_won_vnd": 172480000,
-      "roi": -0.434343,
+      "roi": -0.45098,
       "paper_won_excluding_jackpot_vnd": 172480000,
-      "roi_excluding_jackpot": -0.434343,
+      "roi_excluding_jackpot": -0.45098,
       "prize_counts_total": {
         "first": 7,
         "second": 189,
