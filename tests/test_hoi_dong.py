@@ -7,7 +7,7 @@ Its rules are pinned in tests/test_trader_js.py, against the file that actually 
 
 from __future__ import annotations
 
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 
 import pytest
 
@@ -163,7 +163,14 @@ def test_every_listed_price_is_positive_and_output_costs_more():
 def test_today_is_the_asset_s_own_date():
     now = at("2026-09-23T18:00:00+00:00")
     assert local_date(BTC, now) == date(2026, 9, 23)
-    assert local_date(FPT, now) == date(2026, 9, 24), "01:00 in Vietnam is already tomorrow"
+    assert local_date(FPT, now) == date(2026, 9, 23), "01:00 in Vietnam: the session that closed"
+
+
+def test_vn_before_the_close_sits_on_the_previous_session():
+    tuesday_10_vn = at("2026-09-22T03:00:00+00:00")
+    assert local_date(FPT, tuesday_10_vn) == date(2026, 9, 21)
+    monday_10_vn = at("2026-09-21T03:00:00+00:00")
+    assert [a.key for a in due_assets([], monday_10_vn, assets=ASSETS)] == ["BTC-USD"]
 
 
 def test_vn_sits_monday_to_friday_btc_every_day():
@@ -173,10 +180,21 @@ def test_vn_sits_monday_to_friday_btc_every_day():
     assert [a.key for a in due_assets([], friday, assets=ASSETS)] == ["BTC-USD", "FPT.VN"]
 
 
-def test_the_weekday_is_vietnam_s_not_utc_s():
-    """Friday 18:00 UTC is already Saturday 01:00 in Vietnam: no session to sit on."""
+def test_a_late_friday_run_still_sits_on_friday():
+    """Friday 18:00 UTC is Saturday 01:00 in Vietnam; Friday is the session that closed."""
     late_friday_utc = at("2026-09-18T18:00:00+00:00")
-    assert [a.key for a in due_assets([], late_friday_utc, assets=ASSETS)] == ["BTC-USD"]
+    assert [a.key for a in due_assets([], late_friday_utc, assets=ASSETS)] == ["BTC-USD", "FPT.VN"]
+    assert local_date(FPT, late_friday_utc) == date(2026, 9, 18)
+
+
+def test_trade_date_is_never_after_the_utc_date():
+    """TradingAgents rejects a trade_date after date.today(), and the CI runner's clock is UTC.
+    GitHub starts the scheduled run hours late, so every minute of the week must be safe."""
+    start = at("2026-09-14T00:00:00+00:00")
+    for step in range(7 * 24 * 2):
+        now = start + timedelta(minutes=30 * step)
+        for asset in due_assets([], now, assets=ASSETS):
+            assert local_date(asset, now) <= now.date(), (now, asset.key)
 
 
 def test_nothing_is_due_twice():
