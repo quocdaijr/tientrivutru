@@ -1,0 +1,39 @@
+name: Markets
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 08:00 and 17:00 VN. GitHub delays scheduled runs by up to a few hours, which is
+    # harmless here: `pulse --markets` has no plan to miss, it sends whenever it runs.
+    # (The random `pulse` job does have a plan, and drift is why it mostly stayed silent.)
+    - cron: '0 1 * * *'
+    - cron: '0 10 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: markets
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Sync dependencies
+        run: uv sync --frozen
+
+      # No `|| true`, unlike pulse.yml: this job exists to deliver two prices, so a dead
+      # feed or a missing secret must turn the run red instead of going quiet again.
+      - name: Gold and crypto
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: uv run tientrivutru pulse --markets
