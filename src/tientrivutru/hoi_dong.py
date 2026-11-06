@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, date, datetime, time, timedelta
 from typing import Any, Literal
 from zoneinfo import ZoneInfo
 
@@ -204,8 +204,18 @@ def can_afford(verdicts: Sequence[Verdict], cap: float, model_id: str, month: st
 
 # ---- what is due -------------------------------------------------------------------------
 
+VN_CLOSE = time(15, 0)  # HOSE's close, Vietnam time
+
+
 def local_date(asset: Asset, now: datetime) -> date:
-    return now.astimezone(ZoneInfo(asset.tz)).date()
+    """The session the Council sits on. For a VN stock it is the last one that has closed, not
+    Vietnam's calendar date: GitHub starts the scheduled run hours late, often past midnight in
+    Vietnam, when that calendar date is still tomorrow in UTC - and TradingAgents rejects a
+    trade_date after date.today() on the (UTC) runner."""
+    local = now.astimezone(ZoneInfo(asset.tz))
+    if asset.kind == "vn_stock" and local.time() < VN_CLOSE:
+        return local.date() - timedelta(days=1)
+    return local.date()
 
 
 def due_assets(existing: Iterable[Verdict], now: datetime,
