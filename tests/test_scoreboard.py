@@ -8,6 +8,7 @@ genius.
 from __future__ import annotations
 
 import random
+from datetime import timedelta
 
 import pytest
 
@@ -204,3 +205,13 @@ def test_as_json_is_serialisable_and_carries_disclaimer():
     assert "disclaimer" in payload
     assert "mega645" in payload["per_game"]
     assert json.loads(text)["per_game"]["mega645"]["draws_scored"] == 1
+
+
+def test_a_prophecy_is_only_scored_against_the_draw_on_its_own_date():
+    """Ids are derived by counting draw days; if Vietlott pauses on a day nobody foresaw, the
+    id a prophecy carries belongs to a later draw. Scoring it there would be scoring a
+    prophecy against numbers drawn on a different day."""
+    prophecy = make_prophecy(MEGA645, 1550)
+    shifted = make_draw(MEGA645, 1550, day=prophecy.draw_date + timedelta(days=2))
+
+    assert scoreboard.score_rows(MEGA645, [prophecy], [shifted]) == ()

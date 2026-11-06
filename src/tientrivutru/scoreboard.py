@@ -133,7 +133,8 @@ def score_rows(
     rows = [
         score_one(spec, p, by_id[p.draw_id], wheel_size=wheel_size)
         for p in sorted(prophecies, key=lambda p: p.draw_id)
-        if p.game == spec.key and p.draw_id in by_id
+        # The date too: an id derived across a pause nobody foresaw names a later draw.
+        if p.game == spec.key and p.draw_id in by_id and by_id[p.draw_id].date == p.draw_date
     ]
     return tuple(rows)
 

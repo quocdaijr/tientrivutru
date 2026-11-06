@@ -31,6 +31,15 @@ def test_next_target_skips_the_draw_upstream_missed():
     assert draw_id == "01551"
 
 
+def test_next_target_does_not_count_the_tet_pause():
+    """Vietlott does not draw on giao thừa or mùng 1. Power #01308 was Sat 14 Feb 2026 and the
+    next draw, #01309, was Thu 19 Feb: Tue 17 Feb (mùng 1) was skipped and took no id."""
+    history = [make_draw(POWER655, 1308, day=date(2026, 2, 14))]
+    now = datetime(2026, 2, 17, 10, 0, tzinfo=VN)
+
+    assert cli.next_target(POWER655, history, now=now) == ("01309", date(2026, 2, 19))
+
+
 def test_next_target_moves_on_after_the_draw_time():
     """After 18:00 the day's draw is gone; target the next draw day."""
     now = datetime(2026, 8, 19, 19, 30, tzinfo=VN)
