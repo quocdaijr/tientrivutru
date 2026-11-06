@@ -25,7 +25,7 @@ import html
 import re
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
-from datetime import date, timedelta
+from datetime import date, time, timedelta
 from types import MappingProxyType
 
 import requests
@@ -57,6 +57,7 @@ class RegionSpec:
     path: str
     tiers: tuple[TierSpec, ...]
     prophesiable: bool
+    draw_time: time  # Vietnam time the đài start drawing: a vé after this is a vé after the fact
 
     @property
     def slots(self) -> int:
@@ -103,9 +104,12 @@ _NORTHERN_TIERS = (
 
 REGIONS: Mapping[str, RegionSpec] = MappingProxyType(
     {
-        "mn": RegionSpec("mn", "Miền Nam", "mien-nam", _SOUTHERN_TIERS, prophesiable=True),
-        "mt": RegionSpec("mt", "Miền Trung", "mien-trung", _SOUTHERN_TIERS, prophesiable=True),
-        "mb": RegionSpec("mb", "Miền Bắc", "mien-bac", _NORTHERN_TIERS, prophesiable=False),
+        "mn": RegionSpec("mn", "Miền Nam", "mien-nam", _SOUTHERN_TIERS, prophesiable=True,
+                         draw_time=time(16, 15)),
+        "mt": RegionSpec("mt", "Miền Trung", "mien-trung", _SOUTHERN_TIERS, prophesiable=True,
+                         draw_time=time(17, 15)),
+        "mb": RegionSpec("mb", "Miền Bắc", "mien-bac", _NORTHERN_TIERS, prophesiable=False,
+                         draw_time=time(18, 15)),
     }
 )
 

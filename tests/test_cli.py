@@ -272,9 +272,19 @@ def test_ingest_with_a_region_leaves_the_vietlott_games_alone(monkeypatch, capsy
     assert "Mega 6/45" not in capsys.readouterr().out
 
 
-def test_oracle_writes_a_ve_then_refuses_a_second(capsys):
+VN_MORNING = datetime(2026, 8, 27, 10, 0, tzinfo=VN)  # a Thursday, before any đài draws
+
+
+def _pin_now(monkeypatch, now: datetime) -> None:
+    from tientrivutru import kienthiet_commands
+
+    monkeypatch.setattr(kienthiet_commands, "now_vn", lambda: now)
+
+
+def test_oracle_writes_a_ve_then_refuses_a_second(monkeypatch, capsys):
     """The vé guard is the ticket half of the append-only rule."""
-    today = cli.today_vn()
+    _pin_now(monkeypatch, VN_MORNING)
+    today = VN_MORNING.date()
     store.write_boards("mn", [_a_southern_board(today - timedelta(days=7))])
 
     argv = ["oracle", "--region", "mn", "--offline"]
@@ -287,6 +297,19 @@ def test_oracle_writes_a_ve_then_refuses_a_second(capsys):
     assert first == len(store.read_ve())
     assert first >= 1
     assert "bỏ qua" in capsys.readouterr().out
+
+
+def test_oracle_writes_no_ve_once_the_region_has_drawn(monkeypatch, capsys):
+    """GitHub starts the 10:00 cron hours late; a vé written after 16:15 is written after the
+    result is public, even when the board is not on file yet."""
+    _pin_now(monkeypatch, VN_MORNING.replace(hour=16, minute=39))
+    store.write_boards("mn", [_a_southern_board(VN_MORNING.date() - timedelta(days=7))])
+
+    args = cli.build_parser().parse_args(["oracle", "--region", "mn", "--offline"])
+    args.handler(args)
+
+    assert store.read_ve() == ()
+    assert "đã quay" in capsys.readouterr().out
 
 
 def test_mien_bac_is_never_phan(capsys):
