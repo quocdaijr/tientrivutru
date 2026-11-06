@@ -12,6 +12,8 @@ from dataclasses import dataclass
 from datetime import date, timedelta
 from types import MappingProxyType
 
+from .lunar import to_lunar
+
 WHEEL_SIZE = 12
 BASIC_PICK = 6
 """A plain Vietlott ticket - "Cơ bản" in the app - is six numbers for 10,000d.
@@ -47,6 +49,8 @@ class GameSpec:
     # prophecy, no wheel, no scoreboard - so the honest layer can show that they are
     # every bit as random as Vietlott.
     wheel_playable: bool = True
+    # Vietlott does not draw on giao thừa or mùng 1, and those days take no draw id.
+    pauses_for_tet: bool = False
 
     @property
     def numbers(self) -> range:
@@ -83,6 +87,7 @@ POWER655 = GameSpec(
     prizes=MappingProxyType({"first": 40_000_000, "second": 500_000, "third": 50_000}),
     jackpot_floor=MappingProxyType({"jackpot1": 30_000_000_000, "jackpot2": 3_000_000_000}),
     mirror_filename="power655.jsonl",
+    pauses_for_tet=True,
 )
 
 MEGA645 = GameSpec(
@@ -98,6 +103,7 @@ MEGA645 = GameSpec(
     # Upstream names this file `power645.jsonl` even though it holds Mega 6/45 data.
     # This attribute is the ONLY place that bug is allowed to exist.
     mirror_filename="power645.jsonl",
+    pauses_for_tet=True,
 )
 
 # US games: statistics only. Prize tables are deliberately empty because we never
@@ -157,7 +163,17 @@ def get_game(key: str) -> GameSpec:
 
 def is_draw_day(spec: GameSpec, day: date) -> bool:
     """Does `spec` draw on `day`?"""
-    return day.weekday() in spec.draw_weekdays
+    if day.weekday() not in spec.draw_weekdays:
+        return False
+    return not (spec.pauses_for_tet and _is_tet_pause(day))
+
+
+def _is_tet_pause(day: date) -> bool:
+    """Giao thừa or mùng 1: the only Tết days Vietlott skipped in 2018-2026, every year."""
+    return any(
+        (lunar.day, lunar.month, lunar.is_leap_month) == (1, 1, False)
+        for lunar in (to_lunar(day), to_lunar(day + timedelta(days=1)))
+    )
 
 
 def next_draw_date(spec: GameSpec, after: date, *, inclusive: bool = True) -> date:
