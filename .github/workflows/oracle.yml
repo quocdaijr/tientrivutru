@@ -3,7 +3,8 @@ name: Oracle
 on:
   workflow_dispatch:
   schedule:
-    # 10:00 VN - well before the 18:00 draw, so prophecies are committed in advance.
+    # 10:00 VN. GitHub often starts it hours late, so the oracle itself refuses a vé once
+    # its region has drawn (RegionSpec.draw_time) and a Vietlott draw after 18:00.
     - cron: '0 3 * * *'
     # 18:45 VN - after the draw, to ingest the result and update the scoreboard.
     - cron: '45 11 * * *'
@@ -68,6 +69,8 @@ jobs:
             echo "Vu tru khong noi gi moi hom nay."
           else
             git commit -m "oracle: $(date -u +%F) — vũ trụ đã lên tiếng"
+            # A PR merged mid-run would otherwise reject the push and lose the day's data.
+            git pull --rebase
             git push
           fi
 

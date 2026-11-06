@@ -19,7 +19,7 @@ from . import kienthiet_scoreboard as scoreboard
 from . import notify, store
 from .kienthiet_oracle import latest_special_before
 from .kienthiet_oracle import prophesy as prophesy_ve
-from .schedule import today_vn
+from .schedule import now_vn, today_vn
 from .sources import kienthiet
 from .sources.vibes import gather
 from .store import ProphecyConflict
@@ -107,10 +107,19 @@ def run_oracle(console: Console, args: argparse.Namespace, *, offline: bool) -> 
 
     Only today's đài, never next week's: committing a week of tickets in one run would
     leave the next six runs with nothing to do and every đài prophesied from a single
-    day's signals.
+    day's signals. Never once the region has started drawing: GitHub starts the morning cron
+    hours late, and a vé written then is written after the result is public.
     """
-    today = today_vn()
+    now = now_vn()
+    today = now.date()
     for region in prophesiable(args.region):
+        spec = kienthiet.REGIONS[region]
+        if now.time() >= spec.draw_time:
+            console.print(
+                f"[yellow]kiến thiết {spec.display}: đã quay lúc "
+                f"{spec.draw_time:%H:%M} — không phán sau khi có kết quả[/yellow]"
+            )
+            continue
         boards = store.read_boards(region)
         if not boards:
             console.print(f"[dim]kiến thiết {region}: chưa có data — bỏ qua[/dim]")

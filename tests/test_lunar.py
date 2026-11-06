@@ -113,3 +113,21 @@ def test_sun_longitude_sector_is_never_negative():
     for year in (1930, 1968, 1990, 1999, 2000, 2026):
         sector = _sun_longitude(julian_day_from_date(date(year, 6, 15)))
         assert 0 <= sector <= 11, f"{year}: sector {sector} outside 0..11"
+
+
+@pytest.mark.parametrize(
+    ("day", "expected"),
+    [
+        # The 2026-08-12 eclipse new moon falls at 00:36 on 08-13 in Vietnam.
+        (date(2026, 8, 13), (1, 7, False)),
+        # 2023's leap month is the 2nd, not the 1st.
+        (date(2023, 2, 20), (1, 2, False)),
+        (date(2023, 3, 22), (1, 2, True)),
+        (date(1991, 2, 15), (1, 1, False)),
+    ],
+)
+def test_new_moon_series_matches_ho_ngoc_duc(day, expected):
+    """Three terms of the new-moon series once carried the wrong sign, which moved one new
+    moon in five by a day across the lunar month boundary."""
+    lunar = to_lunar(day)
+    assert (lunar.day, lunar.month, lunar.is_leap_month) == expected

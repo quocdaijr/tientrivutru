@@ -69,12 +69,19 @@ def _new_moon(k: int) -> float:
     mpr = 306.0253 + 385.81691806 * k + 0.0107306 * t2 + 0.00001236 * t3
     f = 21.2964 + 390.67050646 * k - 0.0016528 * t2 - 0.00000239 * t3
     c1 = (0.1734 - 0.000393 * t) * math.sin(m * DEG) + 0.0021 * math.sin(2 * DEG * m)
-    c1 -= 0.4068 * math.sin(mpr * DEG) + 0.0161 * math.sin(2 * DEG * mpr)
-    c1 -= 0.0004 * math.sin(3 * DEG * mpr)
-    c1 += 0.0104 * math.sin(2 * DEG * f) - 0.0051 * math.sin((m + mpr) * DEG)
-    c1 -= 0.0074 * math.sin((m - mpr) * DEG) + 0.0004 * math.sin((2 * f + m) * DEG)
-    c1 -= 0.0004 * math.sin((2 * f - m) * DEG) - 0.0006 * math.sin((2 * f + mpr) * DEG)
-    c1 += 0.0010 * math.sin((2 * f - mpr) * DEG) + 0.0005 * math.sin((2 * mpr + m) * DEG)
+    # One term per line, signs exactly as in Hồ Ngọc Đức's series: grouping terms under a
+    # shared `-=` once flipped three of them.
+    c1 += -0.4068 * math.sin(mpr * DEG)
+    c1 += +0.0161 * math.sin(2 * DEG * mpr)
+    c1 += -0.0004 * math.sin(3 * DEG * mpr)
+    c1 += +0.0104 * math.sin(2 * DEG * f)
+    c1 += -0.0051 * math.sin((m + mpr) * DEG)
+    c1 += -0.0074 * math.sin((m - mpr) * DEG)
+    c1 += +0.0004 * math.sin((2 * f + m) * DEG)
+    c1 += -0.0004 * math.sin((2 * f - m) * DEG)
+    c1 += -0.0006 * math.sin((2 * f + mpr) * DEG)
+    c1 += +0.0010 * math.sin((2 * f - mpr) * DEG)
+    c1 += +0.0005 * math.sin((2 * mpr + m) * DEG)
     if t < -11:
         deltat = (
             0.001 + 0.000839 * t + 0.0002261 * t2 - 0.00000845 * t3 - 0.000000081 * t * t3
