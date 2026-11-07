@@ -53,6 +53,9 @@ const HCM = 'Asia/Ho_Chi_Minh';
  * front end, not an API with a contract. Named here so the page can credit each number
  * on screen, and so the day one of them dies the obituary has an address.
  */
+/** The tickers the foreign-flow query asks for; anything else in the reply is dropped. */
+const FOREIGN_CODES = ['FPT', 'VNM', 'HPG', 'VCB', 'SSI'];
+
 const SOURCES = {
   gold: {
     label: 'PNJ',
@@ -73,7 +76,7 @@ const SOURCES = {
     label: 'VNDIRECT',
     site: 'https://dstock.vndirect.com.vn/',
     url: 'https://api-finfo.vndirect.com.vn/v4/foreigns'
-       + '?q=code:FPT,VNM,HPG,VCB,SSI&sort=tradingDate:desc&size=40',
+       + `?q=code:${FOREIGN_CODES.join(',')}&sort=tradingDate:desc&size=40`,
   },
   crypto: {
     label: 'CoinGecko',
@@ -94,9 +97,24 @@ const SOURCES = {
 
 const num = (v) => {
   const n = typeof v === 'number' ? v : Number(v);
-  if (!Number.isFinite(n)) throw new Error('không phải số: ' + JSON.stringify(v));
+  // Never echo the value: it is an upstream string, and errors are printed as HTML.
+  if (!Number.isFinite(n)) throw new Error('không phải số');
   return n;
 };
+
+/**
+ * An upstream timestamp, checked before it is printed: every block is built with innerHTML,
+ * on the same origin as the visitor's birth date in localStorage. Digits and date
+ * punctuation only, so markup can never pass for a date.
+ */
+const stamp = (v) => {
+  if (v == null || v === '') return null;
+  if (typeof v !== 'string' || !/^[0-9TZ:.\- +]+$/.test(v)) throw new Error('mốc giờ lạ');
+  return v;
+};
+
+/** HTML-escape text from outside the page (error messages quote response bodies). */
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
 /** Gold quotes we care about. The rest of the PNJ list is jewellery alloys. */
 const GOLD_WANTED = [
@@ -127,7 +145,7 @@ function parseGold(payload) {
 
 function parseXau(payload) {
   if (!payload || payload.symbol !== 'XAU') throw new Error('không phải giá XAU');
-  return { usdPerOzt: num(payload.price), updatedAt: payload.updatedAt || null };
+  return { usdPerOzt: num(payload.price), updatedAt: stamp(payload.updatedAt) };
 }
 
 const INDEX_ORDER = ['VNINDEX', 'HNX', 'UPCOM'];
@@ -145,7 +163,7 @@ function parseIndices(payload) {
       price: num(r.price),
       change: num(r.change),
       changePct: num(r.changePct) / 100,
-      lastUpdated: r.lastUpdated || null,
+      lastUpdated: stamp(r.lastUpdated),
     });
   }
   if (!out.length) throw new Error('không có chỉ số nào trong ' + INDEX_ORDER.join(', '));
@@ -162,13 +180,13 @@ function parseIndices(payload) {
 function parseForeign(payload) {
   const rows = payload && payload.data;
   if (!Array.isArray(rows) || !rows.length) throw new Error('VNDIRECT trả về rỗng');
-  const dates = rows.map((r) => r.tradingDate).filter(Boolean).sort();
+  const dates = rows.map((r) => stamp(r.tradingDate)).filter(Boolean).sort();
   const latest = dates[dates.length - 1];
   if (!latest) throw new Error('không có tradingDate');
   const seen = new Set();
   const out = [];
   for (const r of rows) {
-    if (r.tradingDate !== latest || seen.has(r.code)) continue;
+    if (r.tradingDate !== latest || seen.has(r.code) || !FOREIGN_CODES.includes(r.code)) continue;
     seen.add(r.code);
     out.push({ code: r.code, netVal: num(r.netVal), floor: r.floor || null });
   }
@@ -225,7 +243,7 @@ async function settle(key, parse) {
   try {
     return { ok: true, value: await pull(key, parse) };
   } catch (e) {
-    return { ok: false, error: e.message || String(e) };
+    return { ok: false, error: esc(e.message || e) };
   }
 }
 
@@ -648,7 +666,7 @@ async function boot() {
 
 window.TienTriVuTruFinance = {
   parseGold, parseXau, parseIndices, parseForeign, parseCrypto,
-  impliedUsdVnd, canonical, marketRoot, digitRoot, silentCount, todayHcm, sessionLabel,
+  impliedUsdVnd, settle, canonical, marketRoot, digitRoot, silentCount, todayHcm, sessionLabel,
   DONG_PER_PNJ_UNIT, CHI_PER_LUONG, OZT_PER_LUONG,
 };
 
