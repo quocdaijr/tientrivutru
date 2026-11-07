@@ -87,7 +87,7 @@ def _try_live_fallback(spec: GameSpec, missing: Sequence[str]) -> bool:
     """
     try:
         live = vietlott_live.fetch_latest(spec)
-    except (LiveFetchError, requests.RequestException) as exc:
+    except (LiveFetchError, requests.RequestException, ValueError) as exc:
         console.print(f"  [red]dự phòng vietlott.vn thất bại:[/red] {exc}")
         return True
 
@@ -157,7 +157,13 @@ def cmd_ingest(args: argparse.Namespace) -> int:
     # neither flag means everything.
     for spec in _games_for(args):
         console.print(f"[bold]{spec.display}[/bold] — tải từ mirror…")
-        draws = _fetch_for(spec)
+        try:
+            draws = _fetch_for(spec)
+        except (requests.RequestException, ValueError) as exc:
+            # One dead mirror costs its own game, not the games and boards after it.
+            console.print(f"  [red]không tải được {spec.display}:[/red] {exc}")
+            problems += 1
+            continue
         added, total = store.merge_draws(spec.key, draws)
         stored = store.read_draws(spec.key)
         report = mirror.summarise(spec, stored, today)

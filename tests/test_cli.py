@@ -331,6 +331,29 @@ def test_mien_bac_is_never_phan(capsys):
 # ------------------------------------------------- jackpot refresh must never be fatal
 
 
+def test_one_dead_mirror_does_not_stop_the_rest_of_ingest(monkeypatch, capsys):
+    """A timeout on the Mega Millions mirror used to end cmd_ingest, so kiến thiết boards were
+    never fetched - and the workflow's `|| true` hid it. Now it costs that one game."""
+    import requests
+
+    from tientrivutru import kienthiet_commands
+
+    def fetch(spec):
+        if spec.key == "megamillions":
+            raise requests.ConnectionError("raw.githubusercontent.com timed out")
+        return ()
+
+    reached = []
+    monkeypatch.setattr(cli, "_fetch_for", fetch)
+    monkeypatch.setattr(kienthiet_commands, "run_ingest",
+                        lambda *_a, **_k: reached.append("kienthiet") or 0)
+
+    args = cli.build_parser().parse_args(["ingest"])
+    assert args.handler(args) == 1, "a dead source is still a problem worth a red run"
+    assert reached == ["kienthiet"]
+    assert "megamillions" in capsys.readouterr().out.lower().replace(" ", "")
+
+
 def test_prize_failure_does_not_break_ingest(monkeypatch, capsys):
     """The jackpot is commentary on a draw, not part of it. A vietlott.vn layout change
     must cost us the figure, not the whole ingest run."""
