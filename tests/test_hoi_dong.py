@@ -257,3 +257,16 @@ def test_the_page_is_told_when_the_council_runs_for_free():
     paid = verdict(cost=0.2)
     assert council_payload([paid], at("2026-09-21T13:00:00+00:00"))["billing"] == "paid"
     assert council_payload([], at("2026-09-21T13:00:00+00:00"))["billing"] is None
+
+
+def test_a_free_or_tokenless_sitting_is_not_a_cost_sample():
+    """Free-tier rows and sittings that died before a token cost $0. Counting them would let
+    five of them push the reserve to 0 - and wave the first paid sitting past the cap."""
+    free = [verdict(cost=0.0, day=f"2026-09-{d:02d}") for d in range(1, 6)]
+    assert reserve_usd(free, "m", first_run=0.5) == pytest.approx(0.5)
+
+    paid_then_crashes = [verdict(cost=0.4, day="2026-09-01")] + [
+        verdict(status="failed", rating=None, cost=0.0, day=f"2026-09-{d:02d}")
+        for d in range(2, 7)
+    ]
+    assert reserve_usd(paid_then_crashes, "m", first_run=0.5) == pytest.approx(0.4)

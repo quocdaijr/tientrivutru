@@ -189,9 +189,13 @@ def month_spend(verdicts: Iterable[Verdict], month: str) -> float:
 
 def reserve_usd(verdicts: Iterable[Verdict], model_id: str,
                 first_run: float = FIRST_RUN_RESERVE_USD) -> float:
-    """What the next sitting might cost: the worst of this model's last five real sittings."""
+    """What the next sitting might cost: the worst of this model's last five paid sittings.
+
+    Only rows that cost something are samples. A budget skip, a free-tier sitting and one
+    that died before its first token all cost $0, and five of those would otherwise drop the
+    reserve to 0 - letting the first paid sitting through on any cap."""
     recent = sorted(
-        (v for v in verdicts if v.model_id == model_id and v.status != "skipped_budget"),
+        (v for v in verdicts if v.model_id == model_id and v.cost_usd > 0),
         key=lambda v: v.committed_at,
     )[-5:]
     return max((v.cost_usd for v in recent), default=first_run)
