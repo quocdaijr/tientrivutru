@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 [![Ruff](https://img.shields.io/badge/lint-ruff-261230.svg)](https://docs.astral.sh/ruff/)
-[![tests](https://img.shields.io/badge/tests-1060%20passing-brightgreen.svg)](tests/)
+[![tests](https://img.shields.io/badge/tests-1070%20passing-brightgreen.svg)](tests/)
 [![draws analysed](https://img.shields.io/badge/draws%20analysed-31%2C470-informational.svg)](#what-the-honest-layer-found)
 [![chi-square](https://img.shields.io/badge/chi²%20p--value-0.10%20→%20random-informational.svg)](#what-the-honest-layer-found)
 [![prediction accuracy](https://img.shields.io/badge/prediction%20accuracy-0%25-critical.svg)](DISCLAIMER.md)
@@ -83,7 +83,7 @@ Every prophecy is generated **deterministically** from
 be edited after the fact.
 
 `ORACLE_VERSION` is part of the seed, so changing the algorithm cannot flatter the past — two
-prophecies committed at v1.0.0 are still v1.0.0 even though the oracle is now at v1.3.0.
+prophecies committed at v1.0.0 are still v1.0.0 even though the oracle is now at v1.4.0.
 
 That is what makes the **Hall of Shame** (*Bảng Phong Thần* — literally "the register of
 deified names", used here for a scoreboard of failure) mean anything.
@@ -189,7 +189,7 @@ separated out rather than counted as a first prize.
 | | Expected ROI (jackpot at floor) | Excluding jackpot |
 |---|---:|---:|
 | Mega 6/45 | −71.57% | −86.30% |
-| Power 6/55 | −76.20% | −86.55% |
+| Power 6/55 | −70.07% | −86.63% |
 
 A backtest over 1,353 Mega 6/45 draws hit the jackpot exactly **once**, and ROI jumped to
 **+11.35%** — while the hit rate stayed at 1.624 against a chance expectation of 1.600. That is

@@ -488,17 +488,7 @@ def chi_square_uniform(boards: Sequence[Board]) -> stats.ChiSquareResult:
     """Test H0: all 100 two-digit tails are equally likely."""
     if not boards:
         raise ValueError("cannot test uniformity with no boards")
-    counts = frequency(boards)
-    observations = sum(counts.values())
-    expected = observations / DIGIT_SPACE
-    statistic = sum((count - expected) ** 2 / expected for count in counts.values())
-    df = DIGIT_SPACE - 1
-    return stats.ChiSquareResult(
-        statistic=statistic,
-        degrees_of_freedom=df,
-        p_value=stats.chi_square_sf(statistic, df),
-        observations=observations,
-    )
+    return stats.chi_square_counts(frequency(boards))
 
 
 def latest_board(boards: Sequence[Board], province: str | None = None) -> Board | None:

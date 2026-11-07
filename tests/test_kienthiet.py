@@ -17,6 +17,7 @@ from datetime import date
 
 import pytest
 
+from tientrivutru import stats
 from tientrivutru.sources import kienthiet as kt
 
 # --- minhngoc /getkqxs/an-giang/20-08-2026.js, result table only ---------------------
@@ -280,6 +281,11 @@ def test_chi_square_uses_ninety_nine_degrees_of_freedom():
 def test_chi_square_requires_data():
     with pytest.raises(ValueError, match="no boards"):
         kt.chi_square_uniform([])
+
+
+def test_chi_square_is_the_shared_test():
+    boards = [an_giang()] * 40
+    assert kt.chi_square_uniform(boards) == stats.chi_square_counts(kt.frequency(boards))
 
 
 def test_blatant_bias_is_detected():

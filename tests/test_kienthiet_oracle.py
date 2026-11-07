@@ -191,8 +191,8 @@ def test_two_dai_on_the_same_day_are_both_welcome(loud_signals):
 
 
 def test_the_shared_oracle_version_did_not_move():
-    """Bumping it would rewrite every future mega645 and power655 prophecy."""
-    assert oracle.ORACLE_VERSION == "1.3.0"
+    """Bumping it rewrites every future mega645 and power655 prophecy - only on purpose."""
+    assert oracle.ORACLE_VERSION == "1.4.0"
 
 
 def test_cosmic_signals_gained_no_field_for_kien_thiet():
@@ -209,13 +209,13 @@ def test_cosmic_signals_gained_no_field_for_kien_thiet():
 
 @pytest.mark.parametrize("spec", (MEGA645, POWER655), ids=lambda s: s.key)
 def test_existing_game_prophecies_are_unchanged(spec, loud_signals):
-    """Recorded from oracle.py, games.py, models.py and vibes.py at the commit that
-    added kiến thiết, none of which this change touches. If these move, something in the
+    """Recorded at oracle 1.4.0, when the karma draw entered the seed (the kiến thiết
+    commit recorded bd5bc4b3 / fb217e1d at 1.3.0). If these move, something in the
     shared oracle moved with them and every future prophecy moved too.
     """
     expected = {
-        "mega645": ("bd5bc4b3", (3, 4, 5, 16, 18, 20, 31, 32, 40, 41, 42, 44)),
-        "power655": ("fb217e1d", (7, 8, 9, 16, 20, 26, 30, 32, 35, 36, 48, 51)),
+        "mega645": ("2294204f", (5, 8, 16, 20, 21, 25, 27, 28, 31, 36, 37, 41)),
+        "power655": ("edcd0855", (1, 2, 5, 17, 22, 23, 26, 29, 37, 38, 45, 51)),
     }[spec.key]
     prophecy = oracle.prophesy(spec, "01600", date(2026, 9, 1), loud_signals)
 

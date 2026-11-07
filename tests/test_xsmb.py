@@ -6,7 +6,7 @@ from datetime import date
 
 import pytest
 
-from tientrivutru import store
+from tientrivutru import stats, store
 from tientrivutru.sources import xsmb
 
 HEADER = (
@@ -103,6 +103,11 @@ def test_chi_square_uses_ninety_nine_degrees_of_freedom():
 def test_chi_square_requires_data():
     with pytest.raises(ValueError, match="no draws"):
         xsmb.chi_square_uniform([])
+
+
+def test_chi_square_is_the_shared_test():
+    draws = xsmb.parse_csv(CSV)
+    assert xsmb.chi_square_uniform(draws) == stats.chi_square_counts(xsmb.frequency(draws))
 
 
 def test_blatant_bias_is_detected():

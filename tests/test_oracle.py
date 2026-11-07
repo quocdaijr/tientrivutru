@@ -73,11 +73,11 @@ def test_signals_change_the_prophecy(quiet_signals, loud_signals):
 
 def test_seed_is_stable_hex():
     signals = CosmicSignals(lunar_day=8, lunar_month=7, zodiac="Ngọ")
-    seed = oracle.make_seed(MEGA645, DRAW_ID, DRAW_DATE, signals)
+    seed = oracle.make_seed(MEGA645, DRAW_ID, DRAW_DATE, signals, None)
 
     assert len(seed) == 64
     assert int(seed, 16) >= 0
-    assert seed == oracle.make_seed(MEGA645, "1550", DRAW_DATE, signals)
+    assert seed == oracle.make_seed(MEGA645, "1550", DRAW_DATE, signals, None)
 
 
 def test_canonical_signals_render_none_as_dash():
@@ -168,10 +168,14 @@ def test_xsmb_signal_boosts_a_number():
 def test_xsmb_signal_changes_the_seed():
     """A new signal must change future prophecies, or it is decoration."""
     without = oracle.make_seed(
-        MEGA645, DRAW_ID, DRAW_DATE, CosmicSignals(lunar_day=8, lunar_month=7)
+        MEGA645, DRAW_ID, DRAW_DATE, CosmicSignals(lunar_day=8, lunar_month=7), None
     )
     with_signal = oracle.make_seed(
-        MEGA645, DRAW_ID, DRAW_DATE, CosmicSignals(lunar_day=8, lunar_month=7, xsmb_special=83)
+        MEGA645,
+        DRAW_ID,
+        DRAW_DATE,
+        CosmicSignals(lunar_day=8, lunar_month=7, xsmb_special=83),
+        None,
     )
     assert without != with_signal
 
@@ -190,14 +194,15 @@ def test_oracle_version_is_in_the_seed():
     """Bumping the version must invalidate nothing already stored, but change all future
     prophecies - so the version string has to actually reach the digest."""
     signals = CosmicSignals(lunar_day=8, lunar_month=7)
-    original = oracle.make_seed(MEGA645, DRAW_ID, DRAW_DATE, signals)
+    original = oracle.make_seed(MEGA645, DRAW_ID, DRAW_DATE, signals, None)
+    current = oracle.ORACLE_VERSION
     try:
         oracle.ORACLE_VERSION = "99.0.0"
-        bumped = oracle.make_seed(MEGA645, DRAW_ID, DRAW_DATE, signals)
+        bumped = oracle.make_seed(MEGA645, DRAW_ID, DRAW_DATE, signals, None)
     finally:
-        oracle.ORACLE_VERSION = "1.3.0"
+        oracle.ORACLE_VERSION = current
     assert original != bumped
-    assert oracle.make_seed(MEGA645, DRAW_ID, DRAW_DATE, signals) == original
+    assert oracle.make_seed(MEGA645, DRAW_ID, DRAW_DATE, signals, None) == original
 
 
 def test_a_root_of_one_does_not_boost_every_number():
@@ -323,3 +328,28 @@ def test_the_numbers_themselves_did_not_change_when_ranking_was_added(loud_signa
 
     assert prophecy.numbers == again.numbers
     assert prophecy.seed == again.seed
+
+
+def test_karma_draw_reaches_the_seed(loud_signals):
+    """A mirror one draw behind feeds karma a different bonus. If the seed ignored it,
+    one seed on record could stand for two different sets of numbers."""
+    lagging = [make_draw(POWER655, 1384, bonus=30)]
+    fresh = [*lagging, make_draw(POWER655, 1385, bonus=41)]
+
+    behind = oracle.prophesy(POWER655, DRAW_ID, DRAW_DATE, loud_signals, lagging)
+    current = oracle.prophesy(POWER655, DRAW_ID, DRAW_DATE, loud_signals, fresh)
+
+    assert behind.seed != current.seed
+
+
+def test_same_seed_means_same_numbers(loud_signals):
+    """Older history karma never reads must not move the seed or the numbers."""
+    latest = make_draw(POWER655, 1385, bonus=41)
+    short = oracle.prophesy(POWER655, DRAW_ID, DRAW_DATE, loud_signals, [latest])
+    long = oracle.prophesy(
+        POWER655, DRAW_ID, DRAW_DATE, loud_signals, [make_draw(POWER655, 1384, bonus=30), latest]
+    )
+
+    assert short.seed == long.seed
+    assert short.numbers == long.numbers
+    assert short.sermon == long.sermon
