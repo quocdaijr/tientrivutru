@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-06T18:30:20+00:00",
+ "generated_at": "2026-11-07T09:37:16+00:00",
  "disclaimer": "Xổ số là biến cố độc lập. Mỗi kỳ quay reset về 0. Không có số nóng, không có số lạnh. Phần mềm này không dự đoán được gì — nó chỉ tự tin quá mức và tự chấm điểm độ sai của chính mình. Bảng Phong Thần là paper-trading: tiền đốt trên giấy.",
  "games": [
   {
@@ -11,8 +11,8 @@
    "wheel": {
     "combinations": 924,
     "cost_vnd": 9240000,
-    "expected_roi": -0.76197,
-    "expected_roi_excluding_jackpot": -0.865456
+    "expected_roi": -0.700707,
+    "expected_roi_excluding_jackpot": -0.866283
    },
    "draw_count": 1420,
    "latest": {
@@ -275,7 +275,7 @@
     "p_value": 0.5712,
     "observations": 8520,
     "rejects_uniform": false,
-    "verdict": "p = 0.5712 > 0.05. Không có số nào nóng. Không có số nào lạnh. Toàn bộ ngành thống kê vừa nhìn anh và lắc đầu."
+    "verdict": "p = 0.5712 > 0.05. Không có số nào nóng. Không có số nào lạnh. Toàn bộ ngành thống kê vừa nhìn bạn và lắc đầu."
    },
    "pending_prophecy": {
     "game": "power655",
@@ -519,38 +519,23 @@
     "expected_roi": -0.715682,
     "expected_roi_excluding_jackpot": -0.86301
    },
-   "draw_count": 1387,
+   "draw_count": 1388,
    "latest": {
     "game": "mega645",
-    "draw_id": "01584",
-    "date": "2026-11-04",
+    "draw_id": "01585",
+    "date": "2026-11-06",
     "main": [
-     7,
-     14,
-     20,
-     30,
-     34,
-     40
+     1,
+     10,
+     37,
+     38,
+     39,
+     45
     ],
     "bonus": null,
     "source": "mirror:thanhnhu/vietlott"
    },
    "recent": [
-    {
-     "game": "mega645",
-     "draw_id": "01573",
-     "date": "2026-10-09",
-     "main": [
-      5,
-      7,
-      12,
-      23,
-      32,
-      41
-     ],
-     "bonus": null,
-     "source": "mirror:thanhnhu/vietlott"
-    },
     {
      "game": "mega645",
      "draw_id": "01574",
@@ -715,10 +700,25 @@
      ],
      "bonus": null,
      "source": "mirror:thanhnhu/vietlott"
+    },
+    {
+     "game": "mega645",
+     "draw_id": "01585",
+     "date": "2026-11-06",
+     "main": [
+      1,
+      10,
+      37,
+      38,
+      39,
+      45
+     ],
+     "bonus": null,
+     "source": "mirror:thanhnhu/vietlott"
     }
    ],
    "frequency": {
-    "1": 181,
+    "1": 182,
     "2": 174,
     "3": 170,
     "4": 195,
@@ -727,7 +727,7 @@
     "7": 203,
     "8": 177,
     "9": 179,
-    "10": 204,
+    "10": 205,
     "11": 188,
     "12": 169,
     "13": 185,
@@ -754,105 +754,105 @@
     "34": 187,
     "35": 187,
     "36": 182,
-    "37": 198,
-    "38": 164,
-    "39": 172,
+    "37": 199,
+    "38": 165,
+    "39": 173,
     "40": 174,
     "41": 195,
     "42": 179,
     "43": 184,
     "44": 201,
-    "45": 190
+    "45": 191
    },
    "chi_square": {
-    "statistic": 30.513,
+    "statistic": 30.512,
     "degrees_of_freedom": 44,
     "p_value": 0.9388,
-    "observations": 8322,
+    "observations": 8328,
     "rejects_uniform": false,
-    "verdict": "p = 0.9388 > 0.05. Không có số nào nóng. Không có số nào lạnh. Toàn bộ ngành thống kê vừa nhìn anh và lắc đầu."
+    "verdict": "p = 0.9388 > 0.05. Không có số nào nóng. Không có số nào lạnh. Toàn bộ ngành thống kê vừa nhìn bạn và lắc đầu."
    },
    "pending_prophecy": {
     "game": "mega645",
-    "draw_id": "01585",
-    "draw_date": "2026-11-06",
+    "draw_id": "01586",
+    "draw_date": "2026-11-08",
     "numbers": [
-     10,
-     12,
+     1,
+     3,
+     4,
+     7,
+     14,
      18,
-     22,
-     25,
-     26,
-     28,
-     29,
+     24,
+     30,
      32,
-     33,
-     40,
-     42
+     35,
+     44,
+     45
     ],
-    "seed": "1785b80f736519d62b8a874d840cd6256798123c90ef4436f64cac3ce3f00310",
+    "seed": "b98a377fc262d859b46b1e6894893b0489f12908c446c34fbceac1c99a1066c0",
     "signals": {
-     "btc_usd": 80353,
-     "hanoi_temp_c": 25,
-     "lunar_day": 28,
+     "btc_usd": 75707,
+     "hanoi_temp_c": 24,
+     "lunar_day": 30,
      "lunar_month": 9,
      "zodiac": "Ngọ",
-     "day_can_chi": "Giáp Thân",
-     "xsmb_special": 46
+     "day_can_chi": "Bính Tuất",
+     "xsmb_special": 77
     },
     "sermon": {
-     "10": "Số gốc 1. Thầy tính rồi, con khỏi tính lại.",
-     "12": "Số đẹp thế này mà con còn phân vân à?",
-     "18": "Con đừng hỏi nhiều. Thầy nhìn là biết.",
-     "22": "Thầy không lấy tiền của con đâu. Đánh đi.",
-     "25": "Hà Nội 25°C. Trời nóng thế này thì số nó phải nóng theo.",
-     "26": "Thầy nói trước: đừng khoe với ai.",
-     "28": "Số gốc 1. Thầy tính rồi, con khỏi tính lại.",
-     "29": "Giá bitcoin $80,353 chia ra dư đúng nó. Tây nó cũng phải theo thầy.",
-     "32": "Số này nặng vía, con cầm cho chắc.",
-     "33": "Thầy nói trước: đừng khoe với ai.",
-     "40": "Số này hợp vía con, thầy cảm được.",
-     "42": "Thầy nói trước: đừng khoe với ai."
+     "1": "Số này nặng vía, con cầm cho chắc.",
+     "3": "Số gốc 3. Thầy tính rồi, con khỏi tính lại.",
+     "4": "Con đừng hỏi nhiều. Thầy nhìn là biết.",
+     "7": "Con cứ ghi đi, đúng sai tính sau.",
+     "14": "Nhìn mặt con là thầy biết con hợp số này.",
+     "18": "Giá bitcoin $75,707 chia ra dư đúng nó. Tây nó cũng phải theo thầy.",
+     "24": "Hà Nội 24°C. Trời nóng thế này thì số nó phải nóng theo.",
+     "30": "Số gốc 3. Thầy tính rồi, con khỏi tính lại.",
+     "32": "Con cứ ghi đi, đúng sai tính sau.",
+     "35": "Số đẹp thế này mà con còn phân vân à?",
+     "44": "Thầy chỉ nói một lần thôi đấy.",
+     "45": "Con cứ ghi đi, đúng sai tính sau."
     },
     "oracle_version": "1.3.0",
-    "created_at": "2026-11-04T18:53:05+00:00",
+    "created_at": "2026-11-06T18:30:15+00:00",
     "ranked": [
-     28,
-     29,
-     25,
-     10,
-     26,
-     40,
-     32,
-     22,
-     42,
-     12,
+     30,
      18,
-     33
+     24,
+     3,
+     1,
+     45,
+     7,
+     35,
+     14,
+     4,
+     44,
+     32
     ],
     "reasoned": 4,
     "basic_pick": [
-     10,
-     25,
-     26,
-     28,
-     29,
-     40
+     1,
+     3,
+     18,
+     24,
+     30,
+     45
     ],
     "basic_reasoned": 4
    },
    "score": {
     "game": "mega645",
     "display": "Mega 6/45",
-    "draws_scored": 34,
-    "hits_total": 65,
-    "hits_per_draw_actual": 1.9118,
+    "draws_scored": 35,
+    "hits_total": 66,
+    "hits_per_draw_actual": 1.8857,
     "hits_per_draw_expected": 1.6,
-    "paper_burned_vnd": 314160000,
+    "paper_burned_vnd": 323400000,
     "paper_won_vnd": 172480000,
-    "roi": -0.45098,
+    "roi": -0.466667,
     "paper_won_excluding_jackpot_vnd": 172480000,
-    "roi_excluding_jackpot": -0.45098,
+    "roi_excluding_jackpot": -0.466667,
     "prize_counts_total": {
      "first": 7,
      "second": 189,
@@ -906,9 +906,9 @@
     "fetched_at": "2026-10-19T04:33:44+00:00",
     "source": "live:vietlott.vn",
     "matches_latest_draw": false,
-    "draws_behind": 7,
+    "draws_behind": 8,
     "is_stale": true,
-    "latest_draw_id": "01584",
+    "latest_draw_id": "01585",
     "top_jackpot_tax_vnd": 2643495400,
     "top_jackpot_take_home_vnd": 23801458600
    },
@@ -1121,7 +1121,7 @@
     "p_value": 0.1271,
     "observations": 195948,
     "rejects_uniform": false,
-    "verdict": "p = 0.1271 > 0.05. Không có số nào nóng. Không có số nào lạnh. Toàn bộ ngành thống kê vừa nhìn anh và lắc đầu."
+    "verdict": "p = 0.1271 > 0.05. Không có số nào nóng. Không có số nào lạnh. Toàn bộ ngành thống kê vừa nhìn bạn và lắc đầu."
    },
    "ve": {
     "region": "mn",
@@ -1133,6 +1133,7 @@
     "paper_won_excluding_headline_vnd": 200000,
     "roi_excluding_headline": -0.9090909090909091,
     "theoretical_roi": -0.5,
+    "theoretical_roi_net": -0.526,
     "theoretical_roi_excluding_headline": -0.745,
     "prize_counts_total": {
      "g7": 1
@@ -1274,7 +1275,7 @@
     "p_value": 0.6801,
     "observations": 151182,
     "rejects_uniform": false,
-    "verdict": "p = 0.6801 > 0.05. Không có số nào nóng. Không có số nào lạnh. Toàn bộ ngành thống kê vừa nhìn anh và lắc đầu."
+    "verdict": "p = 0.6801 > 0.05. Không có số nào nóng. Không có số nào lạnh. Toàn bộ ngành thống kê vừa nhìn bạn và lắc đầu."
    },
    "ve": {
     "region": "mt",
@@ -1286,6 +1287,7 @@
     "paper_won_excluding_headline_vnd": 300000,
     "roi_excluding_headline": -0.8295454545454546,
     "theoretical_roi": -0.5,
+    "theoretical_roi_net": -0.526,
     "theoretical_roi_excluding_headline": -0.745,
     "prize_counts_total": {
      "g8": 3
@@ -1427,7 +1429,7 @@
     "p_value": 0.2887,
     "observations": 205443,
     "rejects_uniform": false,
-    "verdict": "p = 0.2887 > 0.05. Không có số nào nóng. Không có số nào lạnh. Toàn bộ ngành thống kê vừa nhìn anh và lắc đầu."
+    "verdict": "p = 0.2887 > 0.05. Không có số nào nóng. Không có số nào lạnh. Toàn bộ ngành thống kê vừa nhìn bạn và lắc đầu."
    }
   }
  ],
