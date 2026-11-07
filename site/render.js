@@ -12,7 +12,7 @@ const T = window.TienTriVuTruTheme;
 const THAY = window.TienTriVuTruThay;
 
 const {
-  tw, vnd, billionsNum, billions, pct, pad, el, stage, observeReveals, observeFlips,
+  tw, vnd, billionsNum, billions, pct, todayHcm, pad, el, stage, observeReveals, observeFlips,
 } = window.TienTriVuTruDom;
 
 /**
@@ -128,12 +128,6 @@ function jackpotFocus(game) {
   return block;
 }
 
-/** C(pool, pick), computed rather than shipped, so it cannot disagree with the game spec. */
-function totalCombos(game) {
-  let n = 1;
-  for (let i = 0; i < game.pick; i++) n = n * (game.pool - i) / (i + 1);
-  return Math.round(n);
-}
 function ballRow(numbers, bonus) {
   const box = el('div', 'balls');
   (numbers || []).forEach((n, i) => {
@@ -156,7 +150,11 @@ function sermonList(numbers, sermon) {
 
 /* ============================ 00 · KHAI ============================ */
 
-function stageKhai(data, onSubmit) {
+/** Shown when the browser refuses site data: the fortune still reads, it just isn't kept. */
+const STORAGE_REFUSED =
+  'Trình duyệt của con chặn lưu trữ, nên thầy không nhớ được — tải lại trang là thầy quên.';
+
+function stageKhai(data, onSubmit, storageRefused) {
   const section = stage('00', `${tw('1fa84','🪄')} Khai báo`, 'Thầy cần ngày sinh. Chỉ ngày sinh thôi.');
   const block = el('div', 'block');
   const profile = P.loadProfile();
@@ -184,17 +182,14 @@ function stageKhai(data, onSubmit) {
     const fd = new FormData(form);
     const birthDate = fd.get('birthDate');
     if (!birthDate) return;
-    P.saveProfile({
+    onSubmit(P.saveProfile({
       birthDate,
       name: (fd.get('name') || '').trim(),
       gender: fd.get('gender') || null,
-    });
-    onSubmit();
+    }));
   });
-  form.querySelector('[data-forget]').addEventListener('click', () => {
-    P.clearAll();
-    onSubmit();
-  });
+  form.querySelector('[data-forget]').addEventListener('click', () => onSubmit(P.clearAll()));
+  if (storageRefused) block.appendChild(el('p', 'err', STORAGE_REFUSED));
 
   if (!profile?.birthDate) {
     block.appendChild(el('p', 'hand',
@@ -439,7 +434,6 @@ function veBlock(ve) {
     block.appendChild(el('p', 'note', 'Chưa có vé nào được chấm.'));
     return block;
   }
-  const pct = (v) => `${(v * 100).toFixed(2)}%`;
   const table = el('table', 'stack-sm');
   table.innerHTML = `<tbody>
     <tr><th>vé đã chấm</th><td class="num">${ve.tickets.toLocaleString('vi-VN')}</td></tr>
@@ -572,7 +566,7 @@ function stageSuThat(data) {
 
 /* ============================ boot ============================ */
 
-function render(data) {
+function render(data, storageRefused = false) {
   const app = document.getElementById('app');
   app.innerHTML = '';
 
@@ -581,13 +575,13 @@ function render(data) {
   let fortuneError = null;
   if (profile?.birthDate) {
     try {
-      fortune = P.readFortune(profile, data.astrology, new Date().toISOString().slice(0, 10));
+      fortune = P.readFortune(profile, data.astrology, todayHcm());
     } catch (e) {
       fortuneError = e.message;
     }
   }
 
-  app.appendChild(stageKhai(data, () => render(data)));
+  app.appendChild(stageKhai(data, (kept) => render(data, !kept), storageRefused));
   app.appendChild(stageTuong(fortune, fortuneError));
   app.appendChild(stagePhan(data, profile, fortune));
   app.appendChild(stageSoNo(data, fortune));

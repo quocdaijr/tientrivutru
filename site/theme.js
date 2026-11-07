@@ -11,13 +11,6 @@ const THEMES = ['veso', 'thantai', 'viahe', 'y2k'];
 const THEME_KEY = 'tientrivutru.theme.v1';
 const DEFAULT_THEME = 'veso';
 
-const THEME_LABELS = {
-  veso: { full: 'VÉ SỐ', short: 'V' },
-  thantai: { full: 'THẦN TÀI', short: 'T' },
-  viahe: { full: 'VỈA HÈ', short: 'H' },
-  y2k: { full: 'Y2K', short: 'Y' },
-};
-
 function readTheme() {
   try {
     const stored = localStorage.getItem(THEME_KEY);
@@ -78,7 +71,6 @@ function preloadDisplayFaces() {
 window.TienTriVuTruTheme = {
   THEMES,
   THEME_KEY,
-  THEME_LABELS,
   DEFAULT_THEME,
   readTheme,
   applyTheme,

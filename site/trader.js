@@ -23,7 +23,7 @@ const T = window.TienTriVuTruTheme;
 const THAY = window.TienTriVuTruThay;
 /* The site already has one seeded PRNG and it is the tested one. */
 const seededRandom = window.TienTriVuTruPersonal.seededRandom;
-const { el, stage, tw } = window.TienTriVuTruDom;
+const { el, stage, tw, pctAt, signed } = window.TienTriVuTruDom;
 
 /* ---------------- source ----------------
  * Binance publishes these for its own front end. Verified 2026-09-22: the REST endpoint
@@ -359,9 +359,6 @@ const backoffDelay = (attempt) => Math.min(30000, 1000 * Math.pow(2, Math.min(at
  */
 const usd = (n) => n.toLocaleString('vi-VN', { minimumFractionDigits: 2,
                                                maximumFractionDigits: 2 });
-const pctAt = (x, d) => (x * 100).toLocaleString('vi-VN', { minimumFractionDigits: d,
-                                                            maximumFractionDigits: d }) + '%';
-const signed = (x, d) => (x >= 0 ? '+' : '−') + pctAt(Math.abs(x), d);
 const num = (n, d) => n.toLocaleString('vi-VN', { minimumFractionDigits: d,
                                                   maximumFractionDigits: d });
 

@@ -343,20 +343,6 @@ def test_no_timestamp_means_no_claim_about_when():
     assert got is None
 
 
-def test_today_is_computed_in_vietnam_not_utc():
-    """VNDIRECT writes dates in +07. Comparing against a UTC date would call a fresh
-    session stale for the first seven hours of every Vietnamese day."""
-    got = _run(
-        "const t = F.todayHcm();"
-        "const utc = new Date().toISOString().slice(0, 10);"
-        "const vn = new Intl.DateTimeFormat('en-CA', "
-        "  {timeZone: 'Asia/Ho_Chi_Minh'}).format(new Date());"
-        "console.log(JSON.stringify({t, matchesVn: t === vn, utc}));"
-    )
-    assert got["matchesVn"], f"todayHcm() returned {got['t']}, Vietnam is on a different date"
-    assert len(got["t"]) == 10 and got["t"][4] == "-", "must match the API's YYYY-MM-DD"
-
-
 # --- the page itself ---------------------------------------------------------------
 
 def test_the_finance_page_loads_the_scripts_it_needs_in_order():

@@ -25,7 +25,7 @@ const T = window.TienTriVuTruTheme;
 const THAY = window.TienTriVuTruThay;
 /* The site already has one seeded PRNG and it is the tested one. */
 const seededRandom = window.TienTriVuTruPersonal.seededRandom;
-const { el, stage, tw, vnd } = window.TienTriVuTruDom;
+const { el, stage, tw, vnd, usd, signed, todayHcm } = window.TienTriVuTruDom;
 
 /* ---------------- units ----------------
  *
@@ -45,8 +45,6 @@ const CHI_PER_LUONG = 10;
 const GRAM_PER_LUONG = 37.5;
 const GRAM_PER_OZT = 31.1034768;
 const OZT_PER_LUONG = GRAM_PER_LUONG / GRAM_PER_OZT;
-
-const HCM = 'Asia/Ho_Chi_Minh';
 
 /* ---------------- sources ----------------
  * Every one of these is an internal endpoint that its owner published for their own
@@ -253,30 +251,14 @@ const trieu = (n) => (n / 1e6).toLocaleString('vi-VN', {
   minimumFractionDigits: 2, maximumFractionDigits: 2,
 }) + ' tr';
 
-const usd = (n) => '$' + n.toLocaleString('en-US', {
-  minimumFractionDigits: 2, maximumFractionDigits: 2,
-});
-
 const points = (n) => n.toLocaleString('vi-VN', {
   minimumFractionDigits: 2, maximumFractionDigits: 2,
 });
-
-/* The shared pct() prints "1.78%"; every other figure on this page is vi-VN, where the
-   decimal mark is a comma. One page must not use both. */
-const signedPct = (r) => (r >= 0 ? '+' : '−')
-  + (Math.abs(r) * 100).toLocaleString('vi-VN', {
-      minimumFractionDigits: 2, maximumFractionDigits: 2,
-    }) + '%';
 
 function deltaTag(ratio, text) {
   const cls = ratio > 0 ? 'delta delta--up' : ratio < 0 ? 'delta delta--down' : 'delta';
   const arrow = ratio > 0 ? '▲' : ratio < 0 ? '▼' : '·';
   return el('span', cls, `${arrow} ${text}`);
-}
-
-/** Today in Vietnam, as the API writes it. Comparing in UTC would flip the date at 07:00. */
-function todayHcm() {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: HCM }).format(new Date());
 }
 
 /**
@@ -378,7 +360,7 @@ function stocksBlock(indices, foreign) {
     cell.appendChild(el('div', 'fact__k', idx.code));
     cell.appendChild(el('div', 'fact__v fact__v--num', points(idx.price)));
     cell.appendChild(deltaTag(idx.change,
-      `${points(Math.abs(idx.change))} (${signedPct(idx.changePct)})`));
+      `${points(Math.abs(idx.change))} (${signed(idx.changePct, 2)})`));
     grid.appendChild(cell);
   }
   box.appendChild(grid);
@@ -418,7 +400,7 @@ function cryptoBlock(crypto) {
     const cell = el('div', 'fact');
     cell.appendChild(el('div', 'fact__k', c.ticker + ' / USD'));
     cell.appendChild(el('div', 'fact__v fact__v--num', usd(c.usd)));
-    cell.appendChild(deltaTag(c.change24h, signedPct(c.change24h) + ' · 24h'));
+    cell.appendChild(deltaTag(c.change24h, signed(c.change24h, 2) + ' · 24h'));
     grid.appendChild(cell);
 
     const cellV = el('div', 'fact');
@@ -615,7 +597,7 @@ function stageSuThat(d) {
         zero.appendChild(factGrid([
           ['Vàng thế giới quy ra lượng', trieu(worldLuong) + '/lượng'],
           ['SJC bán ra', trieu(sjc.sellLuong) + '/lượng'],
-          ['Chênh lệch', signedPct(premium)],
+          ['Chênh lệch', signed(premium, 2)],
         ], { numeric: true }));
         zero.appendChild(el('p', 'note',
           `Tỷ giá dùng để quy đổi là <b>${Math.round(rate).toLocaleString('vi-VN')} ₫/$</b>, `
@@ -666,7 +648,7 @@ async function boot() {
 
 window.TienTriVuTruFinance = {
   parseGold, parseXau, parseIndices, parseForeign, parseCrypto,
-  impliedUsdVnd, settle, canonical, marketRoot, digitRoot, silentCount, todayHcm, sessionLabel,
+  impliedUsdVnd, settle, canonical, marketRoot, digitRoot, silentCount, sessionLabel,
   DONG_PER_PNJ_UNIT, CHI_PER_LUONG, OZT_PER_LUONG,
 };
 
