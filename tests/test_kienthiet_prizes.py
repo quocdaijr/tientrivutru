@@ -43,10 +43,6 @@ def test_a_dai_pays_out_exactly_five_billion():
     assert kp.total_pool_vnd() == 5_000_000_000
 
 
-def test_a_dai_takes_exactly_ten_billion():
-    assert kp.revenue_vnd() == 10_000_000_000
-
-
 def test_a_ticket_is_worth_exactly_half_what_it_costs():
     assert kp.expected_payout_vnd() == 5_000
     assert kp.theoretical_roi() == -0.5
@@ -60,6 +56,15 @@ def test_without_the_headline_prizes_a_ticket_is_worth_2550d():
     """What a run of a few hundred thousand tickets actually converges to."""
     assert kp.total_pool_vnd(exclude=kp.HEADLINE_TIERS) == 2_550_000_000
     assert kp.theoretical_roi(exclude=kp.HEADLINE_TIERS) == -0.745
+
+
+def test_after_the_withholding_a_ticket_takes_home_less_than_half():
+    """10% of the excess over 10 million comes off the đặc biệt, phụ ĐB, nhất and nhì
+    (giải ba is exactly 10 million, so it is received whole). Announcing −50% while
+    hiding that is what `tax` exists to refuse."""
+    assert kp.total_pool_vnd(net=True) == 4_740_000_000
+    assert kp.theoretical_roi(net=True) == pytest.approx(-0.526)
+    assert kp.theoretical_roi(exclude=kp.HEADLINE_TIERS, net=True) == pytest.approx(-0.7475)
 
 
 def test_special_prize_is_forty_percent_of_the_pool():

@@ -164,7 +164,14 @@ def cmd_ingest(args: argparse.Namespace) -> int:
             console.print(f"  [red]không tải được {spec.display}:[/red] {exc}")
             problems += 1
             continue
-        added, total = store.merge_draws(spec.key, draws)
+        if spec.wheel_playable:
+            added, total = store.merge_draws(spec.key, draws)
+        else:
+            # US ids are row positions, so one backfilled row upstream renumbers every
+            # later draw; a merge would keep the stale ids. No prophecy points at them.
+            before = len(store.read_draws(spec.key))
+            total = store.write_draws(spec.key, draws)
+            added = total - before
         stored = store.read_draws(spec.key)
         report = mirror.summarise(spec, stored, today)
 
@@ -581,25 +588,9 @@ def _parse_now(raw: str | None) -> datetime:
 
 
 def cmd_pulse(args: argparse.Namespace) -> int:
-    """Push one random card at a randomly-chosen hour of the day.
-
-    Called hourly by `pulse.yml` and exits 0 without sending on the hours that are not
-    in today's plan, so the cron can stay dumb and stateless.
-    """
+    """Push one card. Every run sends; `pulse.yml` decides how many runs a day there are."""
     now = _parse_now(args.now)
     day = now.astimezone(VN_TZ).date()
-    plan = ", ".join(f"{hour:02d}h" for hour in pulse.slots_for(day))
-
-    if args.plan:
-        console.print(f"Kế hoạch {day}: [cyan]{plan}[/cyan]")
-        console.print(DISCLAIMER)
-        return 0
-
-    index = pulse.slot_index(now)
-    if index is None and not args.force:
-        console.print(f"[dim]giờ này không có tin (kế hoạch hôm nay: {plan})[/dim]")
-        console.print(DISCLAIMER)
-        return 0
 
     # A dry run is a local preview, so it must not demand anybody's bot token.
     if not args.dry_run:
@@ -623,9 +614,8 @@ def cmd_pulse(args: argparse.Namespace) -> int:
         fortune=fortune,
         allow_network=not args.offline,
     )
-    # `--force` off-plan has no slot number; the hour stands in for one so that forcing
-    # at different times previews different cards instead of the same one all day.
-    card = pulse.card_for_slot(cards, day, index if index is not None else now.hour)
+    # Without --run (a local preview) the hour stands in, so previews vary through the day.
+    card = pulse.card_for_run(cards, day, now.hour if args.run is None else args.run)
     if card is None:
         console.print("[yellow]không dựng được thẻ nào — chạy `tientrivutru ingest` trước[/yellow]")
         console.print(DISCLAIMER)
@@ -818,9 +808,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     pulse_cmd = add("pulse", "tin random trong ngày lên Telegram", cmd_pulse)
     pulse_cmd.add_argument(
-        "--plan", action="store_true", help="chỉ in các giờ đã chọn cho hôm nay"
+        "--run", type=int, help="số thứ tự lần chạy (github.run_number) để chọn thẻ"
     )
-    pulse_cmd.add_argument("--force", action="store_true", help="gửi bất kể giờ nào")
     pulse_cmd.add_argument("--dry-run", action="store_true", help="in tin ra, không gửi")
     pulse_cmd.add_argument("--offline", action="store_true", help="bỏ tín hiệu cần mạng")
     pulse_cmd.add_argument("--now", help="ghi đè thời điểm (ISO 8601, mặc định giờ VN)")

@@ -85,6 +85,7 @@ def render_score(console: Console, score: VeScore) -> None:
     table.add_row("tiền trúng (giấy)", f"{score.paper_won_vnd:,}đ")
     table.add_row("ROI", f"{score.roi * 100:+.2f}%")
     table.add_row("ROI lý thuyết", f"{score.theoretical_roi * 100:+.2f}%")
+    table.add_row("  sau thuế", f"{score.theoretical_roi_net * 100:+.2f}%")
     table.add_row("ROI bỏ ĐB & phụ ĐB", f"{score.roi_excluding_headline * 100:+.2f}%")
     table.add_row(
         "  lý thuyết", f"{score.theoretical_roi_excluding_headline * 100:+.2f}%"
@@ -115,13 +116,15 @@ def _verdict(score: VeScore) -> str:
     """Say what the number means, including when it flatters the oracle."""
     if score.roi > score.theoretical_roi:
         return (
-            f"ROI {score.roi * 100:+.2f}% đang cao hơn mức lý thuyết −50%. "
+            f"ROI {score.roi * 100:+.2f}% đang cao hơn mức lý thuyết −50,00% "
+            "(−52,60% sau thuế). "
             "Đừng mừng: giải đặc biệt chiếm 40% quỹ giải, trúng một lần là cả bảng "
             f"lệch. Bỏ nó ra thì còn {score.roi_excluding_headline * 100:+.2f}%."
         )
     return (
         f"ROI {score.roi * 100:+.2f}%. Mức lý thuyết là −50,00% và nó không phải ước "
         "lượng — cơ cấu giải trả về đúng 5 tỷ trên 10 tỷ doanh thu mỗi đài mỗi kỳ. "
+        "Trúng giải lớn còn bị khấu trừ thuế, nên tiền thật về tay là −52,60%. "
         "Thầy phán hay con tự bốc thì con số vẫn thế."
     )
 

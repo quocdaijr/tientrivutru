@@ -423,7 +423,8 @@ function chiSquareTable(chi, label) {
 
 /**
  * One đài, one vé, 10.000đ. The prize table pays back exactly half of what a đài takes,
- * so the theoretical ROI is −50% — not an estimate, arithmetic. It is printed next to the
+ * so the theoretical ROI is −50% — not an estimate, arithmetic (−52,6% after tax.py's 10%
+ * withholding on the top tiers, printed beside it). It is printed next to the
  * realised figure precisely because the two will not match for a very long time: giải đặc
  * biệt is 40% of the pool and lands about once per million tickets.
  */
@@ -442,6 +443,7 @@ function veBlock(ve) {
     <tr><th>tiền trúng (giấy)</th><td class="num">${ve.paper_won_vnd.toLocaleString('vi-VN')}đ</td></tr>
     <tr><th>ROI</th><td class="num">${pct(ve.roi)}</td></tr>
     <tr><th>ROI lý thuyết</th><td class="num">${pct(ve.theoretical_roi)}</td></tr>
+    ${ve.theoretical_roi_net == null ? '' : `<tr><th>— sau thuế 10%</th><td class="num">${pct(ve.theoretical_roi_net)}</td></tr>`}
     <tr><th>ROI bỏ ĐB &amp; phụ ĐB</th><td class="num">${pct(ve.roi_excluding_headline)}</td></tr>
     <tr><th>— lý thuyết</th><td class="num">${pct(ve.theoretical_roi_excluding_headline)}</td></tr>
   </tbody>`;

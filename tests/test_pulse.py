@@ -3,13 +3,11 @@ nothing here may leak a birth date or raise on missing data."""
 
 from __future__ import annotations
 
-import os
+import random
 import re
-import subprocess
-import sys
-from collections import Counter
 from dataclasses import replace
 from datetime import date, datetime, timedelta
+from pathlib import Path
 
 import pytest
 
@@ -66,121 +64,6 @@ def counting_send(monkeypatch):
     return counter
 
 
-# --------------------------------------------------------------------------- schedule
-
-
-def test_slots_are_stable_for_the_same_day():
-    assert pulse.slots_for(A_DAY) == pulse.slots_for(A_DAY)
-
-
-def test_bands_tile_the_window_exactly():
-    """No gap between bands and no overlap, or the hours stop being sorted and distinct."""
-    for count in range(pulse.MIN_PER_DAY, pulse.MAX_PER_DAY + 1):
-        bands = pulse.bands_for(count)
-        assert len(bands) == count
-        covered = [hour for band in bands for hour in band]
-        assert covered == list(range(pulse.FIRST_HOUR_VN, pulse.LAST_HOUR_VN + 1)), count
-
-
-def test_slots_hold_their_invariants_across_a_year():
-    for offset in range(365):
-        day = A_DAY + timedelta(days=offset)
-        slots = pulse.slots_for(day)
-
-        assert pulse.MIN_PER_DAY <= len(slots) <= pulse.MAX_PER_DAY, day
-        assert len(set(slots)) == len(slots), day
-        assert list(slots) == sorted(slots), day
-        # One pulse per band is what makes sorted-and-distinct true by construction.
-        for hour, band in zip(slots, pulse.bands_for(len(slots)), strict=True):
-            assert hour in band, (day, slots)
-
-
-def test_slots_actually_move_around_the_day():
-    """A schedule that always picked 09h would satisfy every invariant above."""
-    seen = {hour for offset in range(365) for hour in pulse.slots_for(A_DAY + timedelta(offset))}
-    assert len(seen) > 8
-
-
-def hours_over(days: int) -> Counter:
-    return Counter(
-        hour
-        for offset in range(days)
-        for hour in pulse.slots_for(A_DAY + timedelta(days=offset))
-    )
-
-
-def test_hours_are_spread_evenly_over_the_window():
-    """The regression this replaced: the closed-form min-gap sampler was uniform over
-    valid *schedules*, not over hours, and edge hours sit in more valid schedules. It put
-    08h and 22h 1.55x above 20h. Stratifying by band brings that to about 1.14x."""
-    counts = hours_over(3650)
-    per_hour = [counts[h] for h in range(pulse.FIRST_HOUR_VN, pulse.LAST_HOUR_VN + 1)]
-    assert min(per_hour) > 0
-    assert max(per_hour) / min(per_hour) < 1.25, dict(sorted(counts.items()))
-
-
-def test_no_hour_outside_the_window_is_ever_used():
-    counts = hours_over(3650)
-    assert set(counts) == set(range(pulse.FIRST_HOUR_VN, pulse.LAST_HOUR_VN + 1))
-
-
-def test_close_together_days_are_the_known_price_of_a_flat_spread():
-    """Bands let two pulses land in adjacent hours across a band boundary. That is the
-    trade an even spread costs, so it is measured rather than left to be discovered."""
-    tight = sum(
-        1
-        for offset in range(3650)
-        for slots in [pulse.slots_for(A_DAY + timedelta(days=offset))]
-        if any(later - earlier < 3 for earlier, later in zip(slots, slots[1:], strict=False))
-    )
-    assert 0.10 < tight / 3650 < 0.20, tight / 3650
-
-
-def test_slots_do_not_depend_on_python_hash_seed():
-    """`hash()` is salted per process; the plan must survive a new runner."""
-
-    def plan_with(seed: str) -> str:
-        env = {**os.environ, "PYTHONHASHSEED": seed}
-        return subprocess.run(
-            [
-                sys.executable,
-                "-c",
-                "from datetime import date\n"
-                "from tientrivutru.pulse import slots_for\n"
-                "print(slots_for(date(2026, 8, 23)))",
-            ],
-            capture_output=True,
-            text=True,
-            check=True,
-            env=env,
-        ).stdout.strip()
-
-    assert plan_with("0") == plan_with("1")
-
-
-def test_should_fire_only_on_planned_hours():
-    slots = pulse.slots_for(A_DAY)
-    fired = tuple(hour for hour in range(24) if pulse.should_fire(at(hour)))
-    assert fired == slots
-
-
-def test_slot_index_counts_from_zero_and_is_none_off_plan():
-    slots = pulse.slots_for(A_DAY)
-    assert [pulse.slot_index(at(hour)) for hour in slots] == list(range(len(slots)))
-
-    off_plan = next(hour for hour in range(24) if hour not in slots)
-    assert pulse.slot_index(at(off_plan)) is None
-
-
-def test_plan_is_pinned_so_a_seed_change_is_visible():
-    """A regression pin, computed once from the implementation and then frozen.
-
-    Changing the seed recipe or the sampling is a behaviour change - it should show up
-    here rather than silently reshuffling every day's schedule.
-    """
-    assert pulse.slots_for(date(2026, 8, 23)) == pulse.PINNED_PLAN_2026_08_23
-
-
 # ------------------------------------------------------------------------------ cards
 
 
@@ -192,7 +75,7 @@ def a_prophecy_with_sermons() -> Prophecy:
         numbers=tuple(range(1, 13)),
         seed="deadbeef" * 8,
         signals={},
-        sermon={str(n): f"số {n} gọi tên anh" for n in range(1, 13)},
+        sermon={str(n): f"số {n} gọi tên con" for n in range(1, 13)},
         oracle_version=ORACLE_VERSION,
         created_at=utc_now(),
     )
@@ -361,12 +244,13 @@ def test_ve_card_prints_both_the_realised_and_the_exact_roi():
     body = "\n".join(card.lines)
     assert "-100.00%" in body
     assert "-50.00%" in body
+    assert "-52.60%" in body, "the take-home after tax, next to the gross"
 
 
 def test_sermon_card_quotes_one_line_from_the_pending_prophecy():
     card = pulse.card_sermon(MEGA645, a_prophecy_with_sermons(), pulse.day_rng(A_DAY))
     assert card is not None
-    assert "gọi tên anh" in "\n".join(card.lines)
+    assert "gọi tên con" in "\n".join(card.lines)
 
 
 def test_sermon_card_is_absent_when_the_prophecy_has_no_sermon():
@@ -382,6 +266,9 @@ def test_fortune_card_uses_the_birth_date_without_repeating_it():
     assert fortune.can_chi in body
     assert "1996-04-15" not in body
     assert "15/04/1996" not in body
+    # The fortune-teller calls the reader "con"; "anh"/"chị" is never the project's voice.
+    assert "con" in card.title
+    assert not re.search(r"\b(anh|chị)\b", body, re.IGNORECASE)
 
 
 # ---------------------------------------------------------------------------- picking
@@ -409,43 +296,58 @@ def a_realistic_deck() -> tuple[pulse.Card, ...]:
     )
 
 
-def test_a_day_never_repeats_a_kind_of_card():
-    """Two `hot_cold` cards in one day read as the bot repeating itself, even when they
-    are for different games - so the dedupe is on the kind, not on the object."""
+def with_network(deck, *, gold: bool, crypto: bool) -> tuple[pulse.Card, ...]:
+    extra = [pulse.Card(key=k, title=k, lines=("x",)) for k, on in
+             (("gold", gold), ("crypto", crypto)) if on]
+    return (*deck, *extra)
+
+
+def test_a_day_never_repeats_a_card_even_when_network_cards_come_and_go():
+    """Gold and crypto need the network, so the deck can differ between two runs of one
+    day. Picking by position in a shuffled list let that shift every later card and send
+    the same one twice - about 32 days in 365. A card's place must not depend on what
+    else happens to be in the deck."""
     deck = a_realistic_deck()
+    rng = random.Random(7)
     for offset in range(365):
         day = A_DAY + timedelta(days=offset)
-        picked = [pulse.card_for_slot(deck, day, i) for i in range(pulse.MAX_PER_DAY)]
-        assert len({card.key for card in picked}) == pulse.MAX_PER_DAY, day
+        first = rng.randrange(1000)
+        picked = [
+            pulse.card_for_run(
+                with_network(deck, gold=rng.random() < 0.5, crypto=rng.random() < 0.5),
+                day,
+                first + i,
+            )
+            for i in range(pulse.RUNS_PER_DAY)
+        ]
+        assert len({card.key for card in picked}) == pulse.RUNS_PER_DAY, day
 
 
-def test_day_order_keeps_every_card_reachable():
-    """Fronting one card per kind must not drop the others off the end."""
+def test_the_pick_moves_from_day_to_day():
     deck = a_realistic_deck()
-    order = pulse.day_order(deck, A_DAY)
-    assert sorted(order, key=id) == sorted(deck, key=id)
-    assert len(order) == len(deck)
+    picked = {pulse.card_for_run(deck, A_DAY + timedelta(days=d), 0).key for d in range(60)}
+    assert len(picked) > 5
 
 
-def test_day_order_fronts_one_card_of_each_kind():
+def test_card_for_run_is_stable_for_the_same_day_and_run():
     deck = a_realistic_deck()
-    kinds = {card.key for card in deck}
-    front = pulse.day_order(deck, A_DAY)[: len(kinds)]
-    assert {card.key for card in front} == kinds
+    assert pulse.card_for_run(deck, A_DAY, 1) == pulse.card_for_run(deck, A_DAY, 1)
 
 
-def test_card_for_slot_is_stable_for_the_same_day_and_index():
-    deck = a_realistic_deck()
-    assert pulse.card_for_slot(deck, A_DAY, 1) == pulse.card_for_slot(deck, A_DAY, 1)
-
-
-def test_card_for_slot_wraps_when_there_are_fewer_cards_than_slots():
+def test_card_for_run_still_sends_when_there_is_only_one_card():
     cards = (pulse.Card(key="only", title="t", lines=("x",)),)
-    assert pulse.card_for_slot(cards, A_DAY, 2).key == "only"
+    assert [pulse.card_for_run(cards, A_DAY, r).key for r in range(3)] == ["only"] * 3
 
 
-def test_card_for_slot_is_none_with_no_cards():
-    assert pulse.card_for_slot((), A_DAY, 0) is None
+def test_card_for_run_is_none_with_no_cards():
+    assert pulse.card_for_run((), A_DAY, 0) is None
+
+
+def test_the_workflow_declares_as_many_crons_as_the_code_expects():
+    """`RUNS_PER_DAY` slices the day's cards; a cron added without it would reuse a slice."""
+    workflow = (Path(__file__).parent.parent / ".github/workflows/pulse.yml").read_text()
+    assert len(re.findall(r"^\s*- cron:", workflow, re.MULTILINE)) == pulse.RUNS_PER_DAY
+    assert "github.run_number" in workflow
 
 
 # -------------------------------------------------------------------------- formatting
@@ -565,32 +467,15 @@ def run_cli(*argv: str) -> int:
     return args.handler(args)
 
 
-def test_cli_sends_nothing_off_plan(counting_send, monkeypatch):
+def test_cli_sends_one_card_at_whatever_hour_github_gets_round_to(counting_send, monkeypatch):
+    """GitHub starts these crons hours late. Every run that does happen must send."""
     monkeypatch.setenv(notify.ENV_TOKEN, "tok")
     monkeypatch.setenv(notify.ENV_CHAT_ID, "42")
-    off_plan = next(h for h in range(24) if h not in pulse.slots_for(A_DAY))
 
-    assert run_cli("--now", at(off_plan).isoformat(), "--offline") == 0
-    assert counting_send.calls == 0
-
-
-def test_cli_sends_on_a_planned_hour(counting_send, monkeypatch):
-    monkeypatch.setenv(notify.ENV_TOKEN, "tok")
-    monkeypatch.setenv(notify.ENV_CHAT_ID, "42")
-    on_plan = pulse.slots_for(A_DAY)[0]
-
-    assert run_cli("--now", at(on_plan).isoformat(), "--offline") == 0
-    assert counting_send.calls == 1
+    for hour in (3, 14, 23):
+        assert run_cli("--now", at(hour).isoformat(), "--run", str(hour), "--offline") == 0
+    assert counting_send.calls == 3
     assert notify.DISCLAIMER in counting_send.messages[0]
-
-
-def test_cli_force_ignores_the_plan(counting_send, monkeypatch):
-    monkeypatch.setenv(notify.ENV_TOKEN, "tok")
-    monkeypatch.setenv(notify.ENV_CHAT_ID, "42")
-    off_plan = next(h for h in range(24) if h not in pulse.slots_for(A_DAY))
-
-    assert run_cli("--force", "--now", at(off_plan).isoformat(), "--offline") == 0
-    assert counting_send.calls == 1
 
 
 def test_cli_reports_a_failed_send(counting_send, monkeypatch):
@@ -598,35 +483,27 @@ def test_cli_reports_a_failed_send(counting_send, monkeypatch):
     monkeypatch.setenv(notify.ENV_CHAT_ID, "42")
     counting_send.result = False
 
-    assert run_cli("--force", "--offline") == 1
+    assert run_cli("--offline") == 1
 
 
 def test_cli_dry_run_sends_nothing(counting_send, monkeypatch, capsys):
     monkeypatch.setenv(notify.ENV_TOKEN, "tok")
     monkeypatch.setenv(notify.ENV_CHAT_ID, "42")
 
-    assert run_cli("--force", "--dry-run", "--offline") == 0
+    assert run_cli("--dry-run", "--offline") == 0
     assert counting_send.calls == 0
     assert capsys.readouterr().out.strip()
 
 
 def test_cli_dry_run_needs_no_telegram_config(counting_send, capsys):
     """Previewing a pulse locally must not require anyone's bot token."""
-    assert run_cli("--force", "--dry-run", "--offline") == 0
+    assert run_cli("--dry-run", "--offline") == 0
     assert counting_send.calls == 0
 
 
 def test_cli_fails_loudly_without_telegram_config(counting_send):
-    assert run_cli("--force", "--offline") == 1
+    assert run_cli("--offline") == 1
     assert counting_send.calls == 0
-
-
-def test_cli_plan_prints_the_hours_and_sends_nothing(counting_send, capsys):
-    assert run_cli("--plan", "--now", at(10).isoformat()) == 0
-    assert counting_send.calls == 0
-    out = capsys.readouterr().out
-    for hour in pulse.slots_for(A_DAY):
-        assert f"{hour:02d}" in out
 
 
 def test_cli_never_prints_the_birth_date(counting_send, monkeypatch, capsys):
@@ -635,13 +512,13 @@ def test_cli_never_prints_the_birth_date(counting_send, monkeypatch, capsys):
     monkeypatch.setenv(notify.ENV_TOKEN, "tok")
     monkeypatch.setenv(notify.ENV_CHAT_ID, "42")
 
-    assert run_cli("--force", "--offline") == 0
+    assert run_cli("--offline") == 0
     assert "1996-04-15" not in capsys.readouterr().out
 
 
 def test_cli_warns_without_leaking_a_malformed_birth_date(counting_send, monkeypatch, capsys):
     monkeypatch.setenv(pulse.ENV_BIRTH_DATE, "sinh-nam-1996")
-    assert run_cli("--force", "--dry-run", "--offline") == 0
+    assert run_cli("--dry-run", "--offline") == 0
     out = capsys.readouterr().out
     assert pulse.ENV_BIRTH_DATE in out
     assert "sinh-nam-1996" not in out

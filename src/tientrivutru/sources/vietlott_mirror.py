@@ -17,7 +17,7 @@ missing while Power 6/55 was current), which is exactly why find_missing_dates e
 from __future__ import annotations
 
 import json
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from datetime import date
 from typing import Any
 
@@ -136,7 +136,3 @@ def summarise(spec: GameSpec, draws: Sequence[Draw], until: date) -> dict[str, A
         "missing_draw_dates": [d.isoformat() for d in missing],
     }
 
-
-def iter_history(draws: Iterable[Draw]) -> Iterable[Draw]:
-    """Chronological iteration helper, kept explicit for readability at call sites."""
-    return sorted(draws, key=lambda d: d.draw_id)
