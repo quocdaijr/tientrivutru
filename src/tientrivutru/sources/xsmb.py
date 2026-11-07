@@ -25,16 +25,9 @@ from dataclasses import dataclass
 from datetime import date
 from types import MappingProxyType
 
-import requests
-
 from .. import stats
 
-MIRROR_URL = (
-    "https://raw.githubusercontent.com/khiemdoan/"
-    "vietnam-lottery-xsmb-analysis/main/data/xsmb-2-digits.csv"
-)
 SOURCE_LABEL = "mirror:khiemdoan/vietnam-lottery-xsmb-analysis"
-DEFAULT_TIMEOUT = 60
 
 DIGIT_SPACE = 100
 """XSMB two-digit values run 00..99 inclusive - one hundred outcomes, including zero."""
@@ -108,16 +101,6 @@ def parse_csv(text: str) -> tuple[XsmbDraw, ...]:
         raise ValueError("XSMB mirror CSV is empty")
     draws = [parse_row(row) for row in rows]
     return tuple(sorted(draws, key=lambda d: d.date))
-
-
-def fetch_text(*, timeout: int = DEFAULT_TIMEOUT) -> str:
-    response = requests.get(MIRROR_URL, timeout=timeout)
-    response.raise_for_status()
-    return response.text
-
-
-def fetch_draws(*, timeout: int = DEFAULT_TIMEOUT) -> tuple[XsmbDraw, ...]:
-    return parse_csv(fetch_text(timeout=timeout))
 
 
 def frequency(draws: Sequence[XsmbDraw]) -> Mapping[int, int]:

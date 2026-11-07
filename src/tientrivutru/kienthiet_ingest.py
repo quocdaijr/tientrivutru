@@ -146,30 +146,6 @@ def _flush(region: str, pending: list[kt.Board], report: IngestReport) -> int:
     return added
 
 
-def ingest_days(
-    region: str,
-    days: Iterable[date],
-    *,
-    pause: float = DEFAULT_PAUSE_SECONDS,
-    session: requests.Session | None = None,
-) -> IngestReport:
-    """Patch specific missing days đài by đài. The narrow tool, for gaps a week page missed."""
-    report = IngestReport(region=region)
-    fetched: list[kt.Board] = []
-    for day in days:
-        for province in kt.provinces_in(region):
-            report.requested_weeks += 1
-            try:
-                fetched.append(kt.fetch_board(province.slug, day, session=session))
-            except (requests.RequestException, ValueError) as exc:
-                report.failures.append(WeekResult(anchor=day, fetched=0, added=0, error=str(exc)))
-            if pause:
-                time.sleep(pause)
-    added, total = store.merge_boards(region, fetched)
-    report.added, report.total = added, total
-    return report
-
-
 def missing_days(
     region: str,
     *,

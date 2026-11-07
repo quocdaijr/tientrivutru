@@ -227,6 +227,7 @@ def test_ve_result_message_states_the_exact_theoretical_roi():
         kienthiet_scoreboard.build(tickets, boards),
     )
     assert "-50.0%" in message
+    assert "-52.6%" in message, "the take-home after tax, next to the gross"
 
 
 # -------------------------------------------------------- the jackpot went quiet alert

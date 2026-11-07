@@ -2,11 +2,10 @@
 
 Two halves, kept apart on purpose.
 
-*The schedule* is random but not unpredictable-to-itself. A day's firing hours come from
-a seed derived from the date, so any process on any runner computes the same plan for
-that day - which is what makes an hourly cron with no state file work, and what makes it
-testable. `random.Random` seeded from sha256, never the global `random` and never
-`hash()`, which is salted per process.
+*The pick*: `pulse.yml` asks for a few runs a day and GitHub starts them hours late, so
+the hour a run lands on means nothing. Each run passes its run number, and
+`card_for_run` turns (day, run) into a card with sha256, never the global `random` and
+never `hash()`, which is salted per process.
 
 *The cards* are the content. Every builder returns `Card | None`, where None means "no
 data for this today" - a fresh clone with no draws still has a moon and a birth date to
@@ -38,11 +37,8 @@ from .sources import kienthiet, markets
 from .sources import xsmb as xsmb_source
 from .sources.vibes import CosmicSignals, gather
 
-FIRST_HOUR_VN = 8
-LAST_HOUR_VN = 22
-"""Inclusive: 22 is a legal slot, 23 is not."""
-MIN_PER_DAY = 2
-MAX_PER_DAY = 3
+RUNS_PER_DAY = 3
+"""How many crons `pulse.yml` declares; each run takes its own third of the day's cards."""
 
 TOP_N = 5
 
@@ -59,15 +55,12 @@ their own. A disclaimer that does not fit what it is attached to is decoration."
 MIN_BIRTH_YEAR = 1900
 """Anything earlier is a typo, not a person. The env var is untrusted input."""
 
-PINNED_PLAN_2026_08_23 = (12, 20)
-"""A regression pin for the seed recipe - see `tests/test_pulse.py`."""
-
 
 class BirthDateError(ValueError):
     """A malformed `TIENTRIVUTRU_BIRTH_DATE`. Carries no copy of the offending value."""
 
 
-# ------------------------------------------------------------------------ the schedule
+# ---------------------------------------------------------------------------- seeding
 
 
 def _seed_int(*parts: str) -> int:
@@ -81,47 +74,6 @@ def day_rng(day: date, *, salt: str = "") -> random.Random:
     return random.Random(_seed_int("pulse", day.isoformat(), salt))
 
 
-def bands_for(count: int) -> tuple[range, ...]:
-    """The window cut into `count` equal bands, one pulse to a band."""
-    span = LAST_HOUR_VN - FIRST_HOUR_VN + 1
-
-    def edge(index: int) -> int:
-        return FIRST_HOUR_VN + index * span // count
-
-    return tuple(range(edge(index), edge(index + 1)) for index in range(count))
-
-
-def slots_for(day: date) -> tuple[int, ...]:
-    """The VN hours on `day` that get a pulse: one per band, uniform inside its band.
-
-    Stratifying like this is what keeps the hours spread evenly over the window, and the
-    obvious alternative does not. Sampling `count` hours and re-rolling until they are
-    all >= 3h apart - or the closed-form equivalent, which is what this used to do - is
-    uniform over *valid schedules*, not over hours, and an hour near the edge of the
-    window sits in more valid schedules than one in the middle. Measured over 3650 days
-    that made 08h and 22h come up 1.55x as often as 20h.
-
-    A flat spread and a hard minimum gap are not both available in a fifteen-hour window
-    with three pulses, so this keeps the spread: bands make the typical gap `span/count`
-    hours and leave adjacent-band pairs able to land close, which happens on about 15% of
-    days. Sorted and distinct still hold, by construction - the bands do not overlap.
-    """
-    rng = day_rng(day, salt="slots")
-    count = rng.randint(MIN_PER_DAY, MAX_PER_DAY)
-    return tuple(rng.choice(band) for band in bands_for(count))
-
-
-def slot_index(now: datetime) -> int | None:
-    """Which pulse of the day this is (0-based), or None outside the plan."""
-    moment = now.astimezone(VN_TZ)
-    slots = slots_for(moment.date())
-    return slots.index(moment.hour) if moment.hour in slots else None
-
-
-def should_fire(now: datetime) -> bool:
-    return slot_index(now) is not None
-
-
 # ----------------------------------------------------------------------------- content
 
 
@@ -130,8 +82,8 @@ class Card:
     """One thing worth saying.
 
     `key` is the kind, not the identity: four games each produce a `hot_cold`, so keys
-    repeat inside one build. `day_order` uses that on purpose - it is the kind, not the
-    game, that makes two pulses in a day feel like the same message twice.
+    repeat inside one build. `card_for_run` uses that on purpose - it is the kind, not
+    the game, that makes two pulses in a day feel like the same message twice.
     """
 
     key: str
@@ -432,7 +384,8 @@ def card_ve(score: VeScore) -> Card | None:
             f"ROI: <b>{score.roi * 100:+.2f}%</b> "
             f"(bỏ ĐB &amp; phụ ĐB: {score.roi_excluding_headline * 100:+.2f}%)",
             f"ROI lý thuyết: <b>{score.theoretical_roi * 100:+.2f}%</b> — "
-            "cơ cấu giải trả về đúng 5 tỷ trên 10 tỷ doanh thu mỗi đài mỗi kỳ.",
+            "cơ cấu giải trả về đúng 5 tỷ trên 10 tỷ doanh thu mỗi đài mỗi kỳ; "
+            f"sau thuế thu nhập còn <b>{score.theoretical_roi_net * 100:+.2f}%</b>.",
             "",
             "<i>Thầy phán hay con tự bốc thì con số vẫn thế.</i>",
         ),
@@ -512,7 +465,7 @@ def card_fortune(fortune: Fortune | None, *, day: date) -> Card | None:
         "<i>Suy ra từ ngày sinh, và ngày sinh không nằm ở đâu trong repo này. "
         "Độ chính xác tiên đoán: vẫn bằng không.</i>",
     ]
-    return Card(key="fortune", title="🪷 Lá số của anh", lines=tuple(lines))
+    return Card(key="fortune", title="🪷 Lá số của con", lines=tuple(lines))
 
 
 # ------------------------------------------------------------------- the personal layer
@@ -621,32 +574,31 @@ def build_cards(
     return tuple(card for card in cards if card is not None)
 
 
-def day_order(cards: Sequence[Card], day: date) -> tuple[Card, ...]:
-    """The day's running order: shuffled, then one card per kind pulled to the front.
+def card_for_run(cards: Sequence[Card], day: date, run: int) -> Card | None:
+    """The card for run number `run` on `day`.
 
-    Shuffling alone is not enough. Four games produce four `hot_cold` cards, so a
-    plain shuffle lands two of them in the same day about as often as not, and reads
-    as the bot repeating itself. Fronting the first card of each distinct kind means
-    the first `len(set(keys))` pulses of a day are all different kinds; the remainder
-    keeps the shuffled order so nothing is ever unreachable.
+    Every kind gets a fixed point in [0, 1) from sha256(day|kind), and each run owns one
+    of `RUNS_PER_DAY` equal slices, picking the first kind in its slice - so runs of one
+    day pick different kinds, and a card that is present at one run and gone at the next
+    (gold and crypto need the network) moves no other card. Picking by position in a
+    shuffled list did not survive that and repeated a card on ~32 days a year.
+
+    An empty slice takes the last kind before it, never the first of the next slice,
+    because that one belongs to another run.
     """
-    order = list(cards)
-    day_rng(day, salt="order").shuffle(order)
-    seen: set[str] = set()
-    first_of_kind, rest = [], []
-    for card in order:
-        target = rest if card.key in seen else first_of_kind
-        target.append(card)
-        seen.add(card.key)
-    return tuple(first_of_kind + rest)
-
-
-def card_for_slot(cards: Sequence[Card], day: date, index: int) -> Card | None:
-    """The card for pulse number `index` of `day`. Wraps if asked past the end."""
     if not cards:
         return None
-    order = day_order(cards, day)
-    return order[index % len(order)]
+    today = day.isoformat()
+    point = {card.key: _seed_int("pulse", today, card.key) / 2**256 for card in cards}
+    kinds = sorted(point, key=point.__getitem__)
+    start = (run % RUNS_PER_DAY) / RUNS_PER_DAY
+    mine = [k for k in kinds if start <= point[k] < start + 1 / RUNS_PER_DAY]
+    before = [k for k in kinds if point[k] < start]
+    kind = mine[0] if mine else (before or kinds)[-1]
+    return min(
+        (card for card in cards if card.key == kind),
+        key=lambda card: _seed_int("pulse", today, card.key, card.title),
+    )
 
 
 def format_card(card: Card, *, now: datetime) -> str:

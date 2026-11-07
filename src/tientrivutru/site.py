@@ -26,7 +26,7 @@ from . import (
 from .games import PROPHECY_GAMES, GameSpec
 from .kienthiet_oracle import VeProphecy
 from .models import Draw, Prophecy, utc_now
-from .sources import kienthiet
+from .sources import kienthiet, vietlott_prizes
 
 SITE_DIR = Path(__file__).resolve().parents[2] / "site"
 BUNDLE_NAME = "data.json"
@@ -96,11 +96,9 @@ def _payout_if_hit(
     """
     live = None
     if prizes and prizes.get("jackpots"):
-        live = {
-            label.lower().replace(" ", ""): value
-            for label, value in prizes["jackpots"].items()
-        }
-        if set(live) - set(spec.jackpot_floor):
+        try:
+            live = vietlott_prizes.jackpot_tier_values(spec, prizes["jackpots"])
+        except ValueError:
             live = None  # figures from a different game's page; refuse rather than guess
 
     cost = wheel.wheel_cost_vnd(spec)
@@ -182,18 +180,7 @@ def _game_payload(
         "latest": draws[-1].to_dict() if draws else None,
         "recent": [d.to_dict() for d in draws[-RECENT_DRAWS:]],
         "frequency": {str(n): c for n, c in frequencies.items()},
-        "chi_square": (
-            {
-                "statistic": round(chi.statistic, 3),
-                "degrees_of_freedom": chi.degrees_of_freedom,
-                "p_value": round(chi.p_value, 4),
-                "observations": chi.observations,
-                "rejects_uniform": chi.rejects_uniform,
-                "verdict": stats.verdict(chi),
-            }
-            if chi
-            else None
-        ),
+        "chi_square": _chi_payload(chi) if chi else None,
         "pending_prophecy": pending[0].to_dict() if pending else None,
         "score": score.to_dict(),
         "prizes": prizes,

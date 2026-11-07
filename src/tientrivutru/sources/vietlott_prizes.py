@@ -69,6 +69,24 @@ class PrizeTier:
         return {"label": self.label, "winners": self.winners, "value_vnd": self.value_vnd}
 
 
+def jackpot_tier_values(spec: GameSpec, jackpots: Mapping[str, int]) -> Mapping[str, int]:
+    """Jackpot figures keyed the way `wheel.payout_vnd` expects them.
+
+    The page writes "Giá trị Jackpot 1"; wheel.py keys on `jackpot1`. Translating in
+    one place keeps every caller from doing it slightly differently, and validating
+    against the game spec means a Power page parsed against Mega raises instead of
+    quietly inventing a second jackpot Mega does not have.
+    """
+    mapped = {label.lower().replace(" ", ""): value for label, value in jackpots.items()}
+    unknown = set(mapped) - set(spec.jackpot_floor)
+    if unknown:
+        raise ValueError(
+            f"{spec.key} has no jackpot tier(s) {sorted(unknown)} - "
+            "these figures came from a different game's page"
+        )
+    return MappingProxyType(mapped)
+
+
 @dataclass(frozen=True, slots=True)
 class DrawPrizes:
     """Every money figure the page states for one draw, plus when it was read."""
@@ -98,21 +116,7 @@ class DrawPrizes:
         return self.tiers[0].winners == 0
 
     def tier_values(self, spec: GameSpec) -> Mapping[str, int]:
-        """Jackpot figures keyed the way `wheel.payout_vnd` expects them.
-
-        The page writes "Giá trị Jackpot 1"; wheel.py keys on `jackpot1`. Translating in
-        one place keeps every caller from doing it slightly differently, and validating
-        against the game spec means a Power page parsed against Mega raises instead of
-        quietly inventing a second jackpot Mega does not have.
-        """
-        mapped = {label.lower().replace(" ", ""): value for label, value in self.jackpots.items()}
-        unknown = set(mapped) - set(spec.jackpot_floor)
-        if unknown:
-            raise ValueError(
-                f"{spec.key} has no jackpot tier(s) {sorted(unknown)} - "
-                "these figures came from a different game's page"
-            )
-        return MappingProxyType(mapped)
+        return jackpot_tier_values(spec, self.jackpots)
 
     def as_dict(self) -> dict[str, Any]:
         return {

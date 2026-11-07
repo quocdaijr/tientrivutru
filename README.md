@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 [![Ruff](https://img.shields.io/badge/lint-ruff-261230.svg)](https://docs.astral.sh/ruff/)
-[![tests](https://img.shields.io/badge/tests-1070%20passing-brightgreen.svg)](tests/)
+[![tests](https://img.shields.io/badge/tests-1060%20passing-brightgreen.svg)](tests/)
 [![draws analysed](https://img.shields.io/badge/draws%20analysed-31%2C470-informational.svg)](#kết-quả-tầng-thật-trên-dữ-liệu-thật)
 [![chi-square](https://img.shields.io/badge/chi²%20p--value-0.10%20→%20random-informational.svg)](#kết-quả-tầng-thật-trên-dữ-liệu-thật)
 [![prediction accuracy](https://img.shields.io/badge/prediction%20accuracy-0%25-critical.svg)](DISCLAIMER.md)
@@ -78,8 +78,7 @@ uv run tientrivutru backtest --game mega645  # tiên tri lại toàn bộ lịch
 uv run tientrivutru today                    # dashboard kỳ quay tới
 uv run tientrivutru site                     # sinh site/data.json cho trang tĩnh
 uv run tientrivutru notify --kind prophecy   # đẩy 12 số + vé lên Telegram
-uv run tientrivutru pulse --plan             # giờ nào hôm nay sẽ có tin random
-uv run tientrivutru pulse --force --dry-run  # xem thử một thẻ, không gửi gì
+uv run tientrivutru pulse --dry-run          # xem thử một thẻ, không gửi gì
 ```
 
 Xổ số kiến thiết đi chung mọi lệnh trên. `--region {mb,mn,mt}` thu hẹp về một miền, và
@@ -107,8 +106,8 @@ Thiếu biến thì `notify` báo lỗi rõ ràng, còn pipeline dữ liệu **k
 
 ### Tin random trong ngày — `tientrivutru pulse`
 
-Ngoài hai mốc cố định (10h: 12 số, 18h45: kết quả), `pulse` gửi **2–3 tin/ngày vào giờ bất
-kỳ trong 8h–22h VN**, mỗi tin một thẻ: nóng/lạnh, chi-square, số lâu chưa ra, lịch + jackpot +
+Ngoài hai mốc cố định (10h: 12 số, 18h45: kết quả), `pulse` gửi **3 tin/ngày**, mỗi tin một
+thẻ: nóng/lạnh, chi-square, số lâu chưa ra, lịch + jackpot +
 giá bao 12, Bảng Phong Thần, một lời sấm, kiến thiết cả ba miền, vé thầy phán,
 tín hiệu vũ trụ, **giá vàng**, **giá crypto**, và lá số cá nhân.
 
@@ -127,16 +126,11 @@ chính nguồn giá ngụ ý, không phải tỷ giá ngân hàng, và được 
 **bỏ hẳn dòng premium** chứ không đoán.
 
 
-Giờ gửi là random nhưng **không phải bất định**: kế hoạch của một ngày sinh ra từ seed
-`sha256(ngày)`, nên `pulse.yml` chạy mỗi giờ mà không cần state file — 12 lần thức dậy còn lại
-thoát 0 và không gửi gì. Một ngày không lặp lại cùng một *loại* thẻ. Bấm `workflow_dispatch`
-là gửi ngay, không đợi tới giờ.
-
-Khung giờ cắt thành `n` dải bằng nhau (2 tin → 8–14h và 15–22h; 3 tin → 8–12h, 13–17h, 18–22h),
-mỗi dải bốc uniform một giờ. Cách này giữ phân bố giờ **phẳng** (lệch 1,14× trên 3650 ngày);
-đổi lại, hai tin có thể rơi sát nhau qua ranh dải, khoảng 15% số ngày. Bản trước ép "cách nhau
-≥ 3h" và **chính ràng buộc đó** làm 8h với 22h xuất hiện 1,55× nhiều hơn 20h — vì uniform trên
-*tập kế hoạch hợp lệ* không phải uniform trên *giờ*.
+`pulse.yml` xin ba lần chạy mỗi ngày, nhưng GitHub khởi động cron của repo này **trễ 3–10
+tiếng**, nên giờ ghi trong cron không phải giờ tin tới — tin rơi đâu đó từ trưa tới tối. Lần
+chạy nào tới cũng gửi đúng một thẻ. Thẻ chọn theo `sha256(ngày|loại thẻ)` và số thứ tự lần
+chạy, không theo giờ, nên ba lần chạy trong một ngày không gửi trùng loại thẻ — kể cả khi thẻ
+vàng hay crypto lúc có lúc không vì mạng.
 
 Lá số cá nhân đọc từ `TIENTRIVUTRU_BIRTH_DATE` (kèm `TIENTRIVUTRU_GENDER`, `TIENTRIVUTRU_NAME` tuỳ chọn) và
 chỉ ở dạng secret. Job `pulse` có `permissions: contents: read` — nó không commit gì cả, và
@@ -411,7 +405,7 @@ Một đài phát hành **1.000.000 vé × 10.000đ = 10 tỷ doanh thu**. Bản
 | Tám | 2 số cuối | 10.000 | 100.000 | 1.000.000.000 |
 | | | | **Tổng** | **5.000.000.000** |
 
-5 tỷ trên 10 tỷ. **ROI kỳ vọng của một tấm vé là −50,00%**, và đó không phải ước lượng —
+5 tỷ trên 10 tỷ. **ROI kỳ vọng của một tấm vé là −50,00%** (−52,60% sau 10% thuế khấu trừ trên giải đặc biệt, phụ ĐB, nhất, nhì), và đó không phải ước lượng —
 đó là phép cộng. Test [`test_kienthiet_prizes.py`](tests/test_kienthiet_prizes.py) chấm cả
 **1.000.000 vé** trên một bảng thật và bắt tổng chi trả phải bằng đúng 5 tỷ.
 

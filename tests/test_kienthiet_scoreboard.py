@@ -231,3 +231,14 @@ def test_roi_converges_towards_minus_fifty_percent_over_many_random_boards():
     assert score.theoretical_roi == -0.5
     assert score.theoretical_roi_excluding_headline == -0.745
     assert score.roi_excluding_headline == pytest.approx(-0.745, abs=0.25)
+
+
+@pytest.mark.parametrize("roi", [0.0, -0.9])
+def test_report_verdict_prints_the_take_home_next_to_the_gross(roi):
+    from dataclasses import replace
+
+    from tientrivutru import kienthiet_report
+
+    verdict = kienthiet_report._verdict(replace(ks.build([], []), roi=roi))
+    assert "−50,00%" in verdict
+    assert "−52,60%" in verdict

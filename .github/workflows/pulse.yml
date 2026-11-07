@@ -3,11 +3,14 @@ name: Pulse
 on:
   workflow_dispatch:
   schedule:
-    # Hourly across 08:00-22:00 VN (01:00-15:00 UTC). The cron is deliberately dumb:
-    # `tientrivutru pulse` computes the day's two or three firing hours from a seed derived
-    # from the date, so every runner agrees on the plan with no state file to keep, and
-    # the other twelve wake-ups exit 0 having sent nothing.
-    - cron: '0 1-15 * * *'
+    # Three runs a day, three cards. These times are requests, not appointments: GitHub
+    # has started this repo's crons 3-10 hours late, so cards land somewhere between late
+    # morning and late evening VN. Early UTC slots keep even a 10-hour delay on the same VN
+    # day. Every run that does start sends one card; `--run` (the run number) picks which,
+    # and `pulse.RUNS_PER_DAY` must equal the number of lines here.
+    - cron: '0 0 * * *'
+    - cron: '0 3 * * *'
+    - cron: '0 6 * * *'
 
 # Read-only on purpose. This job commits nothing, which is what keeps a birth date
 # supplied through a secret from ever reaching the repository.
@@ -37,10 +40,6 @@ jobs:
       # `|| true` for the same reason as the notify step in oracle.yml: a dead bot, an
       # unset secret or a rate limit is not a reason to paint this run red. Missing
       # Telegram config exits 1 by design, and that must stay a non-event here.
-      #
-      # A manual run forces the send. Without --force it would recompute today's plan,
-      # find that the current hour is not in it and exit 0 having sent nothing - and a
-      # button that does nothing is worse than no button.
       - name: Pulse
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -51,5 +50,4 @@ jobs:
           TIENTRIVUTRU_GENDER: ${{ secrets.TIENTRIVUTRU_GENDER }}
           TIENTRIVUTRU_NAME: ${{ secrets.TIENTRIVUTRU_NAME }}
         run: |
-          uv run tientrivutru pulse \
-            ${{ github.event_name == 'workflow_dispatch' && '--force' || '' }} || true
+          uv run tientrivutru pulse --run ${{ github.run_number }} || true

@@ -724,3 +724,28 @@ def test_asset_without_dry_run_is_refused(monkeypatch):
     """Picking which asset gets a recorded sitting would be choosing the record."""
     with pytest.raises(SystemExit):
         _council(monkeypatch, COUNCIL_ENV, argv=["--asset", "BTC-USD"])
+
+
+def test_ingest_replaces_a_stats_only_game_so_a_backfilled_row_cannot_shift_ids(monkeypatch):
+    """US ids are row positions. One backfilled historical row shifts every later id, and
+    a merge that keeps stored rows on an id collision then drops the newest draw and
+    stores an old date twice. The fresh fetch is the whole truth for these games."""
+    from tientrivutru.games import POWERBALL
+    from tientrivutru.sources import us_lottery
+
+    header = "date,white_balls,red_ball,power_play\n"
+    before = header + "10/07/2015,18|30|40|48|52,9,3X\n08/17/2026,8|15|25|49|65,22,4X\n"
+    after = before + "01/01/2016,1|2|3|4|5,6,2X\n08/19/2026,7|17|27|37|47,7,2X\n"
+    store.write_draws(POWERBALL.key, us_lottery.parse_csv(POWERBALL, before))
+    fresh = us_lottery.parse_csv(POWERBALL, after)
+
+    monkeypatch.setattr(cli, "_fetch_for", lambda spec: fresh if spec is POWERBALL else ())
+    monkeypatch.setattr(cli.kienthiet_commands, "run_ingest", lambda *_a, **_k: 0)
+    args = cli.build_parser().parse_args(["ingest", "--game", POWERBALL.key])
+    args.handler(args)
+
+    stored = store.read_draws(POWERBALL.key)
+    assert stored == tuple(sorted(fresh, key=lambda d: d.draw_id))
+    dates = [d.date for d in stored]
+    assert dates.count(date(2026, 8, 19)) == 1
+    assert len(dates) == len(set(dates))

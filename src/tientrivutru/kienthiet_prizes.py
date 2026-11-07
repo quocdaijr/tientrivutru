@@ -3,7 +3,8 @@
 One đài issues 1,000,000 tickets of six digits at 10,000đ each: ten billion đồng in,
 five billion out. That fifty percent is not an estimate - it falls out of the prize table
 below and `tests/test_kienthiet_prizes.py` refuses to let it drift. So the honest number
-for buying one ticket, forever, is ROI −50%.
+for buying one ticket, forever, is ROI −50% - and −52.6% after the tax withheld
+from the four prizes above 10 million.
 
 Prizes are cumulative: a ticket matching the last two digits of giải tám and the last
 three of giải bảy collects both.
@@ -19,6 +20,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from types import MappingProxyType
 
+from . import tax
 from .sources.kienthiet import Board
 
 TICKET_PRICE_VND = 10_000
@@ -84,27 +86,30 @@ these two gives the number a normal run actually converges to: −74.5%.
 """
 
 
-def total_pool_vnd(*, exclude: Sequence[str] = ()) -> int:
-    """Every đồng a đài pays out per draw. Five billion, and the tests say so."""
-    return sum(tier.pool_vnd for tier in PRIZES if tier.key not in exclude)
+def total_pool_vnd(*, exclude: Sequence[str] = (), net: bool = False) -> int:
+    """Every đồng a đài pays out per draw. Five billion, and the tests say so.
+
+    `net=True` is what reaches the winners after the 10% withholding in `tax`.
+    """
+    def paid(tier: PrizeTier) -> int:
+        return tax.take_home_vnd(tier.value_vnd) if net else tier.value_vnd
+
+    return sum(tier.winners * paid(tier) for tier in PRIZES if tier.key not in exclude)
 
 
-def revenue_vnd() -> int:
-    return TICKETS_PER_DAI * TICKET_PRICE_VND
-
-
-def expected_payout_vnd(*, exclude: Sequence[str] = ()) -> float:
+def expected_payout_vnd(*, exclude: Sequence[str] = (), net: bool = False) -> float:
     """What one ticket is worth before you buy it."""
-    return total_pool_vnd(exclude=exclude) / TICKETS_PER_DAI
+    return total_pool_vnd(exclude=exclude, net=net) / TICKETS_PER_DAI
 
 
-def theoretical_roi(*, exclude: Sequence[str] = ()) -> float:
+def theoretical_roi(*, exclude: Sequence[str] = (), net: bool = False) -> float:
     """−0.5. Not a forecast, not a sample - arithmetic on the published prize table.
 
     With `exclude=HEADLINE_TIERS` it is −0.745, which is what a run of a few hundred
-    thousand tickets will actually show.
+    thousand tickets will actually show. With `net=True` it is −0.526: the gross figure
+    is the one the đài announces, the net one is what a winner takes home.
     """
-    return expected_payout_vnd(exclude=exclude) / TICKET_PRICE_VND - 1.0
+    return expected_payout_vnd(exclude=exclude, net=net) / TICKET_PRICE_VND - 1.0
 
 
 class TicketEraError(ValueError):

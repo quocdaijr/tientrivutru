@@ -39,10 +39,6 @@ class VeScoreRow:
     cost_vnd: int
 
     @property
-    def won_headline(self) -> bool:
-        return any(self.prize_counts.get(tier, 0) for tier in HEADLINE_TIERS)
-
-    @property
     def payout_excluding_headline_vnd(self) -> int:
         return sum(
             prizes.BY_KEY[tier].value_vnd * count
@@ -77,6 +73,7 @@ class VeScore:
     paper_won_excluding_headline_vnd: int
     roi_excluding_headline: float
     theoretical_roi: float
+    theoretical_roi_net: float
     theoretical_roi_excluding_headline: float
     prize_counts_total: Mapping[str, int]
     winning_tickets: int
@@ -93,6 +90,7 @@ class VeScore:
             "paper_won_excluding_headline_vnd": self.paper_won_excluding_headline_vnd,
             "roi_excluding_headline": self.roi_excluding_headline,
             "theoretical_roi": self.theoretical_roi,
+            "theoretical_roi_net": self.theoretical_roi_net,
             "theoretical_roi_excluding_headline": self.theoretical_roi_excluding_headline,
             "prize_counts_total": dict(self.prize_counts_total),
             "winning_tickets": self.winning_tickets,
@@ -150,6 +148,7 @@ def _empty(region: str | None) -> VeScore:
         paper_won_excluding_headline_vnd=0,
         roi_excluding_headline=0.0,
         theoretical_roi=prizes.theoretical_roi(),
+        theoretical_roi_net=prizes.theoretical_roi(net=True),
         theoretical_roi_excluding_headline=prizes.theoretical_roi(exclude=HEADLINE_TIERS),
         prize_counts_total={},
         winning_tickets=0,
@@ -189,6 +188,7 @@ def build(
         paper_won_excluding_headline_vnd=won_plain,
         roi_excluding_headline=won_plain / burned - 1.0,
         theoretical_roi=prizes.theoretical_roi(),
+        theoretical_roi_net=prizes.theoretical_roi(net=True),
         theoretical_roi_excluding_headline=prizes.theoretical_roi(exclude=HEADLINE_TIERS),
         prize_counts_total=totals,
         winning_tickets=sum(1 for r in rows if r.payout_vnd),
@@ -214,8 +214,8 @@ def as_json(scores: Mapping[str, VeScore]) -> dict[str, Any]:
         "generated_at": utc_now().isoformat(),
         "disclaimer": (
             "Paper trading, moi ky mot ve. Co cau giai tra ve dung 50% doanh thu, "
-            "nen ROI ky vong la -50%. Con so thuc te lech nhieu vi giai dac biet "
-            "chiem 40% quy giai va rat lau moi ve mot lan."
+            "nen ROI ky vong la -50% (-52,6% sau thue thu nhap). Con so thuc te lech "
+            "nhieu vi giai dac biet chiem 40% quy giai va rat lau moi ve mot lan."
         ),
         "per_region": {key: score.to_dict() for key, score in sorted(scores.items())},
     }

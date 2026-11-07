@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 [![Ruff](https://img.shields.io/badge/lint-ruff-261230.svg)](https://docs.astral.sh/ruff/)
-[![tests](https://img.shields.io/badge/tests-1070%20passing-brightgreen.svg)](tests/)
+[![tests](https://img.shields.io/badge/tests-1060%20passing-brightgreen.svg)](tests/)
 [![draws analysed](https://img.shields.io/badge/draws%20analysed-31%2C470-informational.svg)](#what-the-honest-layer-found)
 [![chi-square](https://img.shields.io/badge/chi²%20p--value-0.10%20→%20random-informational.svg)](#what-the-honest-layer-found)
 [![prediction accuracy](https://img.shields.io/badge/prediction%20accuracy-0%25-critical.svg)](DISCLAIMER.md)
@@ -101,8 +101,7 @@ uv run tientrivutru backtest --game mega645  # replay the oracle over all of his
 uv run tientrivutru today                    # dashboard for the next draw
 uv run tientrivutru site                     # emit site/data.json for the static page
 uv run tientrivutru notify --kind prophecy   # push the twelve numbers and the vé to Telegram
-uv run tientrivutru pulse --plan             # which hours today get a random pulse
-uv run tientrivutru pulse --force --dry-run  # preview one card without sending it
+uv run tientrivutru pulse --dry-run          # preview one card without sending it
 ```
 
 Xổ số kiến thiết rides along with every command above. `--region {mb,mn,mt}` narrows to one
@@ -131,7 +130,7 @@ Telegram needs `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` (GitHub Secrets in CI
 ### Random pulses through the day — `tientrivutru pulse`
 
 Beyond the two fixed slots (10:00 for the numbers, 18:45 for the result), `pulse` sends
-**two or three messages a day at arbitrary hours between 08:00 and 22:00 VN**, one card each:
+**three messages a day**, one card each:
 hot and cold numbers, chi-square, longest absences, the next draw with the jackpot and the
 price of a wheel, the Hall of Shame, one line of the pending prophecy, all three kiến
 thiết regions, the committed vé, the cosmic signals, **gold prices**, **crypto prices**,
@@ -152,18 +151,12 @@ for that conversion is the one the price source itself implies, not a bank rate,
 labelled as such — with no rate available the premium line is **dropped rather than guessed**.
 
 
-The hours are random but not unpredictable-to-themselves: a day's plan comes from a
-`sha256(date)` seed, so `pulse.yml` can run hourly with no state file to keep — the other
-twelve wake-ups exit 0 having sent nothing. A day never repeats a *kind* of card, and a manual
-`workflow_dispatch` run sends immediately rather than waiting for an hour on the plan.
-
-The window is cut into `n` equal bands (two pulses → 08:00–14:00 and 15:00–22:00; three →
-08:00–12:00, 13:00–17:00, 18:00–22:00) and each band contributes one uniformly-chosen hour.
-That keeps the spread across hours **flat** — a 1.14× spread over 3650 days — at the price of
-two pulses occasionally landing in adjacent hours across a band boundary, on roughly 15% of
-days. An earlier version enforced "at least 3h apart", and **that constraint was itself** why
-08:00 and 22:00 came up 1.55× as often as 20:00: sampling uniformly over valid *schedules* is
-not sampling uniformly over *hours*.
+`pulse.yml` asks for three runs a day, but GitHub starts this repo's crons **3–10 hours
+late**, so the cron times are not when cards arrive — they land somewhere between midday and
+evening. Every run that does start sends exactly one card. The card is picked from
+`sha256(date|kind)` and the run number, never the hour, so three runs on one day do not send
+the same kind of card twice — even when the gold or crypto card comes and goes with the
+network.
 
 The personal layer reads `TIENTRIVUTRU_BIRTH_DATE` (with optional `TIENTRIVUTRU_GENDER` and
 `TIENTRIVUTRU_NAME`) and lives only as a secret. The `pulse` job runs with
@@ -475,7 +468,7 @@ One đài issues **1,000,000 tickets × 10,000₫ = 10 billion in revenue**. The
 | 8th | last 2 | 10,000 | 100,000 | 1,000,000,000 |
 | | | | **Total** | **5,000,000,000** |
 
-Five billion out of ten. **The expected ROI on one ticket is −50.00%**, and that is not an
+Five billion out of ten. **The expected ROI on one ticket is −50.00%** (−52.60% after the 10% withholding on the special, consolation, first and second prizes), and that is not an
 estimate — it is addition. [`test_kienthiet_prizes.py`](tests/test_kienthiet_prizes.py) settles
 all **1,000,000 tickets** against a real board and requires the payout to come to exactly five
 billion.

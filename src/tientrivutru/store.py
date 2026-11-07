@@ -188,13 +188,6 @@ def write_ve_scoreboard(payload: dict) -> bool:
     return write_json_if_changed(ve_scoreboard_path(), payload)
 
 
-def read_ve_scoreboard() -> dict | None:
-    path = ve_scoreboard_path()
-    if not path.exists():
-        return None
-    return json.loads(path.read_text(encoding="utf-8"))
-
-
 def read_scoreboard() -> dict | None:
     path = scoreboard_path()
     if not path.exists():

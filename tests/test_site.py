@@ -60,6 +60,11 @@ def test_bundle_includes_chi_square_and_verdict():
     assert game["chi_square"]["degrees_of_freedom"] == POWER655.pool - 1
     assert 0.0 <= game["chi_square"]["p_value"] <= 1.0
     assert game["chi_square"]["verdict"]
+    # The page reads the game and kiến thiết chi-square through one renderer.
+    assert set(game["chi_square"]) == {
+        "statistic", "degrees_of_freedom", "p_value", "observations", "rejects_uniform",
+        "verdict",
+    }
 
 
 def test_frequency_covers_the_whole_pool():
@@ -289,6 +294,14 @@ def test_without_a_scraped_jackpot_the_table_falls_back_to_the_floor_and_says_so
     game = next(g for g in site.build_bundle()["games"] if g["key"] == "mega645")
     six = game["payout_if_hit"][6]
 
+    assert six["uses_live_jackpot"] is False
+    assert six["payout_vnd"] >= MEGA645.jackpot_floor["jackpot"]
+
+
+def test_jackpot_labels_from_another_games_page_are_refused_not_priced():
+    """Power's "Jackpot 2" has no meaning for Mega. Pricing it would invent a tier."""
+    power_page = {"jackpots": {"Jackpot 1": 99_000_000_000, "Jackpot 2": 5_000_000_000}}
+    six = site._payout_if_hit(MEGA645, power_page)[6]
     assert six["uses_live_jackpot"] is False
     assert six["payout_vnd"] >= MEGA645.jackpot_floor["jackpot"]
 

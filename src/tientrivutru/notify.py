@@ -161,7 +161,8 @@ def format_ve_prophecy(prophecies: Sequence[VeProphecy], score: VeScore | None =
         lines += [
             "",
             f"📉 Thành tích: {score.tickets:,} vé · ROI {score.roi * 100:.1f}% "
-            f"(lý thuyết {score.theoretical_roi * 100:.1f}%)",
+            f"(lý thuyết {score.theoretical_roi * 100:.1f}%, "
+            f"sau thuế {score.theoretical_roi_net * 100:.1f}%)",
         ]
     lines += ["", f"<i>{DISCLAIMER}</i>"]
     return "\n".join(lines)
@@ -189,7 +190,8 @@ def format_ve_result(rows: Sequence[VeScoreRow], score: VeScore | None = None) -
             f"📉 Cộng dồn: {score.tickets:,} vé · ROI {score.roi * 100:.1f}% · "
             f"bỏ ĐB &amp; phụ ĐB {score.roi_excluding_headline * 100:.1f}%",
             f"<i>Cơ cấu giải trả về đúng 50% doanh thu — ROI lý thuyết "
-            f"{score.theoretical_roi * 100:.1f}%.</i>",
+            f"{score.theoretical_roi * 100:.1f}%, sau thuế thu nhập "
+            f"{score.theoretical_roi_net * 100:.1f}%.</i>",
         ]
     lines += ["", f"<i>{DISCLAIMER}</i>"]
     return "\n".join(lines)

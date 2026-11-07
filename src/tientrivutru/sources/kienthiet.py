@@ -491,13 +491,6 @@ def chi_square_uniform(boards: Sequence[Board]) -> stats.ChiSquareResult:
     return stats.chi_square_counts(frequency(boards))
 
 
-def latest_board(boards: Sequence[Board], province: str | None = None) -> Board | None:
-    candidates = [b for b in boards if province is None or b.province == province]
-    if not candidates:
-        return None
-    return max(candidates, key=lambda b: b.date)
-
-
 SCHEDULE_WEEKS = 8
 """How much recent history the đài calendar is derived from.
 
