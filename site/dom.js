@@ -22,7 +22,18 @@ const vnd = (n) => (n || 0).toLocaleString('vi-VN') + 'đ';
 const billionsNum = (n) => (n / 1e9).toLocaleString('vi-VN', {maximumFractionDigits: 2});
 const billions = (n) => billionsNum(n) + ' tỷ';
 
-const pct = (n) => (n * 100).toFixed(2) + '%';
+/** vi-VN everywhere: "−86,63%", never "-86.63%" beside "9.240.000đ". The minus is U+2212. */
+const pctAt = (x, d) => (x * 100).toLocaleString('vi-VN', { minimumFractionDigits: d,
+                                                            maximumFractionDigits: d }) + '%';
+const signed = (x, d) => (x >= 0 ? '+' : '−') + pctAt(Math.abs(x), d);
+const pct = (x) => (x < 0 ? '−' : '') + pctAt(Math.abs(x), 2);
+const usd = (x) => '$' + x.toLocaleString('vi-VN', { minimumFractionDigits: 2,
+                                                      maximumFractionDigits: 2 });
+
+/** Today in Vietnam as YYYY-MM-DD. The UTC date is yesterday until 07:00 here. */
+const todayHcm = (now = new Date()) =>
+  new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }).format(now);
+
 const pad = (n) => String(n).padStart(2, '0');
 
 function el(tag, cls, html) {
@@ -75,6 +86,7 @@ function observeFlips() {
 }
 
 window.TienTriVuTruDom = {
-  tw, vnd, billionsNum, billions, pct, pad, el, stage, observeReveals, observeFlips,
+  tw, vnd, billionsNum, billions, pct, pctAt, signed, usd, todayHcm, pad, el, stage,
+  observeReveals, observeFlips,
 };
 })();

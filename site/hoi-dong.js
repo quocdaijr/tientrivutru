@@ -256,13 +256,7 @@ async function fetchBars(asset, since) {
 
 /* ============================ the page ============================ */
 
-const { el, tw } = window.TienTriVuTruDom || {};
-
-const pctAt = (x, d) => (x * 100).toLocaleString('vi-VN', { minimumFractionDigits: d,
-                                                            maximumFractionDigits: d }) + '%';
-const signed = (x, d) => (x >= 0 ? '+' : '−') + pctAt(Math.abs(x), d);
-const usd = (x) => '$' + x.toLocaleString('vi-VN', { minimumFractionDigits: 2,
-                                                      maximumFractionDigits: 2 });
+const { el, tw, pctAt, signed, usd } = window.TienTriVuTruDom || {};
 
 const STATUS_WORDS = {
   review: 'đọc không ra bậc (REVIEW)',

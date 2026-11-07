@@ -294,16 +294,31 @@ function personalProphecy(profile, fortune, game, drawId, drawDate) {
 
 /* ---------- storage: profile + committed picks, all local ---------- */
 
+/* What the visitor last saved or cleared on this visit. Browsers that block site data throw
+   on every write, and the fortune must still read for the visit even if it can't be kept. */
+let visitProfile;
+
+/** Swallows the SecurityError a blocked browser throws; returns whether the write landed. */
+function tryStore(write) {
+  try { write(); return true; }
+  catch { return false; }
+}
+
 function loadProfile() {
+  if (visitProfile !== undefined) return visitProfile;
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); }
   catch { return null; }
 }
 function saveProfile(profile) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+  visitProfile = profile;
+  return tryStore(() => localStorage.setItem(STORAGE_KEY, JSON.stringify(profile)));
 }
 function clearAll() {
-  localStorage.removeItem(STORAGE_KEY);
-  localStorage.removeItem(PICKS_KEY);
+  visitProfile = null;
+  return tryStore(() => {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(PICKS_KEY);
+  });
 }
 function loadPicks() {
   try { return JSON.parse(localStorage.getItem(PICKS_KEY) || '{}'); }
@@ -314,7 +329,7 @@ function savePick(pick) {
   const key = `${pick.game}:${pick.drawId}`;
   if (!picks[key]) {            // append-only, same rule as the house oracle
     picks[key] = { numbers: pick.numbers, drawDate: pick.drawDate };
-    localStorage.setItem(PICKS_KEY, JSON.stringify(picks));
+    tryStore(() => localStorage.setItem(PICKS_KEY, JSON.stringify(picks)));
   }
   return picks[key];
 }
