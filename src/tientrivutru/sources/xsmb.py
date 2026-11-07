@@ -130,23 +130,10 @@ def frequency(draws: Sequence[XsmbDraw]) -> Mapping[int, int]:
 
 
 def chi_square_uniform(draws: Sequence[XsmbDraw]) -> stats.ChiSquareResult:
-    """Test H0: all 100 two-digit values are equally likely.
-
-    Reuses the incomplete-gamma implementation in `stats` rather than duplicating it.
-    """
+    """Test H0: all 100 two-digit values are equally likely."""
     if not draws:
         raise ValueError("cannot test uniformity with no draws")
-    counts = frequency(draws)
-    observations = sum(counts.values())
-    expected = observations / DIGIT_SPACE
-    statistic = sum((count - expected) ** 2 / expected for count in counts.values())
-    df = DIGIT_SPACE - 1
-    return stats.ChiSquareResult(
-        statistic=statistic,
-        degrees_of_freedom=df,
-        p_value=stats.chi_square_sf(statistic, df),
-        observations=observations,
-    )
+    return stats.chi_square_counts(frequency(draws))
 
 
 def latest_special(draws: Sequence[XsmbDraw]) -> int | None:

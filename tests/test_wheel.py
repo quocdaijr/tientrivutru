@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from fractions import Fraction
+from itertools import combinations
 from math import comb, isclose
 
 import pytest
@@ -104,8 +106,38 @@ def test_expected_roi_reference_values():
     """Pins the headline numbers so a refactor cannot quietly flatter the odds."""
     assert wheel.expected_roi(MEGA645) == pytest.approx(-0.7157, abs=5e-4)
     assert wheel.expected_roi(MEGA645, include_jackpot=False) == pytest.approx(-0.8630, abs=5e-4)
-    assert wheel.expected_roi(POWER655) == pytest.approx(-0.7620, abs=5e-4)
-    assert wheel.expected_roi(POWER655, include_jackpot=False) == pytest.approx(-0.8655, abs=5e-4)
+    # Power 6/55 counts the bonus landing in the wheel (Jackpot 2). Without it the
+    # code once printed -76.20%, understating the payout by six points.
+    assert wheel.expected_roi(POWER655) == pytest.approx(-0.70071, abs=5e-5)
+    assert wheel.expected_roi(POWER655, include_jackpot=False) == pytest.approx(-0.86628, abs=5e-5)
+
+
+def test_power655_expected_payout_matches_ticket_by_ticket_enumeration():
+    """Independent check: price all 924 tickets against one representative draw per
+    (k, bonus in wheel or not), weighted by how many (draw, bonus) pairs share it."""
+    numbers = list(range(1, WHEEL_SIZE + 1))
+    values = {**POWER655.jackpot_floor, **POWER655.prizes}
+    remaining = POWER655.pool - POWER655.pick
+    outcomes = comb(POWER655.pool, POWER655.pick) * remaining
+    tickets = [set(t) for t in combinations(numbers, POWER655.pick)]
+
+    def ticket_value(ticket, main, bonus):
+        tier = {6: "jackpot1", 4: "second", 3: "third"}.get(len(ticket & main))
+        if len(ticket & main) == 5:
+            tier = "jackpot2" if bonus in ticket else "first"
+        return values.get(tier, 0)
+
+    total = Fraction(0)
+    for k in range(POWER655.pick + 1):
+        main = set(numbers[:k]) | set(range(100, 100 + POWER655.pick - k))
+        draws = comb(WHEEL_SIZE, k) * comb(POWER655.pool - WHEEL_SIZE, POWER655.pick - k)
+        bonus_in_wheel = WHEEL_SIZE - k
+        for bonus, ways in ((numbers[-1], bonus_in_wheel), (999, remaining - bonus_in_wheel)):
+            if ways:
+                won = sum(ticket_value(t, main, bonus) for t in tickets)
+                total += Fraction(draws * ways * won, outcomes)
+
+    assert wheel.expected_payout_vnd(POWER655) == pytest.approx(float(total), rel=1e-12)
 
 
 def test_jackpot_probability_matches_combinatorics():

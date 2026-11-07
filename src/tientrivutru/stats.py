@@ -109,21 +109,28 @@ def gaps_since_last(draws: Sequence[Draw], spec: GameSpec) -> Mapping[int, int]:
     )
 
 
-def chi_square_uniform(draws: Sequence[Draw], spec: GameSpec) -> ChiSquareResult:
-    """Test H0: every number in the pool is equally likely."""
-    if not draws:
-        raise ValueError("cannot test uniformity with no draws")
-    counts = frequency(draws, spec)
-    observations = len(draws) * spec.pick
-    expected = observations / spec.pool
+def chi_square_counts(counts: Mapping[int, int]) -> ChiSquareResult:
+    """Test H0: every key in `counts` is equally likely. One cell per possible value,
+    zeros included - a value never seen is evidence too."""
+    observations = sum(counts.values())
+    if not observations:
+        raise ValueError("cannot test uniformity with no observations")
+    expected = observations / len(counts)
     statistic = sum((count - expected) ** 2 / expected for count in counts.values())
-    df = spec.pool - 1
+    df = len(counts) - 1
     return ChiSquareResult(
         statistic=statistic,
         degrees_of_freedom=df,
         p_value=chi_square_sf(statistic, df),
         observations=observations,
     )
+
+
+def chi_square_uniform(draws: Sequence[Draw], spec: GameSpec) -> ChiSquareResult:
+    """Test H0: every number in the pool is equally likely."""
+    if not draws:
+        raise ValueError("cannot test uniformity with no draws")
+    return chi_square_counts(frequency(draws, spec))
 
 
 def verdict(result: ChiSquareResult) -> str:
@@ -136,7 +143,7 @@ def verdict(result: ChiSquareResult) -> str:
         )
     return (
         f"p = {result.p_value:.4f} > 0.05. Không có số nào nóng. Không có số nào lạnh. "
-        "Toàn bộ ngành thống kê vừa nhìn anh và lắc đầu."
+        "Toàn bộ ngành thống kê vừa nhìn bạn và lắc đầu."
     )
 
 

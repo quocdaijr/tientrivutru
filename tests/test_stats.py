@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 import random
 
 import pytest
@@ -107,3 +108,35 @@ def test_hottest_and_coldest_are_complementary():
     assert [n for n, _ in hot] == [1, 2, 3]
     assert all(count == 10 for _, count in hot)
     assert all(count == 0 for _, count in cold)
+
+
+def test_chi_square_counts_pins_the_shared_arithmetic():
+    """Exact values, so the one shared body cannot drift from what three copies computed."""
+    result = stats.chi_square_counts({0: 10, 1: 20, 2: 30})
+
+    assert (result.statistic, result.degrees_of_freedom, result.observations) == (10.0, 2, 60)
+    assert result.p_value == pytest.approx(math.exp(-5), rel=1e-12)
+
+
+def test_chi_square_counts_rejects_empty_counts():
+    with pytest.raises(ValueError):
+        stats.chi_square_counts({0: 0, 1: 0})
+
+
+def test_chi_square_uniform_is_the_shared_test():
+    rng = random.Random(SEED)
+    draws = [random_draw(MEGA645, i, rng) for i in range(1, 40)]
+    assert stats.chi_square_uniform(draws, MEGA645) == stats.chi_square_counts(
+        stats.frequency(draws, MEGA645)
+    )
+
+
+@pytest.mark.parametrize("p_value", [0.001, 0.5])
+def test_verdict_speaks_to_ban_never_anh(p_value):
+    """CONTEXT.md: the statistics zone addresses the reader as "bạn". "anh" is the voice
+    of a chat between the writer and the repo owner, not of the project."""
+    text = stats.verdict(stats.ChiSquareResult(1.0, 1, p_value, 10))
+    words = text.lower().replace(".", " ").replace(",", " ").split()
+
+    assert "anh" not in words
+    assert "chị" not in words

@@ -123,13 +123,21 @@ def hit_probability(spec: GameSpec, k: int, wheel: int = WHEEL_SIZE) -> float:
 def expected_payout_vnd(
     spec: GameSpec, *, wheel: int = WHEEL_SIZE, include_jackpot: bool = True
 ) -> float:
-    """Expected winnings per draw for a wheel bet - the honest number."""
+    """Expected winnings per draw for a wheel bet - the honest number.
+
+    With a same-pool bonus, given k main hits the bonus is uniform over the
+    pool - pick numbers left, wheel - k of which sit in the wheel.
+    """
     total = 0.0
     for k in range(spec.pick + 1):
-        counts = dict(prize_counts(spec, k, bonus_hit=False, wheel=wheel))
-        if not include_jackpot:
-            counts = {t: n for t, n in counts.items() if t in FIXED_TIERS}
-        total += hit_probability(spec, k, wheel) * payout_vnd(spec, counts)
+        p_bonus = (wheel - k) / (spec.pool - spec.pick) if spec.bonus_shares_main_pool else 0.0
+        for bonus_hit, p in ((False, 1.0 - p_bonus), (True, p_bonus)):
+            if not p:
+                continue
+            counts = dict(prize_counts(spec, k, bonus_hit=bonus_hit, wheel=wheel))
+            if not include_jackpot:
+                counts = {t: n for t, n in counts.items() if t in FIXED_TIERS}
+            total += hit_probability(spec, k, wheel) * p * payout_vnd(spec, counts)
     return total
 
 

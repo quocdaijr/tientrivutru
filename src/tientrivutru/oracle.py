@@ -21,8 +21,9 @@ from .games import WHEEL_SIZE, GameSpec
 from .models import Draw, Prophecy, normalise_draw_id, utc_now
 from .sources.vibes import CosmicSignals
 
-ORACLE_VERSION = "1.3.0"
-"""1.1.0 added the XSMB signal; 1.2.0 fixed the digit-root rule; 1.3.0 changed the voice.
+ORACLE_VERSION = "1.4.0"
+"""1.1.0 added the XSMB signal; 1.2.0 fixed the digit-root rule; 1.3.0 changed the voice;
+1.4.0 put the karma draw into the seed.
 
 The version is part of the seed, so changing signals or weights changes every future
 prophecy. Prophecies already committed keep the version that produced them, and the
@@ -72,8 +73,20 @@ class CursedField:
     reasons: Mapping[int, tuple[str, ...]]
 
 
+def karma_draw(history: Sequence[Draw]) -> Draw | None:
+    """The one past draw karma reads: the latest, and only if it has a bonus to punish."""
+    if not history:
+        return None
+    latest = max(history, key=lambda d: d.draw_id)
+    return latest if latest.bonus is not None else None
+
+
 def make_seed(
-    spec: GameSpec, draw_id: str, draw_date: date, signals: CosmicSignals
+    spec: GameSpec,
+    draw_id: str,
+    draw_date: date,
+    signals: CosmicSignals,
+    karma: Draw | None,
 ) -> str:
     """The audit trail. Same inputs in, same hex digest out, forever."""
     canonical = "|".join(
@@ -83,6 +96,7 @@ def make_seed(
             normalise_draw_id(draw_id),
             draw_date.isoformat(),
             signals.canonical(),
+            f"karma={karma.draw_id}:{karma.bonus}" if karma else "karma=-",
         )
     )
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
@@ -152,13 +166,12 @@ def cursed_weights(
             f"Giải đặc biệt hôm qua về {signals.xsmb_special:02d}. Thầy quy nó về đây cho con.",
         )
 
-    if history:
-        latest = max(history, key=lambda d: d.draw_id)
-        if latest.bonus is not None and latest.bonus in weights:
-            weights[latest.bonus] *= PENALTY_KARMA
-            reasons[latest.bonus].append(
-                f"Số này vừa làm phụ kỳ #{latest.draw_id}, trả nghiệp xong rồi. Cho nó nghỉ."
-            )
+    karma = karma_draw(history)
+    if karma is not None and karma.bonus in weights:
+        weights[karma.bonus] *= PENALTY_KARMA
+        reasons[karma.bonus].append(
+            f"Số này vừa làm phụ kỳ #{karma.draw_id}, trả nghiệp xong rồi. Cho nó nghỉ."
+        )
 
     if any(w <= 0 for w in weights.values()):
         raise AssertionError("cursed weights must stay positive so every number keeps a chance")
@@ -242,7 +255,7 @@ def prophesy(
     wheel: int = WHEEL_SIZE,
 ) -> Prophecy:
     """Commit to `wheel` numbers for one specific unfinished draw."""
-    seed = make_seed(spec, draw_id, draw_date, signals)
+    seed = make_seed(spec, draw_id, draw_date, signals, karma_draw(history))
     field = cursed_weights(spec, signals, history)
 
     rng = random.Random(int(seed[:SEED_BITS], 16))
