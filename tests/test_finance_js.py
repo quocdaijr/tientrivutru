@@ -390,3 +390,54 @@ def test_no_finance_data_is_committed():
     root = SITE.parent
     assert not (SITE / "finance.json").exists()
     assert not (root / "data" / "finance.jsonl").exists()
+
+
+# --- third-party strings never reach innerHTML as markup ----------------------------
+# Every block is built with dom.js `el()`, which sets innerHTML. The page shares its origin
+# with the lottery page, whose localStorage holds the visitor's birth date and name, so a
+# string an upstream API controls must be checked before it is printed.
+
+EVIL = "<img src=x onerror=alert(1)>"
+
+
+@pytest.mark.parametrize(
+    ("parser", "payload"),
+    [
+        ("parseXau", {**XAU, "updatedAt": EVIL}),
+        ("parseIndices", {"data": [{**INDICES["data"][0], "lastUpdated": EVIL}]}),
+        ("parseForeign", {"data": [{**FOREIGN["data"][0], "tradingDate": EVIL}]}),
+    ],
+)
+def test_a_timestamp_that_is_not_a_timestamp_is_refused(parser, payload):
+    got = _run(
+        f"try {{ F.{parser}({json.dumps(payload)}); console.log('null'); }}"
+        " catch (e) { console.log(JSON.stringify(e.message)); }"
+    )
+    assert got is not None, "the parser accepted markup as a timestamp"
+    assert "<" not in got
+
+
+def test_foreign_drops_a_ticker_the_page_did_not_ask_for():
+    payload = {"data": [*FOREIGN["data"], {**FOREIGN["data"][0], "code": EVIL}]}
+    got = _run(f"console.log(JSON.stringify(F.parseForeign({json.dumps(payload)}).rows));")
+    assert [r["code"] for r in got] == ["FPT", "VNM", "HPG"]
+
+
+def test_a_non_numeric_price_is_not_echoed_into_the_error():
+    payload = {**XAU, "price": EVIL}
+    got = _run(
+        f"try {{ F.parseXau({json.dumps(payload)}); }}"
+        " catch (e) { console.log(JSON.stringify(e.message)); }"
+    )
+    assert "<" not in got
+
+
+def test_an_error_message_is_escaped_before_it_is_printed():
+    """A JSON parse error quotes the response body, so error text is escaped in one place."""
+    got = _run(
+        "global.fetch = async () => ({ ok: true, json: async () => ({}) });"
+        "F.settle('xau', () => { throw new Error('Unexpected token <html>'); })"
+        ".then((r) => console.log(JSON.stringify(r.error)));"
+    )
+    assert "<" not in got
+    assert got.startswith("Unexpected token &#60;html")
