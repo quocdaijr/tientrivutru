@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-11-12T10:38:18+00:00",
+  "generated_at": "2026-11-13T10:30:27+00:00",
   "disclaimer": "Paper trading, moi ky mot ve. Co cau giai tra ve dung 50% doanh thu, nen ROI ky vong la -50% (-52,6% sau thue thu nhap). Con so thuc te lech nhieu vi giai dac biet chiem 40% quy giai va rat lau moi ve mot lan.",
   "per_region": {
     "all": {
       "region": null,
       "display": "Kiến thiết",
-      "tickets": 427,
-      "paper_burned_vnd": 4270000,
-      "paper_won_vnd": 500000,
-      "roi": -0.882903981264637,
-      "paper_won_excluding_headline_vnd": 500000,
-      "roi_excluding_headline": -0.882903981264637,
+      "tickets": 430,
+      "paper_burned_vnd": 4300000,
+      "paper_won_vnd": 600000,
+      "roi": -0.8604651162790697,
+      "paper_won_excluding_headline_vnd": 600000,
+      "roi_excluding_headline": -0.8604651162790697,
       "theoretical_roi": -0.5,
       "theoretical_roi_net": -0.526,
       "theoretical_roi_excluding_headline": -0.745,
       "prize_counts_total": {
-        "g8": 3,
+        "g8": 4,
         "g7": 1
       },
-      "winning_tickets": 4,
+      "winning_tickets": 5,
       "best": {
         "draw_date": "2026-10-03",
         "province": "long-an",
@@ -36,19 +36,20 @@
     "mn": {
       "region": "mn",
       "display": "Miền Nam",
-      "tickets": 236,
-      "paper_burned_vnd": 2360000,
-      "paper_won_vnd": 200000,
-      "roi": -0.9152542372881356,
-      "paper_won_excluding_headline_vnd": 200000,
-      "roi_excluding_headline": -0.9152542372881356,
+      "tickets": 239,
+      "paper_burned_vnd": 2390000,
+      "paper_won_vnd": 300000,
+      "roi": -0.8744769874476988,
+      "paper_won_excluding_headline_vnd": 300000,
+      "roi_excluding_headline": -0.8744769874476988,
       "theoretical_roi": -0.5,
       "theoretical_roi_net": -0.526,
       "theoretical_roi_excluding_headline": -0.745,
       "prize_counts_total": {
-        "g7": 1
+        "g7": 1,
+        "g8": 1
       },
-      "winning_tickets": 1,
+      "winning_tickets": 2,
       "best": {
         "draw_date": "2026-10-03",
         "province": "long-an",
