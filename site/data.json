@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-14T09:48:22+00:00",
+ "generated_at": "2026-11-14T16:41:26+00:00",
  "disclaimer": "Xổ số là biến cố độc lập. Mỗi kỳ quay reset về 0. Không có số nóng, không có số lạnh. Phần mềm này không dự đoán được gì — nó chỉ tự tin quá mức và tự chấm điểm độ sai của chính mình. Bảng Phong Thần là paper-trading: tiền đốt trên giấy.",
  "games": [
   {
@@ -2745,6 +2745,14 @@
     "asset": "BTC-USD",
     "trade_date": "2026-11-13",
     "committed_at": "2026-11-13T17:57:53+00:00",
+    "status": "ok",
+    "rating": "Underweight",
+    "memory": true
+   },
+   {
+    "asset": "BTC-USD",
+    "trade_date": "2026-11-14",
+    "committed_at": "2026-11-14T16:41:24+00:00",
     "status": "ok",
     "rating": "Underweight",
     "memory": true
