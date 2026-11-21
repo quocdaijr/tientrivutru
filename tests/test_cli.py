@@ -642,7 +642,7 @@ def test_council_refuses_without_its_settings(monkeypatch, capsys):
 def test_council_sits_on_what_is_due_and_records_the_cap(monkeypatch):
     code, calls = _council(monkeypatch, COUNCIL_ENV)   # a Wednesday
     assert code == 0
-    assert calls == ["BTC-USD", "FPT.VN", "VNM.VN", "VCB.VN"]
+    assert calls == ["BTC-USD", "GC=F", "^VNINDEX", "FPT.VN", "VNM.VN", "VCB.VN"]
     rows = store.read_verdicts()
     assert {r.asset for r in rows} == set(calls)
     assert all(r.usage["cap_usd"] == 5.0 for r in rows)
@@ -653,8 +653,8 @@ def test_council_writes_a_skip_rather_than_going_quiet(monkeypatch):
     page must be able to say so, so the stop is a row, not an absence."""
     code, calls = _council(monkeypatch, COUNCIL_ENV, cost=2.0)
     rows = {r.asset: r for r in store.read_verdicts()}
-    assert calls == ["BTC-USD", "FPT.VN"]
-    assert rows["VNM.VN"].status == "skipped_budget" and rows["VCB.VN"].status == "skipped_budget"
+    assert calls == ["BTC-USD", "GC=F"]
+    assert rows["^VNINDEX"].status == "skipped_budget" and rows["FPT.VN"].status == "skipped_budget"
     assert code == 0
 
 
@@ -670,7 +670,7 @@ def test_council_on_the_free_tier_never_skips_for_money(monkeypatch):
     monkeypatch.setenv("HOI_DONG_BILLING", "free")
     code, calls = _council(monkeypatch, env, cost=0.0)
     assert code == 0
-    assert calls == ["BTC-USD", "FPT.VN", "VNM.VN", "VCB.VN"]
+    assert calls == ["BTC-USD", "GC=F", "^VNINDEX", "FPT.VN", "VNM.VN", "VCB.VN"]
     assert all("cap_usd" not in r.usage for r in store.read_verdicts())
 
 
@@ -681,7 +681,7 @@ def test_a_dry_run_sits_but_writes_nothing(monkeypatch, capsys):
     before = store.read_verdicts()
     code, calls = _council(monkeypatch, COUNCIL_ENV, sittings=[], argv=["--dry-run"])
     assert code == 0
-    assert calls == ["BTC-USD", "FPT.VN", "VNM.VN", "VCB.VN"], "already sat today, sits anyway"
+    assert calls == ["BTC-USD", "GC=F", "^VNINDEX", "FPT.VN", "VNM.VN", "VCB.VN"], "already sat today, sits anyway"
     assert store.read_verdicts() == before
     assert "dry-run" in capsys.readouterr().out
 
@@ -697,7 +697,7 @@ def test_a_recorded_sitting_remembers(monkeypatch, tmp_path):
     memory = tmp_path / "memory" / "trading_memory.md"
     code, _ = _council(monkeypatch, {**COUNCIL_ENV, "HOI_DONG_MEMORY_PATH": str(memory)})
     assert code == 0
-    assert memory.read_text().count("pending") == 4
+    assert memory.read_text().count("pending") == 6
 
 
 def test_a_dry_run_reads_the_memory_but_never_changes_it(monkeypatch, tmp_path):
