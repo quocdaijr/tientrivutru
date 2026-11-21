@@ -681,7 +681,8 @@ def test_a_dry_run_sits_but_writes_nothing(monkeypatch, capsys):
     before = store.read_verdicts()
     code, calls = _council(monkeypatch, COUNCIL_ENV, sittings=[], argv=["--dry-run"])
     assert code == 0
-    assert calls == ["BTC-USD", "GC=F", "^VNINDEX", "FPT.VN", "VNM.VN", "VCB.VN"], "already sat today, sits anyway"
+    all_assets = ["BTC-USD", "GC=F", "^VNINDEX", "FPT.VN", "VNM.VN", "VCB.VN"]
+    assert calls == all_assets, "already sat today, sits anyway"
     assert store.read_verdicts() == before
     assert "dry-run" in capsys.readouterr().out
 

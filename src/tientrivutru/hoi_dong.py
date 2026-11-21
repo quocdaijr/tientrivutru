@@ -78,7 +78,7 @@ ASSETS: Mapping[str, Asset] = {
     a.key: a
     for a in (
         Asset("BTC-USD", "crypto", "UTC"),
-        Asset("GC=F",   "crypto", "America/New_York"),   # gold futures; trades ~23h/day, no weekend skip
+        Asset("GC=F", "crypto", "America/New_York"),  # gold futures; no weekend skip
         Asset("^VNINDEX", "vn_stock", "Asia/Ho_Chi_Minh"),
         Asset("FPT.VN", "vn_stock", "Asia/Ho_Chi_Minh"),
         Asset("VNM.VN", "vn_stock", "Asia/Ho_Chi_Minh"),
