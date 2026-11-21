@@ -943,3 +943,4 @@
 {"game": "megamillions", "draw_id": "00943", "date": "2026-11-10", "main": [2, 18, 25, 30, 65], "bonus": 22, "source": "mirror:jbaranski/jeffs-lottery-utils"}
 {"game": "megamillions", "draw_id": "00944", "date": "2026-11-13", "main": [10, 22, 33, 49, 57], "bonus": 18, "source": "mirror:jbaranski/jeffs-lottery-utils"}
 {"game": "megamillions", "draw_id": "00945", "date": "2026-11-17", "main": [3, 10, 19, 28, 33], "bonus": 21, "source": "mirror:jbaranski/jeffs-lottery-utils"}
+{"game": "megamillions", "draw_id": "00946", "date": "2026-11-20", "main": [32, 35, 48, 58, 61], "bonus": 21, "source": "mirror:jbaranski/jeffs-lottery-utils"}
